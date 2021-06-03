@@ -60,7 +60,7 @@ class Discriminator(nn.Module):
 
         return validity
 
- class GAN(pl.LightningModule):
+class GAN(pl.LightningModule):
 
     def __init__(
         self,
