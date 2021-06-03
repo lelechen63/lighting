@@ -12,7 +12,7 @@ from torch.utils.data import DataLoader, random_split
 from torchvision.datasets import MNIST
 
 import pytorch_lightning as pl
-import data
+from data import MNISTDataModule
 
 class Generator(nn.Module):
     def __init__(self, latent_dim, img_shape):
