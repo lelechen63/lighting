@@ -13,7 +13,7 @@ import pytorch_lightning as pl
 from PIL import Image
 
 class FacescapeDataModule(pl.LightningDataModule):
-    def __init__(self, opt)    data_dir: str = './', batch_size: int = 64, num_workers: int = 8):
+    def __init__(self, opt):
         super().__init__()
         self.batch_size = opt.batchSize
         self.num_workers = int(opt.nThreads)
