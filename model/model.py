@@ -215,7 +215,7 @@ class TexMeshGenerator(nn.Module):
         self.texmeshEnc = TexMeshEncoder(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
                 ngf, n_downsampling, n_blocks, norm_layer, padding_type)
 
-        self.texmeshDec = TexMeshDec(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+        self.texmeshDec = TexMeshDecoder(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
                 ngf, n_downsampling, n_blocks, norm_layer, padding_type)
     def forward(self, A_tex, A_mesh, B_tex, B_mesh):
         A_id_code, A_exp_code = self.texmeshEnc(A_tex, A_mesh)
