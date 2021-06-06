@@ -356,7 +356,7 @@ class TexMeshModule(pl.LightningModule):
 
         #mesh loss
         loss_mesh = 0
-        if not self.no_mesh_loss:
+        if not self.opt.no_mesh_loss:
             loss_mesh += self.l1loss(rec_mesh_A, batch['Amesh'])* self.opt.lambda_mesh
             loss_mesh += self.l1loss(rec_mesh_B, batch['Bmesh'])* self.opt.lambda_mesh
             # mismatch loss
