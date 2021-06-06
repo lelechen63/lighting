@@ -208,7 +208,7 @@ class TexMeshDecoder(nn.Module):
         rec_mesh = self.mesh_fc_dec(feature)
 
         tex_dec = self.tex_fc_dec(feature)
-        tex_dec = tex_dec.unsqueeze(2).unsqueeze(3).repeat(1, 1, int(self.tex_shape / 128),int(self.tex_shape / 128)) # not sure 
+        # tex_dec = tex_dec.unsqueeze(2).unsqueeze(3).repeat(1, 1, int(self.tex_shape / 128),int(self.tex_shape / 128)) # not sure 
         
         tex_dec = tex_dec.view(tex_dec.shape[0], -1, 4,4) # not sure 
 
