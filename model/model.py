@@ -442,14 +442,6 @@ class TexMeshModule(pl.LightningModule):
             self.CLSloss = lossNet.CLSLoss(opt)
 
         self.visualizer = Visualizer(opt)
-        self.save_dir = os.path.join(opt.checkpoints_dir, opt.name)
-
-    def save_network(self, network, network_label, epoch_label):
-        save_filename = '%s_net_%s.pth' % (epoch_label, network_label)
-        save_path = os.path.join(self.save_dir, save_filename)
-        # torch.save(network.state_dict(), save_path)
-
-        trainer.save_checkpoint(save_path)
 
         # if len(gpu_ids) and torch.cuda.is_available():
         #     network.cuda()
