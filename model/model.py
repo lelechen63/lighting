@@ -546,5 +546,5 @@ class TexMeshModule(pl.LightningModule):
                 ])
             self.visualizer.display_current_results(visuals, self.current_epoch, 1000000) 
 
-        if self.current_epoch % 10 == 0:
-            self.save_network(self.generator, 'texmeshED', self.current_epoch )
+        # if self.current_epoch % 10 == 0:
+        #     self.save_network(self.generator, 'texmeshED', self.current_epoch )
