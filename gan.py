@@ -12,7 +12,7 @@ from torch.utils.data import DataLoader, random_split
 from torchvision.datasets import MNIST
 
 import pytorch_lightning as pl
-from data import FacescapeDataModule
+from data.data import FacescapeDataModule
 from options.step1_train_options import TrainOptions
 
 class Generator(nn.Module):
