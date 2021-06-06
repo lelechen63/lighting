@@ -289,8 +289,8 @@ class TexMeshModule(pl.LightningModule):
                         loss_G_VGG += self.VGGloss(rec_tex_BA[i].unsqueeze(0), batch['Btex'][i].unsqueeze(0)) * self.opt.lambda_feat* self.opt.lambda_mismatch
             # reconstruction loss
             
-            loss_G_VGG += self.criterionVGG(rec_tex_A, batch['Atex']) * self.opt.lambda_feat
-            loss_G_VGG +=  self.criterionVGG(rec_tex_B, batch['Btex']) * self.opt.lambda_feat
+            loss_G_VGG += self.VGGloss(rec_tex_A, batch['Atex']) * self.opt.lambda_feat
+            loss_G_VGG +=  self.VGGloss(rec_tex_B, batch['Btex']) * self.opt.lambda_feat
         
         # CLS loss
         loss_G_CLS = 0
