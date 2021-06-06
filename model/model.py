@@ -290,7 +290,7 @@ class MisMatchTexMeshModule(pl.LightningModule):
         # self.logger.experiment.add_image('generated_images', grid, 0)
 
          ### display output images
-        save_fake = True
+        save_fake = False
         # save_fake = batch_idx % opt.display_freq 
         if save_fake:
             Atex = util.tensor2im(batch['Atex'][0])
@@ -534,21 +534,22 @@ class TexMeshModule(pl.LightningModule):
         return [opt_g], []
 
     def on_epoch_end(self):
-        batch = self.batch
-        rec_tex_A, rec_mesh_A = \
-        self(batch['Atex'], batch['Amesh'],batch['Btex'],batch['Bmesh'])
+        if self.current_epoch % 10 == 0:
+            batch = self.batch
+            rec_tex_A, rec_mesh_A = \
+            self(batch['Atex'], batch['Amesh'],batch['Btex'],batch['Bmesh'])
 
-        Atex = util.tensor2im(batch['Atex'][0])
-        Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
-        Atex = util.writeText(Atex, batch['A_path'][0])
+            Atex = util.tensor2im(batch['Atex'][0])
+            Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
+            Atex = util.writeText(Atex, batch['A_path'][0])
+            
         
-       
-        visuals = OrderedDict([
-            ('Atex', Atex),
-            ('rec_tex_A', util.tensor2im(rec_tex_A.data[0]))
-           
-            ])
-        self.visualizer.display_current_results(visuals, self.current_epoch, 1000000) 
+            visuals = OrderedDict([
+                ('Atex', Atex),
+                ('rec_tex_A', util.tensor2im(rec_tex_A.data[0]))
+            
+                ])
+            self.visualizer.display_current_results(visuals, self.current_epoch, 1000000) 
 
         if self.current_epoch % 10 == 0:
             self.save_network(self.generator, 'texmeshED', self.current_epoch )
