@@ -11,7 +11,7 @@ from model import lossNet
 import torchvision
 from collections import OrderedDict
 import util.util as util
-
+import os
 from util.visualizer import Visualizer
 # import pickle
 # pickle.dump(some_object)
