@@ -172,8 +172,8 @@ class GAN(pl.LightningModule):
         self.logger.experiment.add_image('generated_images', grid, self.current_epoch)
 
 opt = TrainOptions().parse()
-opt.datasetname = fs_texmesh
-opt.name = texmesh_step1 
+opt.datasetname = "fs_texmesh"
+opt.name = "texmesh_step1" 
 dm = FacescapeDataModule(opt)
 model = GAN(3,256,256)
 trainer = pl.Trainer(gpus=1, max_epochs=5, progress_bar_refresh_rate=20)
