@@ -14,7 +14,7 @@ from torchvision.datasets import MNIST
 import pytorch_lightning as pl
 from data.data import FacescapeDataModule
 from options.step1_train_options import TrainOptions
-from model import GAN
+from model.model import GAN
 
 
 opt = TrainOptions().parse()
