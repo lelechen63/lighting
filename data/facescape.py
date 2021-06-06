@@ -202,8 +202,9 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         self.exp_set = get_exp()
         print ('===========================')
         print ('id_set:',self.id_set)
-        print ('0' in self.id_set)
+    
         print('+++++++++++++++++++++++++++')
+
         print ('exp_set:',self.exp_set)
 
         print ('===========================')
@@ -289,8 +290,8 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
                 
                 # tex
                 # DEBUG!!
-                tex_index = self.data_list[index]
-                # tex_index = os.path.join( B_id , 'models_reg', B_exp  )   
+                # tex_index = self.data_list[index]
+                tex_index = os.path.join( B_id , 'models_reg', B_exp  )   
                 # tex_path = os.path.join( self.dir_tex , B_id, B_exp + '.png')
                 # # tex_path = '/raid/celong/FaceScape/texture_mapping/target/1/9_mouth_right.png'
                 # # mesh 
