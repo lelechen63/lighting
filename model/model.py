@@ -9,6 +9,7 @@ from torch.autograd import Variable
 from .blocks import LinearBlock, Conv2dBlock, ResBlocks, ActFirstResBlock, ResnetBlock
 from model import lossNet
 import torchvision
+from collections import OrderedDict
 
 # import pickle
 # pickle.dump(some_object)
