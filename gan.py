@@ -96,7 +96,7 @@ class GAN(pl.LightningModule):
     def training_step(self, batch, batch_idx, optimizer_idx):
 
         # imgs, _ = batch
-        imgs = data['Atex']
+        imgs = batch['Atex']
         # sample noise
         z = torch.randn(imgs.shape[0], self.hparams.latent_dim)
         z = z.type_as(imgs)
