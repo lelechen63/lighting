@@ -154,7 +154,7 @@ def get_paired_texmesh_pickle():
     # ids = ids[:300]
     # print(ids)
     for i in range(300):
-        ids.append(str(i))
+        ids.append(str(i + 1))
     with open('/raid/celong/FaceScape/lists/ids.pkl', 'wb') as handle:
         pickle.dump(ids, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
@@ -175,6 +175,8 @@ def gettexmesh_pid_expid():
     exp = sorted(exp)
     print(exp)
     print(pid)
+    with open('/raid/celong/FaceScape/lists/ids.pkl', 'wb') as handle:
+        pickle.dump(pid, handle, protocol=pickle.HIGHEST_PROTOCOL)
 gettexmesh_pid_expid()
 
 # get_paired_texmesh_pickle()
