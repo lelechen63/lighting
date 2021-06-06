@@ -449,7 +449,7 @@ class TexMeshModule(pl.LightningModule):
         save_path = os.path.join(self.save_dir, save_filename)
         # torch.save(network.state_dict(), save_path)
 
-        self.save_checkpoint(save_path)
+        trainer.save_checkpoint(save_path)
 
         # if len(gpu_ids) and torch.cuda.is_available():
         #     network.cuda()
