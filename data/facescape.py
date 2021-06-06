@@ -188,8 +188,6 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         ### json 
         self.dir_json = os.path.join(opt.dataroot, "fsmview_images")
 
-        self.exp_set =  get_exp()
-
         if opt.isTrain:
             _file = open(os.path.join(opt.dataroot, "lists/texmesh_train.pkl"), "rb")
             
@@ -272,11 +270,13 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
                     pool = self.exp_set - set(tmp[-1])
                     B_exp = random.sample(pool, 1)[0]
                     B_id = tmp[0]
+                    Bid = 20
                 # toss 1 -> same exp, diff iden
                 else:
                     pool = self.id_set - set(tmp[0])
                     B_id = random.sample(pool, 1)[0]
                     B_exp = tmp[-1]
+                    Bid = 301
                 
                 # tex
                 # DEBUG!!
@@ -292,8 +292,6 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
                 tex = self.total_tex[tex_index][0]
                 tex = Image.fromarray(np.uint8(tex))
                 
-                # params = get_params(self.opt, tex.size)
-                # transform = get_transform(self.opt, params)      
                 B_tex_tensor = transform(tex)
                 # mesh_path = os.path.join( self.dir_A , B_id, 'models_reg' , B_exp + '.obj')
                 # om_mesh = openmesh.read_trimesh(mesh_path)
