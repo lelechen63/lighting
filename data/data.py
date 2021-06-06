@@ -24,7 +24,7 @@ class FacescapeDataModule(pl.LightningDataModule):
 
     def prepare_data(self):
         pass
-    def get_dataset():
+    def get_dataset(self):
         dataset = None
         if self.opt.datasetname == 'fs':
             from data.facescape import FacescapeDataset
