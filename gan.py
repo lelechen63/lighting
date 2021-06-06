@@ -14,13 +14,13 @@ from torchvision.datasets import MNIST
 import pytorch_lightning as pl
 from data.data import FacescapeDataModule
 from options.step1_train_options import TrainOptions
-from model.model import GAN
+from model.model import TexMeshModule
 
 
 opt = TrainOptions().parse()
 opt.datasetname = "fs_texmesh"
 opt.name = "texmesh_step1" 
 dm = FacescapeDataModule(opt)
-model = GAN(opt)
+model = TexMeshModule(opt)
 trainer = pl.Trainer(gpus= opt.gpu_ids, max_epochs= 200, progress_bar_refresh_rate=20)
 trainer.fit(model, dm)
