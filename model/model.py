@@ -442,6 +442,14 @@ class TexMeshModule(pl.LightningModule):
             self.CLSloss = lossNet.CLSLoss(opt)
 
         self.visualizer = Visualizer(opt)
+        self.save_dir = os.path.join(opt.checkpoints_dir, opt.name)
+
+    def save_network(self, network, network_label, epoch_label):
+        save_filename = '%s_net_%s.pth' % (epoch_label, network_label)
+        save_path = os.path.join(self.save_dir, save_filename)
+        torch.save(network.cpu().state_dict(), save_path)
+        # if len(gpu_ids) and torch.cuda.is_available():
+        #     network.cuda()
 
 
     def forward(self, A_tex, A_mesh, B_tex, B_mesh):
@@ -540,4 +548,7 @@ class TexMeshModule(pl.LightningModule):
             ('rec_tex_A', util.tensor2im(rec_tex_A.data[0]))
            
             ])
-        self.visualizer.display_current_results(visuals, self.current_epoch, 1000000)
+        self.visualizer.display_current_results(visuals, self.current_epoch, 1000000) 
+
+        if self.current_epoch % 10 == 0:
+            self.save_network(self.generator, 'texmeshED', self.current_epoch )
