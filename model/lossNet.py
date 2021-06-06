@@ -7,7 +7,7 @@ import numpy as np
 from .blocks import LinearBlock, Conv2dBlock, ResBlocks, ActFirstResBlock
 
 class VGGLoss(nn.Module):
-    def __init__(self, gpu_ids):
+    def __init__(self):
         super(VGGLoss, self).__init__()        
         self.vgg = Vgg19()#.cuda()
         self.criterion = nn.L1Loss()
