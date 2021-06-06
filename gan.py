@@ -22,5 +22,7 @@ opt.datasetname = "fs_texmesh"
 opt.name = "texmesh_step1" 
 dm = FacescapeDataModule(opt)
 model = TexMeshModule(opt)
-trainer = pl.Trainer(gpus= opt.gpu_ids, max_epochs= 200, progress_bar_refresh_rate=20)
+# trainer = pl.Trainer(gpus= opt.gpu_ids, max_epochs= 200, progress_bar_refresh_rate=20)
+trainer = pl.Trainer(gpus= 1, max_epochs= 200, progress_bar_refresh_rate=20)
+
 trainer.fit(model, dm)
