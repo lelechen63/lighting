@@ -13,6 +13,7 @@ from torchvision.datasets import MNIST
 
 import pytorch_lightning as pl
 from data import FacescapeDataModule
+from options.step1_train_options import TrainOptions
 
 class Generator(nn.Module):
     def __init__(self, latent_dim, img_shape):
@@ -169,8 +170,9 @@ class GAN(pl.LightningModule):
         grid = torchvision.utils.make_grid(sample_imgs)
         self.logger.experiment.add_image('generated_images', grid, self.current_epoch)
 
+opt = TrainOptions().parse()
 
-dm = FacescapeDataModule()
+dm = FacescapeDataModule(opt)
 model = GAN(*dm.size())
 trainer = pl.Trainer(gpus=1, max_epochs=5, progress_bar_refresh_rate=20)
 trainer.fit(model, dm)
