@@ -1,5 +1,5 @@
 import os.path
-from data.base_dataset import BaseDataset, get_params, get_transform, normalize
+from data.base_dataset import *
 from data.image_folder import make_dataset
 
 from PIL import Image, ImageChops, ImageFile
@@ -55,7 +55,7 @@ def get_anlge_list():
         total_list[tmp[0] +'/' + tmp[1] ][tmp[2]] = [float(tmp[3]),float(tmp[4]), float(tmp[5])]
 
     return total_list
-class FacescapeDirDataset(BaseDataset):
+class FacescapeDirDataset(torch.utils.data.Dataset):
     def __init__(self, opt):
         self.opt = opt
 
@@ -171,7 +171,7 @@ class FacescapeDirDataset(BaseDataset):
         return 'FacescapeDirDataset'
 
 
-class FacescapeMeshTexDataset(BaseDataset):
+class FacescapeMeshTexDataset(torch.utils.data.Dataset):
     def __init__(self, opt):
         self.opt = opt
         ### input A (texture and mesh)   
@@ -322,7 +322,7 @@ class FacescapeMeshTexDataset(BaseDataset):
         return 'FacescapeMeshTexDataset'
 
 
-class FacescapeTexDataset(BaseDataset):
+class FacescapeTexDataset(torch.utils.data.Dataset):
     def __init__(self, opt):
         self.opt = opt
 
