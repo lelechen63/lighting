@@ -13,7 +13,7 @@ from torchvision.datasets import MNIST
 
 import pytorch_lightning as pl
 from data.data import FacescapeDataModule
-from options.step1_train_options import TrainOptions
+from options.step1_texmesh_train_options import TrainOptions
 
 class Generator(nn.Module):
     def __init__(self, latent_dim, img_shape):
