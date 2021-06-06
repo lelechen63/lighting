@@ -8,6 +8,8 @@ import functools
 from torch.autograd import Variable
 from .blocks import LinearBlock, Conv2dBlock, ResBlocks, ActFirstResBlock, ResnetBlock
 from model import lossNet
+import torchvision
+
 # import pickle
 # pickle.dump(some_object)
 
