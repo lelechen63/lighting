@@ -11,18 +11,28 @@ from model import lossNet
 # import pickle
 # pickle.dump(some_object)
 
+def get_norm_layer(norm_type='instance'):
+    if norm_type == 'batch':
+        norm_layer = functools.partial(nn.BatchNorm2d, affine=True)
+    elif norm_type == 'instance':
+        norm_layer = functools.partial(nn.InstanceNorm2d, affine=False)
+    else:
+        raise NotImplementedError('normalization layer [%s] is not found' % norm_type)
+    return norm_layer
+
 class TexMeshEncoder(nn.Module):
     def __init__(self,  tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
-                ngf=64, n_downsampling=5, n_blocks=4, norm_layer=nn.BatchNorm2d, \
+                ngf=64, n_downsampling=5, n_blocks=4, norm_layer='batch', \
                 padding_type='reflect'):
         super().__init__()
         self.tex_shape = tex_shape
         activation = nn.ReLU(True)
+        norm_layer = get_norm_layer(norm_type=norm_layer)  
 
-        print (tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
-                ngf, n_downsampling, n_blocks, norm_layer, \
-                padding_type )
-        print('!!!!!!!!!!!!!!!')
+        # print (tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+        #         ngf, n_downsampling, n_blocks, norm_layer, \
+        #         padding_type )
+        # print('!!!!!!!!!!!!!!!')
         
         self.CNNencoder = nn.Sequential(
             nn.ReflectionPad2d(3), nn.Conv2d(input_nc, ngf, kernel_size=7, padding=0),
