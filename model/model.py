@@ -283,13 +283,13 @@ class TexMeshModule(pl.LightningModule):
         save_fake = True
         # save_fake = batch_idx % opt.display_freq 
         if save_fake:
-            Atex = util.tensor2im(data['Atex'][0])
+            Atex = util.tensor2im(batch['Atex'][0])
             Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
-            Atex = util.writeText(Atex, data['A_path'][0])
+            Atex = util.writeText(Atex, batch['A_path'][0])
             
-            Btex = util.tensor2im(data['Btex'][0])
+            Btex = util.tensor2im(batch['Btex'][0])
             Btex = np.ascontiguousarray(Btex, dtype=np.uint8)
-            Btex = util.writeText(Btex, data['B_path'][0])
+            Btex = util.writeText(Btex, batch['B_path'][0])
 
         visuals = OrderedDict([
             ('Atex', Atex),
@@ -388,13 +388,13 @@ class TexMeshModule(pl.LightningModule):
         rec_tex_AB, rec_mesh_AB, rec_tex_BA, rec_mesh_BA = \
         self(batch['Atex'], batch['Amesh'],batch['Btex'],batch['Bmesh'])
 
-        Atex = util.tensor2im(data['Atex'][0])
+        Atex = util.tensor2im(batch['Atex'][0])
         Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
-        Atex = util.writeText(Atex, data['A_path'][0])
+        Atex = util.writeText(Atex, batch['A_path'][0])
         
-        Btex = util.tensor2im(data['Btex'][0])
+        Btex = util.tensor2im(batch['Btex'][0])
         Btex = np.ascontiguousarray(Btex, dtype=np.uint8)
-        Btex = util.writeText(Btex, data['B_path'][0])
+        Btex = util.writeText(Btex, batch['B_path'][0])
 
         visuals = OrderedDict([
             ('Atex', Atex),
