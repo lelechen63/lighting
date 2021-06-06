@@ -263,7 +263,7 @@ class TexMeshModule(pl.LightningModule):
         # generate images
         rec_tex_A, rec_mesh_A, rec_tex_B, rec_mesh_B, \
         rec_tex_AB, rec_mesh_AB, rec_tex_BA, rec_mesh_BA = \
-        self(batch['A_tex'], batch['A_mesh'],batch['B_tex'],batch['B_mesh'])
+        self(batch['Atex'], batch['Amesh'],batch['Btex'],batch['Bmesh'])
         map_type = batch['map_type']
 
         # log sampled images
@@ -281,15 +281,15 @@ class TexMeshModule(pl.LightningModule):
             if not self.opt.no_mismatch_loss:
                 for i in range(map_type.shape[0]):
                     if map_type[i] == 0: # same id, diff exp, mismatch is decided by exp
-                        loss_G_VGG += self.VGGloss(rec_tex_AB[i].unsqueeze(0), batch['B_tex'][i].unsqueeze(0)) * self.opt.lambda_feat * self.opt.lambda_mismatch
-                        loss_G_VGG += self.VGGloss(rec_tex_BA[i].unsqueeze(0), batch['A_tex'][i].unsqueeze(0)) * self.opt.lambda_feat* self.opt.lambda_mismatch
+                        loss_G_VGG += self.VGGloss(rec_tex_AB[i].unsqueeze(0), batch['Btex'][i].unsqueeze(0)) * self.opt.lambda_feat * self.opt.lambda_mismatch
+                        loss_G_VGG += self.VGGloss(rec_tex_BA[i].unsqueeze(0), batch['Atex'][i].unsqueeze(0)) * self.opt.lambda_feat* self.opt.lambda_mismatch
                     else:
-                        loss_G_VGG += self.VGGloss(rec_tex_AB[i].unsqueeze(0), batch['A_tex'][i].unsqueeze(0)) * self.opt.lambda_feat* self.opt.lambda_mismatch
-                        loss_G_VGG += self.VGGloss(rec_tex_BA[i].unsqueeze(0), batch['B_tex'][i].unsqueeze(0)) * self.opt.lambda_feat* self.opt.lambda_mismatch
+                        loss_G_VGG += self.VGGloss(rec_tex_AB[i].unsqueeze(0), batch['Atex'][i].unsqueeze(0)) * self.opt.lambda_feat* self.opt.lambda_mismatch
+                        loss_G_VGG += self.VGGloss(rec_tex_BA[i].unsqueeze(0), batch['Btex'][i].unsqueeze(0)) * self.opt.lambda_feat* self.opt.lambda_mismatch
             # reconstruction loss
             
-            loss_G_VGG += self.criterionVGG(rec_tex_A, batch['A_tex']) * self.opt.lambda_feat
-            loss_G_VGG +=  self.criterionVGG(rec_tex_B, batch['B_tex']) * self.opt.lambda_feat
+            loss_G_VGG += self.criterionVGG(rec_tex_A, batch['Atex']) * self.opt.lambda_feat
+            loss_G_VGG +=  self.criterionVGG(rec_tex_B, batch['Btex']) * self.opt.lambda_feat
         
         # CLS loss
         loss_G_CLS = 0
