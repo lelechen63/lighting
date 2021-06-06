@@ -313,7 +313,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
                     continue
                 break
             except:
-                print('!!!!!', tex_path)
+                print('!!!!!', tex_index)
                 continue
         # vertices=vertices.reshape(-1, 4, 3)
         # B_vertices = vertices[:, 0, :].reshape(-1)
