@@ -120,9 +120,11 @@ class TexMeshEncoder(nn.Module):
 
 class TexMeshDecoder(nn.Module):
     def __init__(self,  tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
-                ngf=64, n_downsampling=5, n_blocks=4, norm_layer=nn.BatchNorm2d, \
+                ngf=64, n_downsampling=5, n_blocks=4, norm_layer = 'batch', \
                 padding_type='reflect'):
         super().__init__()
+        norm_layer = get_norm_layer(norm_type=norm_layer)  
+
         self.tex_shape = tex_shape
         activation = nn.ReLU(True)   
         self.identity_dec = nn.Sequential(
@@ -209,9 +211,11 @@ class TexMeshDecoder(nn.Module):
 
 class TexMeshGenerator(nn.Module):
     def __init__(self, tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
-                ngf=64, n_downsampling=5, n_blocks=4, norm_layer=nn.BatchNorm2d, \
+                ngf=64, n_downsampling=5, n_blocks=4, norm_layer='batch', \
                 padding_type='reflect'):
         super().__init__()
+        norm_layer = get_norm_layer(norm_type=norm_layer)  
+
         self.texmeshEnc = TexMeshEncoder(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
                 ngf, n_downsampling, n_blocks, norm_layer, padding_type)
 
