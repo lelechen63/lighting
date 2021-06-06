@@ -205,8 +205,6 @@ class TexMeshDecoder(nn.Module):
         rec_mesh = self.mesh_fc_dec(feature)
 
         tex_dec = self.tex_fc_dec(feature)
-        print (self.tex_shape / 128)
-        print( '!!!!!!!!!!!!!!!!!!!')
         tex_dec = tex_dec.unsqueeze(2).unsqueeze(3).repeat(1, 1, int(self.tex_shape / 128),int(self.tex_shape / 128)) # not sure 
          
         decoded = self.tex_decoder(tex_dec)
@@ -265,8 +263,6 @@ class TexMeshModule(pl.LightningModule):
     def training_step(self, batch, batch_idx):
 
         # train generator
-        print (batch.keys())
-        print('!!!!!!!!!!')
         # generate images
         rec_tex_A, rec_mesh_A, rec_tex_B, rec_mesh_B, \
         rec_tex_AB, rec_mesh_AB, rec_tex_BA, rec_mesh_BA = \
@@ -279,9 +275,7 @@ class TexMeshModule(pl.LightningModule):
         self.logger.experiment.add_image('generated_images', grid, 0)
 
         # ground truth result (ie: all fake)
-        # put on GPU because we created this tensor inside training_loop
-        valid = torch.ones(imgs.size(0), 1)
-        valid = valid.type_as(imgs)
+       
         # VGG loss
         loss_G_VGG = 0
         if not self.opt.no_vgg_loss:
