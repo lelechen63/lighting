@@ -201,8 +201,9 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         self.id_set = set(pickle.load(ids))
         self.exp_set = get_exp()
         print ('===========================')
-        print ('id_set:', min(self.id_set), max(self.id_set))
-        print ('exp_set:', min(self.exp_set), max(self.exp_set))
+        print ('id_set:',self.id_set)
+        print('+++++++++++++++++++++++++++')
+        print ('exp_set:',self.exp_set)
 
         print ('===========================')
 
