@@ -376,7 +376,7 @@ class TexMeshModule(pl.LightningModule):
         })
 
         errors = {k: v.data.item() if not isinstance(v, int) else v for k, v in tqdm_dict.items()}            
-        self.visualizer.print_current_errors(current_epoch, 10000, errors, 0)
+        self.visualizer.print_current_errors(self.current_epoch, 10000, errors, 0)
         self.visualizer.plot_current_errors(errors, 10000)
 
         return output
