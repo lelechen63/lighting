@@ -10,6 +10,8 @@ from .blocks import LinearBlock, Conv2dBlock, ResBlocks, ActFirstResBlock, Resne
 from model import lossNet
 import torchvision
 from collections import OrderedDict
+import util.util as util
+
 from util.visualizer import Visualizer
 # import pickle
 # pickle.dump(some_object)
