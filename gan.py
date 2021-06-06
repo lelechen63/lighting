@@ -13,7 +13,7 @@ from torchvision.datasets import MNIST
 
 import pytorch_lightning as pl
 from data.data import FacescapeDataModule
-from options.step1_texmesh_train_options import TrainOptions
+from options.step1_train_options import TrainOptions
 
 class Generator(nn.Module):
     def __init__(self, latent_dim, img_shape):
@@ -172,7 +172,8 @@ class GAN(pl.LightningModule):
         self.logger.experiment.add_image('generated_images', grid, self.current_epoch)
 
 opt = TrainOptions().parse()
-
+opt.datasetname = fs_texmesh
+opt.datasetname =  name texmesh_step1 
 dm = FacescapeDataModule(opt)
 model = GAN(3,256,256)
 trainer = pl.Trainer(gpus=1, max_epochs=5, progress_bar_refresh_rate=20)
