@@ -200,7 +200,9 @@ class TexMeshDecoder(nn.Module):
         rec_mesh = self.mesh_fc_dec(feature)
 
         tex_dec = self.tex_fc_dec(feature)
-        tex_dec = tex_dec.unsqueeze(2).unsqueeze(3).repeat(1, 1, self.tex_shape / 128,self.tex_shape / 128) # not sure 
+        print (self.tex_shape / 128)
+        print( '!!!!!!!!!!!!!!!!!!!')
+        tex_dec = tex_dec.unsqueeze(2).unsqueeze(3).repeat(1, 1, int(self.tex_shape / 128),int(self.tex_shape / 128) # not sure 
          
         decoded = self.tex_decoder(tex_dec)
         rec_tex = self.output_layer(decoded)
