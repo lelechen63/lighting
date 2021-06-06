@@ -7,7 +7,7 @@ import torch.nn as nn
 import functools
 from torch.autograd import Variable
 from .blocks import LinearBlock, Conv2dBlock, ResBlocks, ActFirstResBlock
-import lossNet
+from model import lossNet
 import pickle
 pickle.dump(some_object)
 
