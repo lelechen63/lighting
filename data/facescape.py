@@ -276,13 +276,13 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
                     pool = self.exp_set - set(tmp[-1])
                     B_exp = random.sample(pool, 1)[0]
                     B_id = tmp[0]
-                    Bid = 20
+                    # Bid = 20
                 # toss 1 -> same exp, diff iden
                 else:
                     pool = self.id_set - set(tmp[0])
                     B_id = random.sample(pool, 1)[0]
                     B_exp = tmp[-1]
-                    Bid = 301
+                    # Bid = 301
                 
                 # tex
                 # DEBUG!!
