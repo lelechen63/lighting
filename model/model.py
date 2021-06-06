@@ -333,10 +333,10 @@ class TexMeshModule(pl.LightningModule):
         if not self.opt.no_mismatch_loss:
             for i in range(map_type.shape[0]):
                 if map_type[i] == 0: # same id, diff exp, mismatch is decided by exp
-                    loss_mesh += self.l1loss(rec_mesh_AB[i].unsqueeze(0), batch['Btex'][i].unsqueeze(0)) * self.opt.lambda_mesh* self.opt.lambda_mismatch
+                    loss_mesh += self.l1loss(rec_mesh_AB[i].unsqueeze(0), batch['Amesh'][i].unsqueeze(0)) * self.opt.lambda_mesh* self.opt.lambda_mismatch
                     loss_mesh += self.l1loss(rec_mesh_BA[i].unsqueeze(0), batch['Bmesh'][i].unsqueeze(0)) * self.opt.lambda_mesh* self.opt.lambda_mismatch
                 else:
-                    loss_mesh += self.l1loss(rec_mesh_AB[i].unsqueeze(0), batch['Atex'][i].unsqueeze(0)) * self.opt.lambda_mesh* self.opt.lambda_mismatch
+                    loss_mesh += self.l1loss(rec_mesh_AB[i].unsqueeze(0), batch['Amesh'][i].unsqueeze(0)) * self.opt.lambda_mesh* self.opt.lambda_mismatch
                     loss_mesh += self.l1loss(rec_mesh_BA[i].unsqueeze(0), batch['Bmesh'][i].unsqueeze(0)) * self.opt.lambda_mesh* self.opt.lambda_mismatch
         
         # adversarial loss is binary cross-entropy
