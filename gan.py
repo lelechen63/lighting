@@ -16,16 +16,18 @@ from data.data import FacescapeDataModule
 from options.step1_train_options import TrainOptions
 from model.model import TexMeshModule
 
-from util.visualizer import Visualizer
+
 
 opt = TrainOptions().parse()
 opt.datasetname = "fs_texmesh"
 opt.name = "texmesh_step1" 
+
+
 dm = FacescapeDataModule(opt)
 model = TexMeshModule(opt)
 print ( opt.gpu_ids)
 # trainer = pl.Trainer(gpus= opt.gpu_ids, max_epochs= 200, progress_bar_refresh_rate=20)
-trainer = pl.Trainer(gpus=8, accelerator='ddp', max_epochs= 200, progress_bar_refresh_rate=20)
+trainer = pl.Trainer(precision=16,gpus=8, accelerator='ddp', max_epochs= 200, progress_bar_refresh_rate=20)
 
 
 # trainer = pl.Trainer(gpus= 1, max_epochs= 200, progress_bar_refresh_rate=20)
