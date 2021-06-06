@@ -8,6 +8,9 @@ import functools
 from torch.autograd import Variable
 from .blocks import LinearBlock, Conv2dBlock, ResBlocks, ActFirstResBlock
 import lossNet
+import pickle
+pickle.dump(some_object)
+
 class TexMeshEncoder(nn.Module):
     def __init__(self,  tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
                 ngf=64, n_downsampling=5, n_blocks=4, norm_layer=nn.BatchNorm2d, \
