@@ -173,6 +173,6 @@ class GAN(pl.LightningModule):
 opt = TrainOptions().parse()
 
 dm = FacescapeDataModule(opt)
-model = GAN(*dm.size())
+model = GAN(3,256,256)
 trainer = pl.Trainer(gpus=1, max_epochs=5, progress_bar_refresh_rate=20)
 trainer.fit(model, dm)
