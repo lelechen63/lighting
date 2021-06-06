@@ -202,6 +202,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         self.exp_set = get_exp()
         print ('===========================')
         print ('id_set:',self.id_set)
+
         print('+++++++++++++++++++++++++++')
         print ('exp_set:',self.exp_set)
 
@@ -270,6 +271,8 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         # A_vertices = vertices[:, 0, :].reshape(-1)
 
         toss = random.getrandbits(1)
+        print('!!!!!!!!!')
+        print( '0' in self.id_set)
         # toss 0-> same iden, diff exp
         while True:
             try:

@@ -313,9 +313,6 @@ class TexMeshModule(pl.LightningModule):
         # pix loss
         loss_G_pix = 0
         # mismatch loss
-        print (map_type)
-        print (type(map_type))
-        print ('!!!!!!!!!!!!!')
         if not self.opt.no_mismatch_loss:
             for i in range(map_type.shape[0]):
                 if map_type[i] == 0: # same id, diff exp, mismatch is decided by exp
