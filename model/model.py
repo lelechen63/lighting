@@ -192,6 +192,9 @@ class TexMeshDecoder(nn.Module):
             norm_layer(ngf), 
             nn.ReLU(True), #128
         )
+        model = []
+        model += [nn.ReflectionPad2d(3), nn.Conv2d(ngf, 3, kernel_size=7, padding=0), nn.Tanh()]    
+        self.output_layer = nn.Sequential(*model)
 
     def forward(self, id_code, exp_code):
         exp_fea = self.exp_dec(exp_code)
