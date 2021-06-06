@@ -24,7 +24,7 @@ dm = FacescapeDataModule(opt)
 model = TexMeshModule(opt)
 print ( opt.gpu_ids)
 # trainer = pl.Trainer(gpus= opt.gpu_ids, max_epochs= 200, progress_bar_refresh_rate=20)
-trainer = Trainer(gpus=8, accelerator='ddp', max_epochs= 200, progress_bar_refresh_rate=20)
+trainer = pl.Trainer(gpus=8, accelerator='ddp', max_epochs= 200, progress_bar_refresh_rate=20)
 
 
 # trainer = pl.Trainer(gpus= 1, max_epochs= 200, progress_bar_refresh_rate=20)
