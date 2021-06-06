@@ -272,7 +272,7 @@ class TexMeshModule(pl.LightningModule):
         map_type = batch['map_type']
 
         # log sampled images
-        sample_imgs = self.rec_tex_A[:6]
+        sample_imgs = rec_tex_A[:6]
         grid = torchvision.utils.make_grid(sample_imgs)
         self.logger.experiment.add_image('generated_images', grid, 0)
 
