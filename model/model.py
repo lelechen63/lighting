@@ -151,7 +151,7 @@ class TexMeshDecoder(nn.Module):
             nn.ReLU(True),
             )
         self.tex_fc_dec = nn.Sequential(
-            nn.Linear( ngf*4 * 2, ngf*16),
+            nn.Linear( ngf*4 * 2, ngf*16 * 4 * 4),
             nn.ReLU(True)
             )
         self.mesh_fc_dec = nn.Sequential(
@@ -173,9 +173,9 @@ class TexMeshDecoder(nn.Module):
             norm_layer(ngf * 8), 
             nn.ReLU(True), #2
 
-            nn.ConvTranspose2d(ngf * 8, ngf * 8, kernel_size=3, stride=2, padding=1, output_padding=1),
-            norm_layer(ngf * 8), 
-            nn.ReLU(True), #4
+            # nn.ConvTranspose2d(ngf * 8, ngf * 8, kernel_size=3, stride=2, padding=1, output_padding=1),
+            # norm_layer(ngf * 8), 
+            # nn.ReLU(True), #4
 
             nn.ConvTranspose2d(ngf * 8, ngf * 4, kernel_size=3, stride=2, padding=1, output_padding=1),
             norm_layer(ngf * 4), 
@@ -209,7 +209,9 @@ class TexMeshDecoder(nn.Module):
 
         tex_dec = self.tex_fc_dec(feature)
         tex_dec = tex_dec.unsqueeze(2).unsqueeze(3).repeat(1, 1, int(self.tex_shape / 128),int(self.tex_shape / 128)) # not sure 
-         
+        
+        tex_dec = tex_dec.view(tex_dec.shape[0], -1, 4,4) # not sure 
+
         decoded = self.tex_decoder(tex_dec)
         rec_tex = self.output_layer(decoded)
         return rec_tex, rec_mesh
@@ -354,18 +356,19 @@ class TexMeshModule(pl.LightningModule):
 
         #mesh loss
         loss_mesh = 0
-        loss_mesh += self.l1loss(rec_mesh_A, batch['Amesh'])* self.opt.lambda_mesh
-        loss_mesh += self.l1loss(rec_mesh_B, batch['Bmesh'])* self.opt.lambda_mesh
-        # mismatch loss
-        if not self.opt.no_mismatch_loss:
-            for i in range(map_type.shape[0]):
-                if map_type[i] == 0: # same id, diff exp, mismatch is decided by exp
-                    loss_mesh += self.l1loss(rec_mesh_AB[i].unsqueeze(0), batch['Amesh'][i].unsqueeze(0)) * self.opt.lambda_mesh* self.opt.lambda_mismatch
-                    loss_mesh += self.l1loss(rec_mesh_BA[i].unsqueeze(0), batch['Bmesh'][i].unsqueeze(0)) * self.opt.lambda_mesh* self.opt.lambda_mismatch
-                else:
-                    loss_mesh += self.l1loss(rec_mesh_AB[i].unsqueeze(0), batch['Amesh'][i].unsqueeze(0)) * self.opt.lambda_mesh* self.opt.lambda_mismatch
-                    loss_mesh += self.l1loss(rec_mesh_BA[i].unsqueeze(0), batch['Bmesh'][i].unsqueeze(0)) * self.opt.lambda_mesh* self.opt.lambda_mismatch
-        
+        if not self.no_mesh_loss:
+            loss_mesh += self.l1loss(rec_mesh_A, batch['Amesh'])* self.opt.lambda_mesh
+            loss_mesh += self.l1loss(rec_mesh_B, batch['Bmesh'])* self.opt.lambda_mesh
+            # mismatch loss
+            if not self.opt.no_mismatch_loss:
+                for i in range(map_type.shape[0]):
+                    if map_type[i] == 0: # same id, diff exp, mismatch is decided by exp
+                        loss_mesh += self.l1loss(rec_mesh_AB[i].unsqueeze(0), batch['Amesh'][i].unsqueeze(0)) * self.opt.lambda_mesh* self.opt.lambda_mismatch
+                        loss_mesh += self.l1loss(rec_mesh_BA[i].unsqueeze(0), batch['Bmesh'][i].unsqueeze(0)) * self.opt.lambda_mesh* self.opt.lambda_mismatch
+                    else:
+                        loss_mesh += self.l1loss(rec_mesh_AB[i].unsqueeze(0), batch['Amesh'][i].unsqueeze(0)) * self.opt.lambda_mesh* self.opt.lambda_mismatch
+                        loss_mesh += self.l1loss(rec_mesh_BA[i].unsqueeze(0), batch['Bmesh'][i].unsqueeze(0)) * self.opt.lambda_mesh* self.opt.lambda_mismatch
+            
         # adversarial loss is binary cross-entropy
         g_loss = loss_G_pix + loss_G_VGG + loss_G_CLS + loss_mesh
         tqdm_dict = {'loss_pix': loss_G_pix, 'loss_G_VGG': loss_G_VGG, 'loss_G_CLS': loss_G_CLS, 'loss_mesh': loss_mesh }
