@@ -17,7 +17,12 @@ class TexMeshEncoder(nn.Module):
                 padding_type='reflect'):
         super().__init__()
         self.tex_shape = tex_shape
-        activation = nn.ReLU(True)   
+        activation = nn.ReLU(True)
+
+        print (tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+                ngf, n_downsampling, n_blocks, norm_layer, \
+                padding_type )
+        print('!!!!!!!!!!!!!!!')
         
         self.CNNencoder = nn.Sequential(
             nn.ReflectionPad2d(3), nn.Conv2d(input_nc, ngf, kernel_size=7, padding=0),
@@ -227,6 +232,8 @@ class TexMeshModule(pl.LightningModule):
             input_nc, opt.code_n,opt.encoder_fc_n, opt.ngf, 
             opt.n_downsample_global, opt.n_blocks_global,opt.norm)
 
+        
+                
         self.l1loss = torch.nn.L1Loss()
         self.l2loss = torch.nn.MSELoss()
         if not opt.no_vgg_loss:             
