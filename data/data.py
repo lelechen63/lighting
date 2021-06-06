@@ -40,7 +40,7 @@ class FacescapeDataModule(pl.LightningDataModule):
             from data.facescape import FacescapeTexDataset
             dataset = FacescapeTexDataset(self.opt)
         print("dataset [%s] was created" % (dataset.name()))
-        dataset.initialize(opt)
+        # dataset.initialize(opt)
         return dataset
         # (self.data_dir, train=True, download=True)
         # MNIST(self.data_dir, train=False, download=True)
