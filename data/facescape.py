@@ -200,6 +200,12 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         ids = open(os.path.join(opt.dataroot, "lists/ids.pkl"), "rb")
         self.id_set = set(pickle.load(ids))
         self.exp_set = get_exp()
+        print ('===========================')
+        print ('id_set': self.id_set.min(), self.id_set.max())
+        print ('exp_set': self.exp_set.min(), self.exp_set.max())
+
+        print ('===========================')
+
         # self.facial_seg = cv2.imread("./predef/facial_mask_v10.png")[:,:,::-1]
         self.facial_seg = Image.open("./predef/facial_mask_v10.png")
         # self.facial_seg  = self.facial_seg.resize(self.img_size)
@@ -226,7 +232,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
             om_mesh = openmesh.read_trimesh(mesh_path)
             A_vertices = np.array(om_mesh.points()).reshape(-1)
             self.total_tex[data].append(A_vertices)
-            if len(self.total_tex) == 10:
+            if len(self.total_tex) == 4:
                 break
         
     def __getitem__(self, index):
