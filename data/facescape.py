@@ -202,7 +202,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         self.exp_set = get_exp()
         print ('===========================')
         print ('id_set:',self.id_set)
-
+        print ('0' in self.id_set)
         print('+++++++++++++++++++++++++++')
         print ('exp_set:',self.exp_set)
 
