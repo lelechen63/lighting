@@ -203,9 +203,6 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         print ('===========================')
         print ('id_set:',self.id_set)
 
-        print('!!!!!!!!!')
-        print( '0' in self.id_set)
-
         print('+++++++++++++++++++++++++++')
         print ('exp_set:',self.exp_set)
 
@@ -325,7 +322,6 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
                 'map_type':toss, 'Aid': int(A_id) - 1, 'Aexp': int(A_exp) -1,
                 'Bid':int(B_id) - 1, 'Bexp':int(B_exp.split('_')[0]) - 1 }
 
-        print (input_dict['Aid'], input_dict['Aexp'], input_dict['Bid'], input_dict['Bexp'] )
         return input_dict
 
     def __len__(self):
