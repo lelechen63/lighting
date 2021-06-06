@@ -22,12 +22,11 @@ def get_norm_layer(norm_type='instance'):
 
 class TexMeshEncoder(nn.Module):
     def __init__(self,  tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
-                ngf=64, n_downsampling=5, n_blocks=4, norm_layer='batch', \
+                ngf=64, n_downsampling=5, n_blocks=4, norm_layer= nn.BatchNorm2d, \
                 padding_type='reflect'):
         super().__init__()
         self.tex_shape = tex_shape
         activation = nn.ReLU(True)
-        norm_layer = get_norm_layer(norm_type=norm_layer)  
 
         # print (tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
         #         ngf, n_downsampling, n_blocks, norm_layer, \
@@ -120,10 +119,9 @@ class TexMeshEncoder(nn.Module):
 
 class TexMeshDecoder(nn.Module):
     def __init__(self,  tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
-                ngf=64, n_downsampling=5, n_blocks=4, norm_layer = 'batch', \
+                ngf=64, n_downsampling=5, n_blocks=4, norm_layer = nn.BatchNorm2d, \
                 padding_type='reflect'):
         super().__init__()
-        norm_layer = get_norm_layer(norm_type=norm_layer)  
 
         self.tex_shape = tex_shape
         activation = nn.ReLU(True)   
@@ -246,8 +244,6 @@ class TexMeshModule(pl.LightningModule):
             input_nc, opt.code_n,opt.encoder_fc_n, opt.ngf, 
             opt.n_downsample_global, opt.n_blocks_global,opt.norm)
 
-        
-                
         self.l1loss = torch.nn.L1Loss()
         self.l2loss = torch.nn.MSELoss()
         if not opt.no_vgg_loss:             
