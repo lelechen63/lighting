@@ -245,7 +245,7 @@ class TexMeshGenerator(nn.Module):
 
             return rec_tex_A, rec_mesh_A, rec_tex_B, rec_mesh_B, rec_tex_AB, rec_mesh_AB, rec_tex_BA, rec_mesh_BA
         else:
-            A_tex, A_mesh = input_lists[0], input_lists[1]
+            # A_tex, A_mesh = input_lists[0], input_lists[1]
             A_id_code, A_exp_code = self.texmeshEnc(A_tex, A_mesh)
 
             # reconstruction
