@@ -222,12 +222,12 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
             tex =  tex[self.y:self.y+self.l,self.x :self.x +self.l,:]
             tex = cv2.resize(tex, (opt.loadSize,opt.loadSize), interpolation = cv2.INTER_AREA)
             self.total_tex[data] = [tex]
-            self.total_tex.append(tex)
+            # self.total_tex[data].append(tex)
 
             mesh_path = os.path.join( self.dir_A , data + '.obj')
             om_mesh = openmesh.read_trimesh(mesh_path)
             A_vertices = np.array(om_mesh.points()).reshape(-1)
-            self.total_tex.append(A_vertices)
+            self.total_tex[data].append(A_vertices)
             if len(self.total_tex) == 10:
                 break
         
@@ -279,7 +279,9 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
                     B_exp = tmp[-1]
                 
                 # tex
-                tex_index = os.path.join( B_id , 'models_reg', B_exp  )   
+                # DEBUG!!
+                tex_index = self.data_list[index]
+                # tex_index = os.path.join( B_id , 'models_reg', B_exp  )   
                 # tex_path = os.path.join( self.dir_tex , B_id, B_exp + '.png')
                 # # tex_path = '/raid/celong/FaceScape/texture_mapping/target/1/9_mouth_right.png'
                 # # mesh 
