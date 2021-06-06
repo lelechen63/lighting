@@ -300,7 +300,7 @@ class TexMeshModule(pl.LightningModule):
             ('rec_tex_AB', util.tensor2im(rec_tex_AB.data[0])),
             ('rec_tex_BA', util.tensor2im(rec_tex_BA.data[0]))
             ])
-        self.visualizer.display_current_results(visuals, batch_idx, 1000000)
+        self.visualizer.display_current_results(visuals, current_epoch, 1000000)
 
         # ground truth result (ie: all fake)
        
@@ -405,5 +405,5 @@ class TexMeshModule(pl.LightningModule):
             ('rec_tex_AB', util.tensor2im(rec_tex_AB.data[0])),
             ('rec_tex_BA', util.tensor2im(rec_tex_BA.data[0]))
             ])
-        self.visualizer.display_current_results(visuals, self.batch_idx, 1000000)
+        self.visualizer.display_current_results(visuals, self.current_epoch, 1000000)
 
