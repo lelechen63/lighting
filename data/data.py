@@ -48,7 +48,7 @@ class FacescapeDataModule(pl.LightningDataModule):
 
         # Assign train/val datasets for use in dataloaders
         # if stage == 'fit' or stage is None:
-        self.dataset = get_dataset()        
+        self.dataset = self.get_dataset()        
 
     def train_dataloader(self):
         return DataLoader(self.dataset, batch_size=self.batch_size, num_workers=self.num_workers)
