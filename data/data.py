@@ -14,6 +14,7 @@ from PIL import Image
 
 class FacescapeDataModule(pl.LightningDataModule):
     def __init__(self, opt):
+        self.opt = opt
         super().__init__()
         self.batch_size = opt.batchSize
         self.num_workers = int(opt.nThreads)
