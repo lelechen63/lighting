@@ -290,8 +290,8 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
                 
                 # tex
                 # DEBUG!!
-                # tex_index = self.data_list[index]
-                tex_index = os.path.join( B_id , 'models_reg', B_exp  )   
+                tex_index = self.data_list[index]
+                # tex_index = os.path.join( B_id , 'models_reg', B_exp  )   
                 # tex_path = os.path.join( self.dir_tex , B_id, B_exp + '.png')
                 # # tex_path = '/raid/celong/FaceScape/texture_mapping/target/1/9_mouth_right.png'
                 # # mesh 
