@@ -267,6 +267,7 @@ class TexMeshModule(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         self.batch = batch
+        self.batch_idx = batch_idx
         # train generator
         # generate images
         rec_tex_A, rec_mesh_A, rec_tex_B, rec_mesh_B, \
