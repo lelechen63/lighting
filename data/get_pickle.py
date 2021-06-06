@@ -168,7 +168,7 @@ def gettexmesh_pid_expid():
     for d in data_list:
         print(d)
         tmp = d.split('/')
-        pid.add(int(tmp[0]))
+        pid.add(str(tmp[0]))
         exp.add(int(tmp[-1].split('_')[0]))
         # break
     pid = sorted(pid)
