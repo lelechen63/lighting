@@ -9,13 +9,14 @@ import torch.nn.functional as F
 import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader, random_split
-from torchvision.datasets import MNIST
+# from torchvision.datasets import MNIST
 
 import pytorch_lightning as pl
 from data.data import FacescapeDataModule
 from options.step1_train_options import TrainOptions
 from model.model import TexMeshModule
 
+from util.visualizer import Visualizer
 
 opt = TrainOptions().parse()
 opt.datasetname = "fs_texmesh"

@@ -10,7 +10,7 @@ from .blocks import LinearBlock, Conv2dBlock, ResBlocks, ActFirstResBlock, Resne
 from model import lossNet
 import torchvision
 from collections import OrderedDict
-
+from util.visualizer import Visualizer
 # import pickle
 # pickle.dump(some_object)
 
@@ -257,12 +257,14 @@ class TexMeshModule(pl.LightningModule):
         if not opt.no_cls_loss:
             self.CLSloss = lossNet.CLSLoss(opt)
 
+        self.visualizer = Visualizer(opt)
+
 
     def forward(self, A_tex, A_mesh, B_tex, B_mesh):
         return self.generator(A_tex, A_mesh, B_tex, B_mesh)
 
     def training_step(self, batch, batch_idx):
-
+        self.batch = batch
         # train generator
         # generate images
         rec_tex_A, rec_mesh_A, rec_tex_B, rec_mesh_B, \
@@ -271,9 +273,31 @@ class TexMeshModule(pl.LightningModule):
         map_type = batch['map_type']
 
         # log sampled images
-        sample_imgs = rec_tex_A[:6]
-        grid = torchvision.utils.make_grid(sample_imgs)
-        self.logger.experiment.add_image('generated_images', grid, 0)
+        # sample_imgs = rec_tex_A[:6]
+        # grid = torchvision.utils.make_grid(sample_imgs)
+        # self.logger.experiment.add_image('generated_images', grid, 0)
+
+         ### display output images
+        save_fake = True
+        # save_fake = batch_idx % opt.display_freq 
+        if save_fake:
+            Atex = util.tensor2im(data['Atex'][0])
+            Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
+            Atex = util.writeText(Atex, data['A_path'][0])
+            
+            Btex = util.tensor2im(data['Btex'][0])
+            Btex = np.ascontiguousarray(Btex, dtype=np.uint8)
+            Btex = util.writeText(Btex, data['B_path'][0])
+
+        visuals = OrderedDict([
+            ('Atex', Atex),
+            ('Btex', Btex),
+            ('rec_tex_A', util.tensor2im(rec_tex_A.data[0])),
+            ('rec_tex_B', util.tensor2im(rec_tex_B.data[0])),
+            ('rec_tex_AB', util.tensor2im(rec_tex_AB.data[0])),
+            ('rec_tex_BA', util.tensor2im(rec_tex_BA.data[0]))
+            ])
+            visualizer.display_current_results(visuals, batch_idx, 1000000)
 
         # ground truth result (ie: all fake)
        
@@ -356,11 +380,27 @@ class TexMeshModule(pl.LightningModule):
         opt_g = torch.optim.Adam(self.generator.parameters(), lr=lr, betas=(self.opt.beta1, 0.999))
         return [opt_g], []
 
-    # def on_epoch_end(self):
-    #     z = self.validation_z.type_as(self.generator.model[0].weight)
+    def on_epoch_end(self):
+        batch = self.batch
+        rec_tex_A, rec_mesh_A, rec_tex_B, rec_mesh_B, \
+        rec_tex_AB, rec_mesh_AB, rec_tex_BA, rec_mesh_BA = \
+        self(batch['Atex'], batch['Amesh'],batch['Btex'],batch['Bmesh'])
 
-    #     # log sampled images
-    #     sample_imgs = self(z)
-    #     grid = torchvision.utils.make_grid(sample_imgs)
-    #     self.logger.experiment.add_image('generated_images', grid, self.current_epoch)
+        Atex = util.tensor2im(data['Atex'][0])
+        Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
+        Atex = util.writeText(Atex, data['A_path'][0])
+        
+        Btex = util.tensor2im(data['Btex'][0])
+        Btex = np.ascontiguousarray(Btex, dtype=np.uint8)
+        Btex = util.writeText(Btex, data['B_path'][0])
+
+        visuals = OrderedDict([
+            ('Atex', Atex),
+            ('Btex', Btex),
+            ('rec_tex_A', util.tensor2im(rec_tex_A.data[0])),
+            ('rec_tex_B', util.tensor2im(rec_tex_B.data[0])),
+            ('rec_tex_AB', util.tensor2im(rec_tex_AB.data[0])),
+            ('rec_tex_BA', util.tensor2im(rec_tex_BA.data[0]))
+            ])
+        self.visualizer.display_current_results(visuals, self.batch_idx, 1000000)
 
