@@ -49,6 +49,12 @@ class MeshRender():
         self.om_indices = torch.from_numpy(om_indices).type(torch.int32).to(self.pyredner.get_device())
         self.image_data_root = "/raid/celong/FaceScape/fsmview_images"
 
+    def shift(self, image, vector):
+        transform = AffineTransform(translation=vector)
+        shifted = warp(image, transform, mode='wrap', preserve_range=True)
+        return shifted.astype(image.dtype)
+
+
     def meshrender(self,id_idx, exp_idx, vertices, cam_idx=1):
         """
         # id_idx: int
@@ -119,6 +125,6 @@ class MeshRender():
         img = self.pyredner.render_deferred(scene, lights=lights)
 
         img = torch.pow(img, 1.0/2.2).cpu().numpy()
-        img = shift(img, [-dx, -dy])
+        img = self.shift(img, [-dx, -dy])
 
         return img
