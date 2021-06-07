@@ -66,7 +66,7 @@ class MeshRender():
         input_vertices = input_vertices.contiguous()
 
         m = self.pyredner.Material(diffuse_reflectance = torch.tensor((0.5, 0.5, 0.5), device = self.pyredner.get_device()))
-        obj = self.pyredner.Object(vertices=input_vertices, indices=om_indices, material=m)
+        obj = self.pyredner.Object(vertices=input_vertices, indices=self.om_indices, material=m)
         obj.normals = self.pyredner.compute_vertex_normal(obj.vertices, obj.indices)
 
         img_dir = f"{image_data_root}/{id_idx}/{expressions[exp_idx]}"
