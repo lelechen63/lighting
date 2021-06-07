@@ -101,7 +101,6 @@ def render(id_idx, exp_idx, vertices, cam_idx=1):
     # cam_idx: 1
     # return: rendered image, [h,w,3]
     """
-
     scale = Rt_scale_dict['%d'%id_idx]['%d'%exp_idx][0]
     Rt_TU = np.array(Rt_scale_dict['%d'%id_idx]['%d'%exp_idx][1])
     Rt_TU = torch.from_numpy(Rt_TU).type(torch.float32).to(pyredner.get_device())
@@ -281,6 +280,7 @@ if __name__ == '__main__':
                 
                 if not os.path.exists(rendering_dir):
                     os.makedirs(rendering_dir)
+                print (rendering_path)
                 imageio.imsave(rendering_path, rendered_full_head)
                 # imageio.imsave(f"results/head_id{id_idx}_exp{exp_idx}_cam{cam_idx}.png", rendered_full_head)
                 # imageio.imsave(f"results/ori_id{id_idx}_exp{exp_idx}_cam{cam_idx}.png", gt_img)
