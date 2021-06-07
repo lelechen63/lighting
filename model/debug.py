@@ -1,4 +1,4 @@
-from util.render_class import MeshRender
+from .util.render_class import MeshRender
 
 ms = MeshRender()
 
