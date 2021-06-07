@@ -1,4 +1,6 @@
-import util.util as util
+import sys
+
+sys.path.insert(1, '/raid/celong/lele/github/lighting')
 
 from util.render_class import MeshRender
 
