@@ -453,6 +453,7 @@ class TexMeshModule(pl.LightningModule):
             self.CLSloss = lossNet.CLSLoss(opt)
 
         self.visualizer = Visualizer(opt)
+        self.meshrender = MeshRender()
 
         # if len(gpu_ids) and torch.cuda.is_available():
         #     network.cuda()
@@ -475,21 +476,10 @@ class TexMeshModule(pl.LightningModule):
         # self.logger.experiment.add_image('generated_images', grid, 0)
 
          ### display output images
-        save_fake = True
+        # save_fake = True
         # save_fake = batch_idx % opt.display_freq 
-        if save_fake:
-            Atex = util.tensor2im(batch['Atex'][0])
-            Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
-            Atex = util.writeText(Atex, batch['A_path'][0])
+        # if save_fake:
             
-          
-
-        visuals = OrderedDict([
-            ('Atex', Atex),
-            ('rec_tex_A', util.tensor2im(rec_tex_A.data[0]))
-           
-            ])
-        self.visualizer.display_current_results(visuals, self.current_epoch, 1000000)
 
         # ground truth result (ie: all fake)
        
@@ -548,13 +538,18 @@ class TexMeshModule(pl.LightningModule):
             Atex = util.tensor2im(batch['Atex'][0])
             Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
             Atex = util.writeText(Atex, batch['A_path'][0])
-            
-        
+                    
+            gt_Amesh = self.meshrender.render(int(tmp[0]), int(tmp[-1].split('_')[0]),batch['Amesh'].data[0] )
+            rec_Amesh = self.meshrender.render(int(tmp[0]), int(tmp[-1].split('_')[0]), rec_mesh_A.data[0])
+
+
             visuals = OrderedDict([
-                ('Atex', Atex),
-                ('rec_tex_A', util.tensor2im(rec_tex_A.data[0]))
-            
-                ])
+            ('Atex', Atex),
+            ('Amesh', gt_Amesh),
+            ('rec_tex_A', util.tensor2im(rec_tex_A.data[0])),
+            ('rec_Amesh', rec_Amesh)
+           
+            ])
             self.visualizer.display_current_results(visuals, self.current_epoch, 1000000) 
 
         # if self.current_epoch % 10 == 0:
