@@ -10,6 +10,7 @@ ms = MeshRender()
 id_idx = 140
 exp_idx = 4
 cam_idx = 1
+mesh_root = "/raid/celong/FaceScape/textured_meshes"
 
 mesh_path = f"{mesh_root}/{id_idx}/models_reg/{expressions[exp_idx]}.obj"
 
