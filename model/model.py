@@ -272,7 +272,8 @@ class MisMatchTexMeshModule(pl.LightningModule):
             self.CLSloss = lossNet.CLSLoss(opt)
 
         self.visualizer = Visualizer(opt)
-        self.render = 
+        self.meshrender = MeshRender()
+
 
 
     def forward(self, A_tex, A_mesh, B_tex, B_mesh):
@@ -393,6 +394,7 @@ class MisMatchTexMeshModule(pl.LightningModule):
         self.visualizer.print_current_errors(self.current_epoch, batch_idx, errors, 0)
         self.visualizer.plot_current_errors(errors, batch_idx)
 
+
         return output
 
         
@@ -410,13 +412,17 @@ class MisMatchTexMeshModule(pl.LightningModule):
         Atex = util.tensor2im(batch['Atex'][0])
         Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
         Atex = util.writeText(Atex, batch['A_path'][0])
-        
+        tmp = batch['A_path'][0].split('/')
+        gt_Amesh = self.meshrender.render(int(tmp[0]), int(tmp[-1].split('_')[0]),batch['Amesh'].data[0] )
+        rec_Amesh = self.meshrender.render(int(tmp[0]), int(tmp[-1].split('_')[0]), rec_mesh_A.data[0])
+
         Btex = util.tensor2im(batch['Btex'][0])
         Btex = np.ascontiguousarray(Btex, dtype=np.uint8)
         Btex = util.writeText(Btex, batch['B_path'][0])
 
         visuals = OrderedDict([
             ('Atex', Atex),
+            ('Amesh', gt_Amesh)
             ('Btex', Btex),
             ('rec_tex_A', util.tensor2im(rec_tex_A.data[0])),
             ('rec_tex_B', util.tensor2im(rec_tex_B.data[0])),
@@ -424,7 +430,9 @@ class MisMatchTexMeshModule(pl.LightningModule):
             ('rec_tex_BA', util.tensor2im(rec_tex_BA.data[0]))
             ])
         self.visualizer.display_current_results(visuals, self.current_epoch, 1000000)
-
+        
+         
+        
 
 
 class TexMeshModule(pl.LightningModule):
