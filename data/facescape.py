@@ -235,8 +235,8 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
             om_mesh = openmesh.read_trimesh(mesh_path)
             A_vertices = np.array(om_mesh.points()).reshape(-1)
             self.total_tex[data].append(A_vertices)
-            if len(self.total_tex) == 24:
-                break
+            # if len(self.total_tex) == 24:
+            #     break
         
     def __getitem__(self, index):
         t = time.time()
@@ -290,8 +290,8 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
                 
                 # tex
                 # DEBUG!!
-                tex_index = self.data_list[index]
-                # tex_index = os.path.join( B_id , 'models_reg', B_exp  )   
+                # tex_index = self.data_list[index]
+                tex_index = os.path.join( B_id , 'models_reg', B_exp  )   
                 # tex_path = os.path.join( self.dir_tex , B_id, B_exp + '.png')
                 # # tex_path = '/raid/celong/FaceScape/texture_mapping/target/1/9_mouth_right.png'
                 # # mesh 
