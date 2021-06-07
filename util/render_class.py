@@ -47,7 +47,8 @@ class MeshRender():
         self.pyredner.set_print_timing(False)
         om_indices = np.load("./predef/om_indices.npy")
         self.om_indices = torch.from_numpy(om_indices).type(torch.int32).to(self.pyredner.get_device())
-    
+        self.image_data_root = "/raid/celong/FaceScape/fsmview_images"
+
     def meshrender(self,id_idx, exp_idx, vertices, cam_idx=1):
         """
         # id_idx: int
@@ -69,7 +70,7 @@ class MeshRender():
         obj = self.pyredner.Object(vertices=input_vertices, indices=self.om_indices, material=m)
         obj.normals = self.pyredner.compute_vertex_normal(obj.vertices, obj.indices)
 
-        img_dir = f"{image_data_root}/{id_idx}/{expressions[exp_idx]}"
+        img_dir = f"{self.image_data_root}/{id_idx}/{expressions[exp_idx]}"
         with open(f"{img_dir}/params.json", 'r') as f:
             params = json.load(f)
 
