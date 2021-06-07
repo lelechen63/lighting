@@ -70,7 +70,7 @@ class MeshRender():
         obj = self.pyredner.Object(vertices=input_vertices, indices=self.om_indices, material=m)
         obj.normals = self.pyredner.compute_vertex_normal(obj.vertices, obj.indices)
 
-        img_dir = f"{self.image_data_root}/{id_idx}/{expressions[exp_idx]}"
+        img_dir = f"{self.image_data_root}/{id_idx}/{self.expressions[exp_idx]}"
         with open(f"{img_dir}/params.json", 'r') as f:
             params = json.load(f)
 
