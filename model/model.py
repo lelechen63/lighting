@@ -538,7 +538,7 @@ class TexMeshModule(pl.LightningModule):
             Atex = util.tensor2im(batch['Atex'][0])
             Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
             Atex = util.writeText(Atex, batch['A_path'][0])
-                    
+            tmp = batch['A_path'][0].split('/')
             gt_Amesh = self.meshrender.meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),batch['Amesh'].data[0] )
             rec_Amesh = self.meshrender.meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), rec_mesh_A.data[0])
 
