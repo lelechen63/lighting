@@ -40,10 +40,10 @@ expressions = {
     20: "20_brow_lower"
 }
 
-image_data_root = "/raid/celong/FaceScape/fsmview_images"
-landmark_root = "/raid/celong/FaceScape/fsmview_landmarks"
-mesh_root = "/raid/celong/FaceScape/textured_meshes"
-rendering_root = "/raid/celong/FaceScape/fsmview_renderings"
+root = '/data/home/us000042/lelechen/FaceScape'
+image_data_root = root +  "/fsmview_images"
+mesh_root = root  + "/textured_meshes"
+rendering_root = root + "/fsmview_renderings"
 
 pyredner.set_use_gpu(torch.cuda.is_available())
 pyredner.set_print_timing(False)
