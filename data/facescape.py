@@ -294,7 +294,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
                 
                 tex_index = os.path.join( B_id , 'models_reg', B_exp  )
                 
-                if opt.debug:
+                if self.opt.debug:
                     tex_index = self.data_list[index]
 
                 if tex_index not in self.total_tex.keys():
