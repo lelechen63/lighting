@@ -61,8 +61,8 @@ class CLSLoss(nn.Module):
         # self.expcls = self.expcls.cuda()
         # self.idcls = self.idcls.cuda()
         
-        self.idcls.load_state_dict(torch.load('/data/home/us000042/lelechen/github/render2real/checkpoints/cls/200_net_idcls.pth'))
-        self.expcls.load_state_dict(torch.load('/data/home/us000042/lelechen/github/render2real/checkpoints/cls/200_net_expcls.pth'))
+        self.idcls.load_state_dict(torch.load('./checkpoints/cls/200_net_idcls.pth'))
+        self.expcls.load_state_dict(torch.load('./checkpoints/cls/200_net_expcls.pth'))
         
         for param in self.idcls.parameters():
             param.requires_grad = False
