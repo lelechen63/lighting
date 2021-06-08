@@ -275,7 +275,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
 
         # toss 0-> same iden, diff exp
         while True:
-            try:
+            # try:
                 if toss == 0:
                     pool = self.exp_set - set(tmp[-1])
                     B_exp = random.sample(pool, 1)[0]
@@ -291,7 +291,9 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
                 # tex
                 # DEBUG!!
                 # tex_index = self.data_list[index]
-                tex_index = os.path.join( B_id , 'models_reg', B_exp  )   
+                tex_index = os.path.join( B_id , 'models_reg', B_exp  )
+                if tex_index not in self.total_tex.keys():
+                    continue 
                 # tex_path = os.path.join( self.dir_tex , B_id, B_exp + '.png')
                 # # tex_path = '/raid/celong/FaceScape/texture_mapping/target/1/9_mouth_right.png'
                 # # mesh 
@@ -312,9 +314,9 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
                     print('!!!!',B_vertices.shape )
                     continue
                 break
-            except:
-                print('!!!!!', tex_index)
-                continue
+            # except:
+            #     print('!!!!!', tex_index)
+            #     continue
         # vertices=vertices.reshape(-1, 4, 3)
         # B_vertices = vertices[:, 0, :].reshape(-1)
         input_dict = { 'Atex': A_tex_tensor, 'Amesh': torch.FloatTensor(A_vertices),
