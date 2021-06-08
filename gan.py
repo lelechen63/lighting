@@ -15,7 +15,7 @@ import pytorch_lightning as pl
 from data.data import FacescapeDataModule
 from options.step1_train_options import TrainOptions
 from model.model import TexMeshModule as module 
-from model.model import TexMeshGenerator as module 
+# from model.model import TexMeshGenerator as module 
 
 from pytorch_lightning.callbacks import ModelCheckpoint
 
