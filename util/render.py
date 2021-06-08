@@ -40,7 +40,7 @@ expressions = {
     20: "20_brow_lower"
 }
 
-root = '/data/home/us000042/lelechen/data/FaceScape'
+root = '/data/home/us000042/lelechen/data/Facescape'
 image_data_root = root +  "/fsmview_images"
 mesh_root = root  + "/textured_meshes"
 rendering_root = root + "/fsmview_renderings"
