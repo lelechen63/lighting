@@ -538,18 +538,27 @@ class TexMeshModule(pl.LightningModule):
             Atex = util.tensor2im(batch['Atex'][0])
             Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
             Atex = util.writeText(Atex, batch['A_path'][0])
-            # tmp = batch['A_path'][0].split('/')
-            # gt_Amesh = self.meshrender.meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),batch['Amesh'].data[0].cpu() )
-            # rec_Amesh = self.meshrender.meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), rec_mesh_A.data[0].cpu())
+            if self.opt.debug:
+                tmp = batch['A_path'][0].split('/')
+                gt_Amesh = self.meshrender.meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),batch['Amesh'].data[0].cpu() )
+                rec_Amesh = self.meshrender.meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), rec_mesh_A.data[0].cpu())
 
 
-            visuals = OrderedDict([
-            ('Atex', Atex),
-            # ('Amesh', gt_Amesh),
-            ('rec_tex_A', util.tensor2im(rec_tex_A.data[0])),
-            # ('rec_Amesh', rec_Amesh)
-           
-            ])
+                visuals = OrderedDict([
+                ('Atex', Atex),
+                ('Amesh', gt_Amesh),
+                ('rec_tex_A', util.tensor2im(rec_tex_A.data[0])),
+                ('rec_Amesh', rec_Amesh)
+            
+                ])
+            else:
+                visuals = OrderedDict([
+                ('Atex', Atex),
+                # ('Amesh', gt_Amesh),
+                ('rec_tex_A', util.tensor2im(rec_tex_A.data[0])),
+                # ('rec_Amesh', rec_Amesh)
+            
+                ])
             self.visualizer.display_current_results(visuals, self.current_epoch, 1000000) 
 
         # if self.current_epoch % 10 == 0:
