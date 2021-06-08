@@ -177,7 +177,8 @@ if __name__ == '__main__':
     om_mesh = openmesh.read_trimesh(mesh_path)
     om_vertices = np.array(om_mesh.points()).reshape(-1)
     om_vertices = torch.from_numpy(om_vertices.astype(np.float32))
-    
+    print (om_vertices.shape)
+    print (type(om_vertices))
     img = render(id_idx, exp_idx, om_vertices)
     
     imageio.imwrite("fkass.png", img)
