@@ -412,9 +412,9 @@ class MisMatchTexMeshModule(pl.LightningModule):
         Atex = util.tensor2im(batch['Atex'][0])
         Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
         Atex = util.writeText(Atex, batch['A_path'][0])
-        tmp = batch['A_path'][0].split('/')
-        gt_Amesh = self.meshrender.render(int(tmp[0]), int(tmp[-1].split('_')[0]),batch['Amesh'].data[0] )
-        rec_Amesh = self.meshrender.render(int(tmp[0]), int(tmp[-1].split('_')[0]), rec_mesh_A.data[0])
+        # tmp = batch['A_path'][0].split('/')
+        # gt_Amesh = self.meshrender.render(int(tmp[0]), int(tmp[-1].split('_')[0]),batch['Amesh'].data[0] )
+        # rec_Amesh = self.meshrender.render(int(tmp[0]), int(tmp[-1].split('_')[0]), rec_mesh_A.data[0])
 
         Btex = util.tensor2im(batch['Btex'][0])
         Btex = np.ascontiguousarray(Btex, dtype=np.uint8)
@@ -422,7 +422,7 @@ class MisMatchTexMeshModule(pl.LightningModule):
 
         visuals = OrderedDict([
             ('Atex', Atex),
-            ('Amesh', gt_Amesh)
+            # ('Amesh', gt_Amesh)
             ('Btex', Btex),
             ('rec_tex_A', util.tensor2im(rec_tex_A.data[0])),
             ('rec_tex_B', util.tensor2im(rec_tex_B.data[0])),
