@@ -46,7 +46,7 @@ class MeshRender():
         self.pyredner.set_use_gpu(torch.cuda.is_available())
         self.pyredner.set_print_timing(False)
         om_indices = np.load("./predef/om_indices.npy")
-        self.om_indices = torch.from_numpy(om_indices).type(torch.int32).to(self.pyredner.get_device())
+        self.om_indices = torch.from_numpy(om_indices).type(torch.int32).cuda()#.to(self.pyredner.get_device())
         self.image_data_root = "/data/home/us000042/lelechen/data/Facescape/jsons"
 
     def shift(self, image, vector):
@@ -65,14 +65,14 @@ class MeshRender():
         """
         scale = self.Rt_scale_dict['%d'%id_idx]['%d'%exp_idx][0]
         Rt_TU = np.array(self.Rt_scale_dict['%d'%id_idx]['%d'%exp_idx][1])
-        Rt_TU = torch.from_numpy(Rt_TU).type(torch.float32).to(self.pyredner.get_device())
+        Rt_TU = torch.from_numpy(Rt_TU).type(torch.float32).cuda()#to(self.pyredner.get_device())
         
-        input_vertices = vertices.reshape(-1,3).to(self.pyredner.get_device())
+        input_vertices = vertices.reshape(-1,3).cuda()#.to(self.pyredner.get_device())
         input_vertices = (Rt_TU[:3,:3].T @ (input_vertices - Rt_TU[:3,3]).T).T
         input_vertices = input_vertices / scale
         input_vertices = input_vertices.contiguous()
 
-        m = self.pyredner.Material(diffuse_reflectance = torch.tensor((0.5, 0.5, 0.5), device = self.pyredner.get_device()))
+        m = self.pyredner.Material(diffuse_reflectance = torch.tensor((0.5, 0.5, 0.5)).cuda()#, device = self.pyredner.get_device()))
         obj = self.pyredner.Object(vertices=input_vertices, indices=self.om_indices, material=m)
         obj.normals = self.pyredner.compute_vertex_normal(obj.vertices, obj.indices)
 
@@ -118,7 +118,7 @@ class MeshRender():
         light_dir = torch.tensor([[0.0, 0.0, 1.0]])
         light_dir = (c2w[:3,:3]@light_dir.T).T
         lights = [
-            self.pyredner.DirectionalLight(light_dir.to(self.pyredner.get_device()), torch.tensor([5.0, 5.0, 5.0], device = self.pyredner.get_device()))
+            self.pyredner.DirectionalLight(light_dir.cuda(), torch.tensor([5.0, 5.0, 5.0]).cuda())
         ]
         
         scene = self.pyredner.Scene(camera=cam, objects=[obj])
