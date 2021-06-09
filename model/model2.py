@@ -374,25 +374,25 @@ class TexMeshModule(pl.LightningModule):
             Atex = util.tensor2im(batch['Atex'][0])
             Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
             Atex = util.writeText(Atex, batch['A_path'][0])
-            tmp = batch['A_path'][0].split('/')
-            gg = batch['Amesh'].data[0].cpu()
-            gg = gg.numpy()
-            gg = torch.from_numpy(gg.astype(np.float32))
+            # tmp = batch['A_path'][0].split('/')
+            # gg = batch['Amesh'].data[0].cpu()
+            # gg = gg.numpy()
+            # gg = torch.from_numpy(gg.astype(np.float32))
 
-            gt_Amesh = self.meshrender.meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gg )
+            # gt_Amesh = self.meshrender.meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gg )
             
-            gg =rec_mesh_A.data[0].cpu()
-            gg = gg.numpy()
-            gg = torch.from_numpy(gg.astype(np.float32))
+            # gg =rec_mesh_A.data[0].cpu()
+            # gg = gg.numpy()
+            # gg = torch.from_numpy(gg.astype(np.float32))
 
-            rec_Amesh = self.meshrender.meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gg)
+            # rec_Amesh = self.meshrender.meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gg)
 
 
             visuals = OrderedDict([
             ('Atex', Atex),
-            ('Amesh', gt_Amesh),
+            # ('Amesh', gt_Amesh),
             ('rec_tex_A', util.tensor2im(rec_tex_A.data[0])),
-            ('rec_Amesh', rec_Amesh)
+            # ('rec_Amesh', rec_Amesh)
         
             ])
        
