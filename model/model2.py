@@ -384,7 +384,6 @@ class TexMeshModule(pl.LightningModule):
             gg =rec_mesh_A.data[0].cpu()
             gg = gg.numpy()
             gg = torch.from_numpy(gg.astype(np.float32))
-            gg = torch.from_numpy(gg.astype(np.float32))
 
             rec_Amesh = self.meshrender.meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gg)
 
