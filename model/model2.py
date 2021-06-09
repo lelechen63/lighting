@@ -281,6 +281,8 @@ class TexMeshModule(pl.LightningModule):
             input_nc, opt.code_n,opt.encoder_fc_n, opt.ngf, 
             opt.n_downsample_global, opt.n_blocks_global,opt.norm)
 
+        self.discriminator = MultiscaleDiscriminator(input_nc)   
+
         self.l1loss = torch.nn.L1Loss()
         self.l2loss = torch.nn.MSELoss()
         if not opt.no_vgg_loss:             
@@ -297,8 +299,9 @@ class TexMeshModule(pl.LightningModule):
 
     def forward(self, A_tex, A_mesh, B_tex, B_mesh):
         return self.generator(A_tex, A_mesh)
-
-    def training_step(self, batch, batch_idx):
+    def adversarial_loss(self, y_hat, y):
+        return F.binary_cross_entropy(y_hat, y)
+    def training_step(self, batch, batch_idx, optimizer_idx):
         self.batch = batch
         # train generator
         # generate images
@@ -306,63 +309,84 @@ class TexMeshModule(pl.LightningModule):
         self(batch['Atex'], batch['Amesh'],batch['Btex'],batch['Bmesh'])
         map_type = batch['map_type']
 
-        # log sampled images
-        # sample_imgs = rec_tex_A[:6]
-        # grid = torchvision.utils.make_grid(sample_imgs)
-        # self.logger.experiment.add_image('generated_images', grid, 0)
-
-         ### display output images
-        # save_fake = True
-        # save_fake = batch_idx % opt.display_freq 
-        # if save_fake:
+        if optimizer_idx ==0:       
+            # VGG loss
+            loss_G_VGG = 0
+            if not self.opt.no_vgg_loss:
+                loss_G_VGG += self.VGGloss(rec_tex_A, batch['Atex']) * self.opt.lambda_feat
             
+            # CLS loss
+            loss_G_CLS = 0
+            if not self.opt.no_cls_loss:
+                loss_G_CLS += self.CLSloss(rec_tex_A,  batch['Aid'] , 'id') * self.opt.lambda_cls
+                loss_G_CLS += self.CLSloss(rec_tex_A,  batch['Aexp'] , 'exp') * self.opt.lambda_cls
 
-        # ground truth result (ie: all fake)
-       
-        # VGG loss
-        loss_G_VGG = 0
-        if not self.opt.no_vgg_loss:
-            loss_G_VGG += self.VGGloss(rec_tex_A, batch['Atex']) * self.opt.lambda_feat
-        
-        # CLS loss
-        loss_G_CLS = 0
-        if not self.opt.no_cls_loss:
-               
-            loss_G_CLS += self.CLSloss(rec_tex_A,  batch['Aid'] , 'id') * self.opt.lambda_cls
-            loss_G_CLS += self.CLSloss(rec_tex_A,  batch['Aexp'] , 'exp') * self.opt.lambda_cls
+            # pix loss
+            loss_G_pix = 0
+            # reconstruction loss
+            loss_G_pix += self.l1loss(rec_tex_A, batch['Atex']) * self.opt.lambda_pix
 
-        # pix loss
-        loss_G_pix = 0
-        # mismatch loss
-             
-        # reconstruction loss
-        loss_G_pix += self.l1loss(rec_tex_A, batch['Atex']) * self.opt.lambda_pix
+            #mesh loss
+            loss_mesh = 0
+            if not self.opt.no_mesh_loss:
+                loss_mesh += self.l1loss(rec_mesh_A, batch['Amesh'])* self.opt.lambda_mesh
+                # mismatch loss
+            
+            # adversarial loss is binary cross-entropy
+            valid = torch.ones(batch['Atex'].size(0), 1)
+            valid = valid.type_as(batch['Atex'])
 
-        #mesh loss
-        loss_mesh = 0
-        if not self.opt.no_mesh_loss:
-            loss_mesh += self.l1loss(rec_mesh_A, batch['Amesh'])* self.opt.lambda_mesh
-            # mismatch loss
-           
-        # adversarial loss is binary cross-entropy
-        g_loss = loss_G_pix + loss_G_VGG + loss_G_CLS + loss_mesh
-        tqdm_dict = {'loss_pix': loss_G_pix, 'loss_G_VGG': loss_G_VGG, 'loss_G_CLS': loss_G_CLS, 'loss_mesh': loss_mesh }
-        output = OrderedDict({
-            'loss': g_loss,
-            'progress_bar': tqdm_dict,
-            'log': tqdm_dict
-        })
+            # adversarial loss is binary cross-entropy
+            g_loss = self.adversarial_loss(self.discriminator(rec_tex_A), valid)
 
-        errors = {k: v.data.item() if not isinstance(v, int) else v for k, v in tqdm_dict.items()}            
-        self.visualizer.print_current_errors(self.current_epoch, batch_idx, errors, 0)
-        self.visualizer.plot_current_errors(errors, batch_idx)
-        return output
+            loss = loss_G_pix + loss_G_VGG + loss_G_CLS + loss_mesh + g_loss
+            tqdm_dict = {'loss_pix': loss_G_pix, 'loss_G_VGG': loss_G_VGG, 'loss_G_CLS': loss_G_CLS, 'loss_mesh': loss_mesh, 'loss_GAN': g_loss }
+            output = OrderedDict({
+                'loss': loss,
+                'progress_bar': tqdm_dict,
+                'log': tqdm_dict
+            })
+
+            errors = {k: v.data.item() if not isinstance(v, int) else v for k, v in tqdm_dict.items()}            
+            self.visualizer.print_current_errors(self.current_epoch, batch_idx, errors, 0)
+            self.visualizer.plot_current_errors(errors, batch_idx)
+            return output
+        if optimizer_idx == 1:
+            # how well can it label as real?
+            valid = torch.ones(batch['Atex'].size(0), 1)
+            valid = valid.type_as(batch['Atex'])
+
+            real_loss = self.adversarial_loss(self.discriminator(batch['Atex']), valid)
+
+            # how well can it label as fake?
+            fake = torch.zeros(batch['Atex'].size(0), 1)
+            fake = fake.type_as(batch['Atex'])
+
+            fake_loss = self.adversarial_loss(
+                self.discriminator(rec_tex_A.detach()), fake)
+
+            # discriminator loss is the average of these
+            d_loss = (real_loss + fake_loss) / 2
+            tqdm_dict = {'d_loss': d_loss}
+            output = OrderedDict({
+                'loss': d_loss,
+                'progress_bar': tqdm_dict,
+                'log': tqdm_dict
+            })
+
+            errors = {k: v.data.item() if not isinstance(v, int) else v for k, v in tqdm_dict.items()}            
+            self.visualizer.print_current_errors(self.current_epoch, batch_idx, errors, 0)
+            self.visualizer.plot_current_errors(errors, batch_idx)
+            return output
 
         
     def configure_optimizers(self):
         lr = self.opt.lr
         opt_g = torch.optim.Adam(self.generator.parameters(), lr=lr, betas=(self.opt.beta1, 0.999))
-        return [opt_g], []
+        
+        opt_d = torch.optim.Adam(self.discriminator.parameters(), lr=lr, betas=(self.opt.beta1, 0.999))
+
+        return [opt_g, opt_d], []
 
     def on_epoch_end(self):
         if self.current_epoch % 10 == 0:
@@ -394,3 +418,97 @@ class TexMeshModule(pl.LightningModule):
        
             self.visualizer.display_current_results(visuals, self.current_epoch, 1000000) 
 
+
+
+
+class MultiscaleDiscriminator(nn.Module):
+    def __init__(self, input_nc, ndf=64, n_layers=3, norm_layer=nn.BatchNorm2d, 
+                 use_sigmoid=True, num_D=3, getIntermFeat=False):
+        super(MultiscaleDiscriminator, self).__init__()
+        self.num_D = num_D
+        self.n_layers = n_layers
+        self.getIntermFeat = getIntermFeat
+     
+        for i in range(num_D):
+            netD = NLayerDiscriminator(input_nc, ndf, n_layers, norm_layer, use_sigmoid, getIntermFeat)
+            if getIntermFeat:                                
+                for j in range(n_layers+2):
+                    setattr(self, 'scale'+str(i)+'_layer'+str(j), getattr(netD, 'model'+str(j)))                                   
+            else:
+                setattr(self, 'layer'+str(i), netD.model)
+
+        self.downsample = nn.AvgPool2d(3, stride=2, padding=[1, 1], count_include_pad=False)
+
+    def singleD_forward(self, model, input):
+        if self.getIntermFeat:
+            result = [input]
+            for i in range(len(model)):
+                result.append(model[i](result[-1]))
+            return result[1:]
+        else:
+            return [model(input)]
+
+    def forward(self, input):        
+        num_D = self.num_D
+        result = []
+        input_downsampled = input
+        for i in range(num_D):
+            if self.getIntermFeat:
+                model = [getattr(self, 'scale'+str(num_D-1-i)+'_layer'+str(j)) for j in range(self.n_layers+2)]
+            else:
+                model = getattr(self, 'layer'+str(num_D-1-i))
+            result.append(self.singleD_forward(model, input_downsampled))
+            if i != (num_D-1):
+                input_downsampled = self.downsample(input_downsampled)
+        return result
+# Defines the PatchGAN discriminator with the specified arguments.
+class NLayerDiscriminator(nn.Module):
+    def __init__(self, input_nc, ndf=64, n_layers=3, norm_layer=nn.BatchNorm2d, use_sigmoid=False, getIntermFeat=False):
+        super(NLayerDiscriminator, self).__init__()
+        self.getIntermFeat = getIntermFeat
+        self.n_layers = n_layers
+
+        kw = 4
+        padw = int(np.ceil((kw-1.0)/2))
+        sequence = [[nn.Conv2d(input_nc, ndf, kernel_size=kw, stride=2, padding=padw), nn.LeakyReLU(0.2, True)]]
+
+        nf = ndf
+        for n in range(1, n_layers):
+            nf_prev = nf
+            nf = min(nf * 2, 512)
+            sequence += [[
+                nn.Conv2d(nf_prev, nf, kernel_size=kw, stride=2, padding=padw),
+                norm_layer(nf), nn.LeakyReLU(0.2, True)
+            ]]
+
+        nf_prev = nf
+        nf = min(nf * 2, 512)
+        sequence += [[
+            nn.Conv2d(nf_prev, nf, kernel_size=kw, stride=1, padding=padw),
+            norm_layer(nf),
+            nn.LeakyReLU(0.2, True)
+        ]]
+
+        sequence += [[nn.Conv2d(nf, 1, kernel_size=kw, stride=1, padding=padw)]]
+
+        if use_sigmoid:
+            sequence += [[nn.Sigmoid()]]
+
+        if getIntermFeat:
+            for n in range(len(sequence)):
+                setattr(self, 'model'+str(n), nn.Sequential(*sequence[n]))
+        else:
+            sequence_stream = []
+            for n in range(len(sequence)):
+                sequence_stream += sequence[n]
+            self.model = nn.Sequential(*sequence_stream)
+
+    def forward(self, input):
+        if self.getIntermFeat:
+            res = [input]
+            for n in range(self.n_layers+2):
+                model = getattr(self, 'model'+str(n))
+                res.append(model(res[-1]))
+            return res[1:]
+        else:
+            return self.model(input)        
