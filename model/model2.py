@@ -333,7 +333,7 @@ class TexMeshModule(pl.LightningModule):
                 # mismatch loss
             
             
-            g_loss = self.GANloss(self.GANloss( torch.cat((batch['Atex'], rec_tex_A), dim=1) ), True)
+            g_loss = self.GANloss( torch.cat((batch['Atex'], rec_tex_A), dim=1), True)
 
             loss = loss_G_pix + loss_G_VGG + loss_G_CLS + loss_mesh + g_loss
             tqdm_dict = {'loss_pix': loss_G_pix, 'loss_G_VGG': loss_G_VGG, 'loss_G_CLS': loss_G_CLS, 'loss_mesh': loss_mesh, 'loss_GAN': g_loss }
