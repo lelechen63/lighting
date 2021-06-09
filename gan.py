@@ -31,10 +31,10 @@ model = module(opt)
 print ( opt.gpu_ids)
 # trainer = pl.Trainer(gpus= opt.gpu_ids, max_epochs= 200, progress_bar_refresh_rate=20)
 # if opt.debug:
-trainer = pl.Trainer(precision=16,gpus=1,  max_epochs= 10000, progress_bar_refresh_rate=20)
+# trainer = pl.Trainer(precision=16,gpus=1,  max_epochs= 10000, progress_bar_refresh_rate=20)
 
 # else:
-# trainer = pl.Trainer(precision=16,gpus=4, accelerator='ddp', max_epochs= 10000, progress_bar_refresh_rate=20)
+trainer = pl.Trainer(precision=16,gpus=4, accelerator='dp', max_epochs= 10000, progress_bar_refresh_rate=20)
 checkpoint_callback = ModelCheckpoint(
     monitor='train_loss',
     dirpath= os.path.join(opt.checkpoints_dir, opt.name),
