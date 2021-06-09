@@ -385,7 +385,7 @@ class TexMeshModule(pl.LightningModule):
             gg = gg.numpy()
             gg = torch.from_numpy(gg.astype(np.float32))
 
-            rec_Amesh = self.meshrender.meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gg))
+            rec_Amesh = self.meshrender.meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gg)
 
 
             visuals = OrderedDict([
