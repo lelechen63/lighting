@@ -159,7 +159,7 @@ class TexMeshDecoder(nn.Module):
             nn.ReLU(True)
             )
         self.mesh_fc_dec = nn.Sequential(
-            nn.Linear( ngf*4 * 2, ngf*4),
+            nn.Linear( ngf*4, ngf*4),
             nn.ReLU(True),
             nn.Linear( ngf*4, ngf*4),
             nn.ReLU(True),
