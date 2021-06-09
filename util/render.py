@@ -41,7 +41,7 @@ expressions = {
 }
 
 root = '/data/home/us000042/lelechen/data/Facescape'
-image_data_root = root +  "/fsmview_images"
+image_data_root = root +  "/jsons"
 mesh_root = root  + "/textured_meshes"
 rendering_root = root + "/fsmview_renderings"
 
