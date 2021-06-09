@@ -43,7 +43,7 @@ class MeshRender():
         self.pyredner = pyredner
         with open("./predef/Rt_scale_dict.json", 'r') as f:
             self.Rt_scale_dict = json.load(f)
-        self.pyredner.set_use_gpu(torch.cuda.is_available())
+        self.pyredner.set_use_gpu(False)
         self.pyredner.set_print_timing(False)
         om_indices = np.load("./predef/om_indices.npy")
         self.om_indices = torch.from_numpy(om_indices).type(torch.int32).to(self.pyredner.get_device())
