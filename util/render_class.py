@@ -127,4 +127,6 @@ class MeshRender():
         img = torch.pow(img, 1.0/2.2).cpu().numpy()
         img = self.shift(img, [-dx, -dy])
 
+        img = np.asarray(img)
+
         return img

@@ -181,6 +181,9 @@ if __name__ == '__main__':
     print (om_vertices.shape)
     print (type(om_vertices))
     img = render(id_idx, exp_idx, om_vertices)
+
+    print (type(img))
+    print (img.shape)
     img = np.asarray(img)
     image_pil = Image.fromarray(img)
     image_pil.save("fkass.png")
