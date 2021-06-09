@@ -47,7 +47,7 @@ class MeshRender():
         self.pyredner.set_print_timing(False)
         om_indices = np.load("./predef/om_indices.npy")
         self.om_indices = torch.from_numpy(om_indices).type(torch.int32).to(self.pyredner.get_device())
-        self.image_data_root = "/raid/celong/FaceScape/fsmview_images"
+        self.image_data_root = "/data/home/us000042/lelechen/Facescape/jsons"
 
     def shift(self, image, vector):
         transform = AffineTransform(translation=vector)
