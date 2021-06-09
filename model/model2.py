@@ -116,7 +116,6 @@ class TexMeshEncoder(nn.Module):
         self.resblocks = nn.Sequential(*model)
     def forward(self, tex, mesh):
         tex_encoded = self.CNNencoder(tex)
-        print (tex_encoded.shape)
         tex_encoded = self.resblocks(tex_encoded).view(tex_encoded.shape[0], -1)
         mesh_encoded = self.meshencoder(mesh)
         # encoded= torch.cat([mesh_encoded, tex_encoded], 1)
