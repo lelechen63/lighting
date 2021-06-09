@@ -72,7 +72,7 @@ class MeshRender():
         input_vertices = input_vertices / scale
         input_vertices = input_vertices.contiguous()
 
-        m = self.pyredner.Material(diffuse_reflectance = torch.tensor((0.5, 0.5, 0.5).cuda()))#, device = self.pyredner.get_device()))
+        m = self.pyredner.Material(diffuse_reflectance = torch.tensor((0.5, 0.5, 0.5)).cuda())#, device = self.pyredner.get_device()))
         obj = self.pyredner.Object(vertices=input_vertices, indices=self.om_indices, material=m)
         obj.normals = self.pyredner.compute_vertex_normal(obj.vertices, obj.indices)
 
