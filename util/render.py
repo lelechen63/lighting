@@ -184,7 +184,8 @@ if __name__ == '__main__':
 
     print (type(img))
     print (img.shape)
-    img = np.asarray(img)
+    img = img* 255
+    img = img.astype(np.uint8)
     image_pil = Image.fromarray(img)
     image_pil.save("fkass.png")
     # imageio.imwrite("fkass.png", img)
