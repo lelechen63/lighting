@@ -133,7 +133,8 @@ class MeshRender():
         
         light_dir = torch.tensor([[0.0, 0.0, 1.0]])
         light_dir = (c2w[:3,:3]@light_dir.T).T
-        light_dir = light_dir.to(self.pyredner.get_device())
+        light_dir = light_dir.to("cuda:0")
+        # light_dir = light_dir.to(self.pyredner.get_device())
         print ('light_dir:', light_dir.device)
         lights = [
             self.pyredner.DirectionalLight(light_dir, torch.tensor([5.0, 5.0, 5.0], device = self.pyredner.get_device()))
