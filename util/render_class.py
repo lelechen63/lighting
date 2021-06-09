@@ -148,5 +148,5 @@ class MeshRender():
 
         img = img* 255
         img = img.astype(np.uint8)
-
+        print ('**********************************')
         return img
