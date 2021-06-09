@@ -48,9 +48,9 @@ class TexMeshEncoder(nn.Module):
             norm_layer(ngf  * 2),
             nn.ReLU(True),  # 2
 
-            nn.Conv2d( ngf * 2, ngf  * 2, kernel_size=3, stride=2, padding=1),
-            norm_layer(ngf  * 2),
-            nn.ReLU(True),  #4
+            # nn.Conv2d( ngf * 2, ngf  * 2, kernel_size=3, stride=2, padding=1),
+            # norm_layer(ngf  * 2),
+            # nn.ReLU(True),  #4
 
             nn.Conv2d(ngf*2 , ngf  * 4, kernel_size=3, stride=2, padding=1),
             norm_layer(ngf  * 4),
