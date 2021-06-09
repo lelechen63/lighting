@@ -49,6 +49,7 @@ class MeshRender():
         om_indices = np.load("./predef/om_indices.npy")
         self.om_indices = torch.from_numpy(om_indices).type(torch.int32).to(self.pyredner.get_device())
         print ('om_indices', self.om_indices.device)
+        print('+++++++')
         self.image_data_root = "/data/home/us000042/lelechen/data/Facescape/jsons"
 
     def shift(self, image, vector):
