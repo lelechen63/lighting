@@ -116,6 +116,7 @@ class TexMeshEncoder(nn.Module):
         self.resblocks = nn.Sequential(*model)
     def forward(self, tex, mesh):
         tex_encoded = self.CNNencoder(tex)
+        print (tex_encoded.shape)
         tex_encoded = self.resblocks(tex_encoded).view(tex_encoded.shape[0], -1)
         mesh_encoded = self.meshencoder(mesh)
         # encoded= torch.cat([mesh_encoded, tex_encoded], 1)
@@ -356,37 +357,6 @@ class TexMeshModule(pl.LightningModule):
         errors = {k: v.data.item() if not isinstance(v, int) else v for k, v in tqdm_dict.items()}            
         self.visualizer.print_current_errors(self.current_epoch, batch_idx, errors, 0)
         self.visualizer.plot_current_errors(errors, batch_idx)
-
-        rec_tex_A, rec_mesh_A = \
-        self(batch['Atex'], batch['Amesh'],batch['Btex'],batch['Bmesh'])
-
-        Atex = util.tensor2im(batch['Atex'][0])
-        Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
-        Atex = util.writeText(Atex, batch['A_path'][0])
-        tmp = batch['A_path'][0].split('/')
-        gg = batch['Amesh'].data[0].cpu()
-        gg = gg.numpy()
-        gg = torch.from_numpy(gg.astype(np.float32))
-        gt_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gg )
-        
-        gg =rec_mesh_A.data[0].cpu()
-        gg = gg.numpy()
-        gg = torch.from_numpy(gg.astype(np.float32))
-
-        rec_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gg)
-
-
-        visuals = OrderedDict([
-        ('Atex', Atex),
-        ('Amesh', gt_Amesh),
-        ('rec_tex_A', util.tensor2im(rec_tex_A.data[0])),
-        ('rec_Amesh', rec_Amesh)
-    
-        ])
-    
-        self.visualizer.display_current_results(visuals, self.current_epoch, 1000000) 
-
-
         return output
 
         
@@ -395,37 +365,33 @@ class TexMeshModule(pl.LightningModule):
         opt_g = torch.optim.Adam(self.generator.parameters(), lr=lr, betas=(self.opt.beta1, 0.999))
         return [opt_g], []
 
-    # def on_epoch_end(self):
-    #     # if self.current_epoch % 10 == 0:
-    #         batch = self.batch
-    #         rec_tex_A, rec_mesh_A = \
-    #         self(batch['Atex'], batch['Amesh'],batch['Btex'],batch['Bmesh'])
+    def on_epoch_end(self):
+        if self.current_epoch % 10 == 0:
+            batch = self.batch
+            rec_tex_A, rec_mesh_A = \
+            self(batch['Atex'], batch['Amesh'],batch['Btex'],batch['Bmesh'])
 
-    #         Atex = util.tensor2im(batch['Atex'][0])
-    #         Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
-    #         Atex = util.writeText(Atex, batch['A_path'][0])
-    #         tmp = batch['A_path'][0].split('/')
-    #         gg = batch['Amesh'].data[0].cpu()
-    #         gg = gg.numpy()
-    #         gg = torch.from_numpy(gg.astype(np.float32))
-    #         gt_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gg )
+            Atex = util.tensor2im(batch['Atex'][0])
+            Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
+            Atex = util.writeText(Atex, batch['A_path'][0])
+            # tmp = batch['A_path'][0].split('/')
+            # gg = batch['Amesh'].data[0].cpu()
+            # gg = gg.numpy()
+            # gg = torch.from_numpy(gg.astype(np.float32))
+            # gt_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gg )
             
-    #         gg =rec_mesh_A.data[0].cpu()
-    #         gg = gg.numpy()
-    #         gg = torch.from_numpy(gg.astype(np.float32))
+            # gg =rec_mesh_A.data[0].cpu()
+            # gg = gg.numpy()
+            # gg = torch.from_numpy(gg.astype(np.float32))
 
-    #         rec_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gg)
-
-
-    #         visuals = OrderedDict([
-    #         ('Atex', Atex),
-    #         ('Amesh', gt_Amesh),
-    #         ('rec_tex_A', util.tensor2im(rec_tex_A.data[0])),
-    #         ('rec_Amesh', rec_Amesh)
+            # rec_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gg)
+            visuals = OrderedDict([
+            ('Atex', Atex),
+            # ('Amesh', gt_Amesh),
+            ('rec_tex_A', util.tensor2im(rec_tex_A.data[0])),
+            # ('rec_Amesh', rec_Amesh)
         
-    #         ])
+            ])
        
-    #         self.visualizer.display_current_results(visuals, self.current_epoch, 1000000) 
+            self.visualizer.display_current_results(visuals, self.current_epoch, 1000000) 
 
-    #     if self.current_epoch % 10 == 0:
-    #         self.save_network(self.generator, 'texmeshED', self.current_epoch )
