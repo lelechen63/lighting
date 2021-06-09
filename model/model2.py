@@ -377,14 +377,14 @@ class TexMeshModule(pl.LightningModule):
             tmp = batch['A_path'][0].split('/')
             gg = batch['Amesh'].data[0].cpu()
             gg = gg.numpy()
-            gg = torch.from_numpy(gg.astype(np.float32)).cpu()
+            gg = torch.from_numpy(gg.astype(np.float32))
 
             gt_Amesh = self.meshrender.meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gg )
             
             gg =rec_mesh_A.data[0].cpu()
             gg = gg.numpy()
             gg = torch.from_numpy(gg.astype(np.float32))
-            gg = torch.from_numpy(gg.astype(np.float32)).cpu()
+            gg = torch.from_numpy(gg.astype(np.float32))
 
             rec_Amesh = self.meshrender.meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gg)
 
