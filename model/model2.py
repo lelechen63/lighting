@@ -349,11 +349,7 @@ class TexMeshModule(pl.LightningModule):
             return output
         if optimizer_idx == 1:
 
-            real_loss = self.GANloss( torch.cat((batch['Atex'], torch.cat((batch['Atex']), dim=1), True)
-
-            # how well can it label as fake?
-            fake = torch.zeros(batch['Atex'].size(0), 1)
-            fake = fake.type_as(batch['Atex'])
+            real_loss = self.GANloss( torch.cat((batch['Atex'], batch['Atex']), dim=1), True)
 
             fake_loss = self.adversarial_loss(
                 self.GANloss( torch.cat((batch['Atex'], rec_tex_A.detach()), False)
