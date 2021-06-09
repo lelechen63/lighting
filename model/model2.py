@@ -352,7 +352,7 @@ class TexMeshModule(pl.LightningModule):
             real_loss = self.GANloss( torch.cat((batch['Atex'], batch['Atex']), dim=1), True)
 
             fake_loss = self.adversarial_loss(
-                self.GANloss( torch.cat((batch['Atex'], rec_tex_A.detach()), False))
+                self.GANloss( torch.cat((batch['Atex'], rec_tex_A.detach() ), dim = 1), False)
 
             # discriminator loss is the average of these
             d_loss = (real_loss + fake_loss) / 2
