@@ -324,7 +324,8 @@ class TexMeshModule(pl.LightningModule):
             # pix loss
             loss_G_pix = 0
             # reconstruction loss
-            loss_G_pix += self.l1loss(rec_tex_A, batch['Atex']) * self.opt.lambda_pix
+            if not self.opt.no_pix_loss:
+                loss_G_pix += self.l1loss(rec_tex_A, batch['Atex']) * self.opt.lambda_pix
 
             #mesh loss
             loss_mesh = 0

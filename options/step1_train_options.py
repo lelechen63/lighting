@@ -36,6 +36,8 @@ class TrainOptions(BaseOptions):
         self.parser.add_argument('--lambda_pix', type=float, default=10, help='weight for feature matching loss')                
         self.parser.add_argument('--lambda_mesh', type=float, default=0.01, help='weight for feature matching loss')                
         self.parser.add_argument('--no_cls_loss', action='store_true', help='if specified, do *not* use discriminator feature matching loss')
+        self.parser.add_argument('--no_pix_loss', action='store_true', help='if specified, do *not* use discriminator feature matching loss')
+
         self.parser.add_argument('--lambda_cls', type=float, default=0.01, help='weight for feature matching loss')                
         self.parser.add_argument('--lambda_mismatch', type=float, default=0.01, help='weight for feature matching loss')                
 
