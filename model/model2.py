@@ -366,7 +366,7 @@ class TexMeshModule(pl.LightningModule):
         return [opt_g], []
 
     def on_epoch_end(self):
-        if self.current_epoch % 10 == 0:
+        # if self.current_epoch % 10 == 0:
             batch = self.batch
             rec_tex_A, rec_mesh_A = \
             self(batch['Atex'], batch['Amesh'],batch['Btex'],batch['Bmesh'])
