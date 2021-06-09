@@ -66,19 +66,19 @@ class MeshRender():
         """
         scale = self.Rt_scale_dict['%d'%id_idx]['%d'%exp_idx][0]
         Rt_TU = np.array(self.Rt_scale_dict['%d'%id_idx]['%d'%exp_idx][1])
-        Rt_TU = torch.from_numpy(Rt_TU).type(torch.float32).to(om_indices.device)
+        Rt_TU = torch.from_numpy(Rt_TU).type(torch.float32).to(self.om_indices.device)
         
-        input_vertices = vertices.reshape(-1,3).to(om_indices.device)
+        input_vertices = vertices.reshape(-1,3).to(self.om_indices.device)
         input_vertices = (Rt_TU[:3,:3].T @ (input_vertices - Rt_TU[:3,3]).T).T
         input_vertices = input_vertices / scale
         input_vertices = input_vertices.contiguous()
 
         print (input_vertices)
-        m = self.pyredner.Material(diffuse_reflectance = torch.tensor((0.5, 0.5, 0.5), device = om_indices.device))
+        m = self.pyredner.Material(diffuse_reflectance = torch.tensor((0.5, 0.5, 0.5), device = self.om_indices.device))
         obj = self.pyredner.Object(vertices=input_vertices, indices=self.om_indices, material=m)
         
         obj.normals = self.pyredner.compute_vertex_normal(obj.vertices, obj.indices)
-        # obj.normals = self.pyredner.compute_vertex_normal(obj.vertices.to(om_indices.device), obj.indices.to(om_indices.device)).cpu()
+        # obj.normals = self.pyredner.compute_vertex_normal(obj.vertices.to(self.om_indices.device), obj.indices.to(self.om_indices.device)).cpu()
 
         img_dir = f"{self.image_data_root}/{id_idx}/{self.expressions[exp_idx]}"
         with open(f"{img_dir}/params.json", 'r') as f:
@@ -122,7 +122,7 @@ class MeshRender():
         light_dir = torch.tensor([[0.0, 0.0, 1.0]])
         light_dir = (c2w[:3,:3]@light_dir.T).T
         lights = [
-            self.pyredner.DirectionalLight(light_dir.to(om_indices.device), torch.tensor([5.0, 5.0, 5.0], device = om_indices.device))
+            self.pyredner.DirectionalLight(light_dir.to(self.om_indices.device), torch.tensor([5.0, 5.0, 5.0], device = self.om_indices.device))
         ]
         
         scene = self.pyredner.Scene(camera=cam, objects=[obj])
