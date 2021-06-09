@@ -75,7 +75,8 @@ class MeshRender():
 
         m = self.pyredner.Material(diffuse_reflectance = torch.tensor((0.5, 0.5, 0.5), device = self.pyredner.get_device()))
         obj = self.pyredner.Object(vertices=input_vertices, indices=self.om_indices, material=m)
-        obj.normals = self.pyredner.compute_vertex_normal(obj.vertices.to(self.pyredner.get_device()), obj.indices.to(self.pyredner.get_device())).cpu()
+        obj.normals = self.pyredner.compute_vertex_normal(obj.vertices, obj.indices)
+        # obj.normals = self.pyredner.compute_vertex_normal(obj.vertices.to(self.pyredner.get_device()), obj.indices.to(self.pyredner.get_device())).cpu()
 
         img_dir = f"{self.image_data_root}/{id_idx}/{self.expressions[exp_idx]}"
         with open(f"{img_dir}/params.json", 'r') as f:
