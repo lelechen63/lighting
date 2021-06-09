@@ -48,8 +48,6 @@ class MeshRender():
         self.pyredner.set_print_timing(False)
         om_indices = np.load("./predef/om_indices.npy")
         self.om_indices = torch.from_numpy(om_indices).type(torch.int32).to(self.pyredner.get_device())
-        print ('om_indices', self.om_indices.device)
-        print('+++++++')
         self.image_data_root = "/data/home/us000042/lelechen/data/Facescape/jsons"
 
     def shift(self, image, vector):
@@ -70,6 +68,10 @@ class MeshRender():
         Rt_TU = np.array(self.Rt_scale_dict['%d'%id_idx]['%d'%exp_idx][1])
         Rt_TU = torch.from_numpy(Rt_TU).type(torch.float32).to(self.pyredner.get_device())
         print ('Rt_TU', Rt_TU.device)
+
+        print ('om_indices', self.om_indices.device)
+        print('+++++++')
+        
         input_vertices = vertices.reshape(-1,3).to(self.pyredner.get_device())
         input_vertices = (Rt_TU[:3,:3].T @ (input_vertices - Rt_TU[:3,3]).T).T
         input_vertices = input_vertices / scale
