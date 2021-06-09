@@ -180,8 +180,10 @@ if __name__ == '__main__':
     print (om_vertices.shape)
     print (type(om_vertices))
     img = render(id_idx, exp_idx, om_vertices)
-    
-    imageio.imwrite("fkass.png", img)
+    img = np.asarray(img)
+    image_pil = Image.fromarray(img)
+    image_pil.save("fkass.png")
+    # imageio.imwrite("fkass.png", img)
 
     exit(0)
     for id_idx in range(1,400):

@@ -397,9 +397,9 @@ class TexMeshModule(pl.LightningModule):
             else:
                 visuals = OrderedDict([
                 ('Atex', Atex),
-                # ('Amesh', gt_Amesh),
+                ('Amesh', gt_Amesh),
                 ('rec_tex_A', util.tensor2im(rec_tex_A.data[0])),
-                # ('rec_Amesh', rec_Amesh)
+                ('rec_Amesh', rec_Amesh)
             
                 ])
             self.visualizer.display_current_results(visuals, self.current_epoch, 1000000) 
