@@ -301,6 +301,120 @@ class TexMeshModule(pl.LightningModule):
     def forward(self, A_tex, A_mesh, B_tex, B_mesh):
         return self.generator(A_tex, A_mesh)
     
+    def training_step(self, batch, batch_idx):
+        self.batch = batch
+        # train generator
+        # generate images
+        rec_tex_A, rec_mesh_A = \
+        self(batch['Atex'], batch['Amesh'],batch['Btex'],batch['Bmesh'])
+        map_type = batch['map_type']
+
+        # VGG loss
+        loss_G_VGG = 0
+        if not self.opt.no_vgg_loss:
+            loss_G_VGG += self.VGGloss(rec_tex_A, batch['Atex']) * self.opt.lambda_feat
+        
+        # CLS loss
+        loss_G_CLS = 0
+        if not self.opt.no_cls_loss:
+            loss_G_CLS += self.CLSloss(rec_tex_A,  batch['Aid'] , 'id') * self.opt.lambda_cls
+            loss_G_CLS += self.CLSloss(rec_tex_A,  batch['Aexp'] , 'exp') * self.opt.lambda_cls
+
+        # pix loss
+        loss_G_pix = 0
+        # reconstruction loss
+        if not self.opt.no_pix_loss:
+            loss_G_pix += self.l1loss(rec_tex_A, batch['Atex']) * self.opt.lambda_pix
+
+        #mesh loss
+        loss_mesh = 0
+        if not self.opt.no_mesh_loss:
+            loss_mesh += self.l1loss(rec_mesh_A, batch['Amesh'])* self.opt.lambda_mesh
+            # mismatch loss
+    
+
+        loss = loss_G_pix + loss_G_VGG + loss_G_CLS + loss_mesh 
+        tqdm_dict = {'loss_pix': loss_G_pix, 'loss_G_VGG': loss_G_VGG, 'loss_G_CLS': loss_G_CLS, 'loss_mesh': loss_mesh}
+        output = OrderedDict({
+            'loss': loss,
+            'progress_bar': tqdm_dict,
+            'log': tqdm_dict
+        })
+
+        errors = {k: v.data.item() if not isinstance(v, int) else v for k, v in tqdm_dict.items()}            
+        self.visualizer.print_current_errors(self.current_epoch, batch_idx, errors, 0)
+        self.visualizer.plot_current_errors(errors, batch_idx)
+        return output
+          
+    def configure_optimizers(self):
+        lr = self.opt.lr
+        opt_g = torch.optim.Adam(self.generator.parameters(), lr=lr, betas=(self.opt.beta1, 0.999))
+        
+
+        return [opt_g], []
+
+    def on_epoch_end(self):
+        if self.current_epoch % 10 == 0:
+            batch = self.batch
+            rec_tex_A, rec_mesh_A = \
+            self(batch['Atex'], batch['Amesh'],batch['Btex'],batch['Bmesh'])
+
+            Atex = util.tensor2im(batch['Atex'][0])
+            Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
+            Atex = util.writeText(Atex, batch['A_path'][0])
+            # tmp = batch['A_path'][0].split('/')
+            # gg = batch['Amesh'].data[0].cpu()
+            # gg = gg.numpy()
+            # gg = torch.from_numpy(gg.astype(np.float32))
+            # gt_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gg )
+            
+            # gg =rec_mesh_A.data[0].cpu()
+            # gg = gg.numpy()
+            # gg = torch.from_numpy(gg.astype(np.float32))
+
+            # rec_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gg)
+            visuals = OrderedDict([
+            ('Atex', Atex),
+            # ('Amesh', gt_Amesh),
+            ('rec_tex_A', util.tensor2im(rec_tex_A.data[0])),
+            # ('rec_Amesh', rec_Amesh)
+        
+            ])
+       
+            self.visualizer.display_current_results(visuals, self.current_epoch, 1000000) 
+
+
+
+class TexMeshGANModule(pl.LightningModule):
+    def __init__(self, opt ):
+        super().__init__()
+        self.opt = opt
+        input_nc = 3
+        # networks
+        self.generator = TexMeshGenerator(opt.loadSize, not opt.no_linearity, 
+            input_nc, opt.code_n,opt.encoder_fc_n, opt.ngf, 
+            opt.n_downsample_global, opt.n_blocks_global,opt.norm)
+
+        self.discriminator = MultiscaleDiscriminator(input_nc = 6)   
+
+        self.l1loss = torch.nn.L1Loss()
+        self.l2loss = torch.nn.MSELoss()
+        if not opt.no_vgg_loss:             
+            self.VGGloss = lossNet.VGGLoss()
+        if not opt.no_cls_loss:
+            self.CLSloss = lossNet.CLSLoss(opt)
+
+        self.GANloss = lossNet.GANLoss()
+        self.visualizer = Visualizer(opt)
+        # self.meshrender = MeshRender()
+
+        # if len(gpu_ids) and torch.cuda.is_available():
+        #     network.cuda()
+
+
+    def forward(self, A_tex, A_mesh, B_tex, B_mesh):
+        return self.generator(A_tex, A_mesh)
+    
     def training_step(self, batch, batch_idx, optimizer_idx):
         self.batch = batch
         # train generator
@@ -406,7 +520,6 @@ class TexMeshModule(pl.LightningModule):
             ])
        
             self.visualizer.display_current_results(visuals, self.current_epoch, 1000000) 
-
 
 
 
