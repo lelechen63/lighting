@@ -13,7 +13,7 @@ from collections import OrderedDict
 import util.util as util
 import os
 from util.visualizer import Visualizer
-from util.render_class import MeshRender
+from util.render_class import meshrender
 
 # import pickle
 # pickle.dump(some_object)
@@ -289,7 +289,7 @@ class TexMeshModule(pl.LightningModule):
             self.CLSloss = lossNet.CLSLoss(opt)
 
         self.visualizer = Visualizer(opt)
-        self.meshrender = MeshRender()
+        # self.meshrender = MeshRender()
 
         # if len(gpu_ids) and torch.cuda.is_available():
         #     network.cuda()
@@ -379,13 +379,13 @@ class TexMeshModule(pl.LightningModule):
             gg = gg.numpy()
             gg = torch.from_numpy(gg.astype(np.float32))
 
-            gt_Amesh = self.meshrender.meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gg )
+            gt_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gg )
             
             gg =rec_mesh_A.data[0].cpu()
             gg = gg.numpy()
             gg = torch.from_numpy(gg.astype(np.float32))
 
-            rec_Amesh = self.meshrender.meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gg)
+            rec_Amesh = semeshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gg)
 
 
             visuals = OrderedDict([
