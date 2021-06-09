@@ -4,6 +4,7 @@ import trimesh
 import imageio
 import openmesh
 import cv2
+from PIL import Image
 
 import pyredner
 import redner
