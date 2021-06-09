@@ -79,7 +79,8 @@ class MeshRender():
         # print ('m', m.device)
 
         obj = self.pyredner.Object(vertices=input_vertices, indices=self.om_indices, material=m)
-        
+        print ('obj.vertices', obj.vertices.device)
+        print ('obj.indices', obj.indices.device)
         obj.normals = self.pyredner.compute_vertex_normal(obj.vertices, obj.indices)
         print ('obj.normals', obj.normals.device)
 
