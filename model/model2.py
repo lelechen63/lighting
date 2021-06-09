@@ -375,9 +375,17 @@ class TexMeshModule(pl.LightningModule):
             Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
             Atex = util.writeText(Atex, batch['A_path'][0])
             tmp = batch['A_path'][0].split('/')
+            gg = batch['Amesh'].data[0].cpu()
+            gg = gg.numpy()
+            gg = torch.from_numpy(gg.astype(np.float32))
+
+            gt_Amesh = self.meshrender.meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gg )
             
-            gt_Amesh = self.meshrender.meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),torch.from_numpy(batch['Amesh'].data[0].cpu().numpy().astype(np.float32)) )
-            rec_Amesh = self.meshrender.meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), torch.from_numpy(rec_mesh_A.data[0].cpu().numpy().astype(np.float32)))
+            gg =rec_mesh_A.data[0].cpu()
+            gg = gg.numpy()
+            gg = torch.from_numpy(gg.astype(np.float32))
+
+            rec_Amesh = self.meshrender.meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gg))
 
 
             visuals = OrderedDict([
@@ -387,7 +395,7 @@ class TexMeshModule(pl.LightningModule):
             ('rec_Amesh', rec_Amesh)
         
             ])
-    
+       
             self.visualizer.display_current_results(visuals, self.current_epoch, 1000000) 
 
         # if self.current_epoch % 10 == 0:
