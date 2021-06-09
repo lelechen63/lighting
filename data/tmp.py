@@ -11,5 +11,5 @@ for id in os.listdir(base):
     for exp in os.listdir( base + '/' + id ):
         if not os.path.exists(  newbase + '/' + id  + '/' + exp):
             os.mkdir( newbase + '/' + id + '/' + exp)
-        command ='cp  ' +  newbase + '/' + id  + '/' + exp + '/params.json' + ' ' + newbase + '/' + id + '/' + exp
+        command ='cp  ' +  base + '/' + id  + '/' + exp + '/params.json' + ' ' + newbase + '/' + id + '/' + exp
         os.system(command)
