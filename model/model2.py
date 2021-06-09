@@ -198,7 +198,7 @@ class TexMeshDecoder(nn.Module):
             nn.ReLU(True), #64
 
             nn.ConvTranspose2d(ngf * 2, ngf , kernel_size=3, stride=2, padding=1, output_padding=1),
-            norm_layer(ng f), 
+            norm_layer(ngf), 
             nn.ReLU(True), #128
         )
         model = []
