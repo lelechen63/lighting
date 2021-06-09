@@ -48,6 +48,7 @@ class MeshRender():
         self.pyredner.set_print_timing(False)
         om_indices = np.load("./predef/om_indices.npy")
         self.om_indices = torch.from_numpy(om_indices).type(torch.int32).to(self.pyredner.get_device())
+        print ('om_indices', self.om_indices.device)
         self.image_data_root = "/data/home/us000042/lelechen/data/Facescape/jsons"
 
     def shift(self, image, vector):
@@ -125,8 +126,10 @@ class MeshRender():
         
         light_dir = torch.tensor([[0.0, 0.0, 1.0]])
         light_dir = (c2w[:3,:3]@light_dir.T).T
+        light_dir = light_dir.to(self.pyredner.get_device())
+        print ('light_dir:', light_dir.device)
         lights = [
-            self.pyredner.DirectionalLight(light_dir.to(self.pyredner.get_device()), torch.tensor([5.0, 5.0, 5.0], device = self.pyredner.get_device()))
+            self.pyredner.DirectionalLight(light_dir, torch.tensor([5.0, 5.0, 5.0], device = self.pyredner.get_device()))
         ]
         
         scene = self.pyredner.Scene(camera=cam, objects=[obj])
