@@ -66,13 +66,16 @@ class MeshRender():
         """
         scale = self.Rt_scale_dict['%d'%id_idx]['%d'%exp_idx][0]
         Rt_TU = np.array(self.Rt_scale_dict['%d'%id_idx]['%d'%exp_idx][1])
-        Rt_TU = torch.from_numpy(Rt_TU).type(torch.float32).to(self.pyredner.get_device())
+        # Rt_TU = torch.from_numpy(Rt_TU).type(torch.float32).to(self.pyredner.get_device())
+        Rt_TU = torch.from_numpy(Rt_TU).type(torch.float32).to("cuda:0")
+
         print ('Rt_TU', Rt_TU.device)
 
         print ('om_indices', self.om_indices.device)
         print('+++++++')
-        
-        input_vertices = vertices.reshape(-1,3).to(self.pyredner.get_device())
+        input_vertices = vertices.reshape(-1,3).to("cuda:0")
+
+        # input_vertices = vertices.reshape(-1,3).to(self.pyredner.get_device())
         input_vertices = (Rt_TU[:3,:3].T @ (input_vertices - Rt_TU[:3,3]).T).T
         input_vertices = input_vertices / scale
         input_vertices = input_vertices.contiguous()
