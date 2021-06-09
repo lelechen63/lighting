@@ -332,12 +332,8 @@ class TexMeshModule(pl.LightningModule):
                 loss_mesh += self.l1loss(rec_mesh_A, batch['Amesh'])* self.opt.lambda_mesh
                 # mismatch loss
             
-            # adversarial loss is binary cross-entropy
-            valid = torch.ones(batch['Atex'].size(0), 1)
-            valid = valid.type_as(batch['Atex'])
-
-            # adversarial loss is binary cross-entropy
-            g_loss = self.adversarial_loss(self.discriminator(rec_tex_A), valid)
+            
+            g_loss = self.GANloss(self.GANloss( torch.cat((batch['Atex'], rec_tex_A), dim=1) ), True)
 
             loss = loss_G_pix + loss_G_VGG + loss_G_CLS + loss_mesh + g_loss
             tqdm_dict = {'loss_pix': loss_G_pix, 'loss_G_VGG': loss_G_VGG, 'loss_G_CLS': loss_G_CLS, 'loss_mesh': loss_mesh, 'loss_GAN': g_loss }
@@ -352,18 +348,15 @@ class TexMeshModule(pl.LightningModule):
             self.visualizer.plot_current_errors(errors, batch_idx)
             return output
         if optimizer_idx == 1:
-            # how well can it label as real?
-            valid = torch.ones(batch['Atex'].size(0), 1)
-            valid = valid.type_as(batch['Atex'])
 
-            real_loss = self.adversarial_loss(self.discriminator(batch['Atex']), valid)
+            real_loss = self.GANloss( torch.cat((batch['Atex'], torch.cat((batch['Atex']), dim=1), True)
 
             # how well can it label as fake?
             fake = torch.zeros(batch['Atex'].size(0), 1)
             fake = fake.type_as(batch['Atex'])
 
             fake_loss = self.adversarial_loss(
-                self.discriminator(rec_tex_A.detach()), fake)
+                self.GANloss( torch.cat((batch['Atex'], rec_tex_A.detach()), False)
 
             # discriminator loss is the average of these
             d_loss = (real_loss + fake_loss) / 2
