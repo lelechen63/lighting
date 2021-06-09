@@ -15,7 +15,7 @@ import torch
 from tqdm import tqdm
 import glob
 from skimage.transform import AffineTransform, warp
-os.environ["CUDA_VISIBLE_DEVICES"]="0"
+# os.environ["CUDA_VISIBLE_DEVICES"]="0"
 
 class MeshRender():
     def __init__(self):
