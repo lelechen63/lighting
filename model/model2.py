@@ -349,9 +349,14 @@ class TexMeshModule(pl.LightningModule):
     def configure_optimizers(self):
         lr = self.opt.lr
         opt_g = torch.optim.Adam(self.generator.parameters(), lr=lr, betas=(self.opt.beta1, 0.999))
-        
-
         return [opt_g], []
+    
+    def optimizer_step(self, epoch_nb, batch_nb, optimizer, optimizer_i, opt_closure):
+        if self.trainer.global_step > 30:
+            for pg in optimizer.param_groups:
+                pg['lr'] = 0.8 * self.opt.lr
+        optimizer.step()
+        optimizer.zero_grad()
 
     def on_epoch_end(self):
         if self.current_epoch % 10 == 0:
