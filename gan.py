@@ -23,7 +23,7 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 
 opt = TrainOptions().parse()
 opt.datasetname = "fs_texmesh"
-opt.name = "texmesh_step1_real" 
+# opt.name = "texmesh_step1_real" 
 
 
 dm = FacescapeDataModule(opt)
