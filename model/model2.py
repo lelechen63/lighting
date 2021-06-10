@@ -355,6 +355,7 @@ class TexMeshModule(pl.LightningModule):
                 lr_scale = 0.8 ** (10 - epoch)
             else:
                 lr_scale = 0.95 ** epoch
+            return lr_scale
         scheduler = torch.optim.lr_scheduler.LambdaLR(
             opt_g,
             lr_lambda=lr_foo
