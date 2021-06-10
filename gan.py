@@ -34,7 +34,7 @@ print ( opt.gpu_ids)
 # trainer = pl.Trainer(gpus=1,  max_epochs= 10000, progress_bar_refresh_rate=20)
 
 # else:
-trainer = pl.Trainer(precision=16,gpus= len( opt.gpu_ids.split(',') ), accelerator='ddp', max_epochs= 10000, progress_bar_refresh_rate=20)
+trainer = pl.Trainer(precision=16,gpus= len( opt.gpu_ids ), accelerator='ddp', max_epochs= 10000, progress_bar_refresh_rate=20)
 # trainer = pl.Trainer(gpus=4, accelerator='dp', max_epochs= 10000, progress_bar_refresh_rate=20)
 
 checkpoint_callback = ModelCheckpoint(
