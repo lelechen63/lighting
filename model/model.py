@@ -14,9 +14,6 @@ import util.util as util
 import os
 from util.visualizer import Visualizer
 
-# import pickle
-# pickle.dump(some_object)
-
 def get_norm_layer(norm_type='instance'):
     if norm_type == 'batch':
         norm_layer = functools.partial(nn.BatchNorm2d, affine=True)
@@ -88,27 +85,27 @@ class TexMeshEncoder(nn.Module):
             )
 
         self.enc_input_size = int(ngf * 16 * self.tex_shape/128 * self.tex_shape/128  + ngf * 4)
-        # self.identity_enc = nn.Sequential(
-        #     nn.Linear( self.enc_input_size, ngf*4),
-        #     nn.ReLU(True),
-        #     nn.Linear( ngf*4, ngf*4),
-        #     nn.ReLU(True),
-        #     nn.Linear( ngf*4, ngf*4),
-        #     nn.ReLU(True),
-        #     nn.Linear( ngf*4,code_n),
-        #     nn.ReLU(True),
-        #     )
+        self.identity_enc = nn.Sequential(
+            nn.Linear( self.enc_input_size, ngf*4),
+            nn.ReLU(True),
+            nn.Linear( ngf*4, ngf*4),
+            nn.ReLU(True),
+            nn.Linear( ngf*4, ngf*4),
+            nn.ReLU(True),
+            nn.Linear( ngf*4,code_n),
+            nn.ReLU(True),
+            )
 
-        # self.expression_enc = nn.Sequential(
-        #     nn.Linear( self.enc_input_size, ngf*4),
-        #     nn.ReLU(True),
-        #     nn.Linear( ngf*4, ngf*4),
-        #     nn.ReLU(True),
-        #     nn.Linear( ngf*4, ngf*4),
-        #     nn.ReLU(True),
-        #     nn.Linear( ngf*4,code_n),
-        #     nn.ReLU(True),
-        #     )
+        self.expression_enc = nn.Sequential(
+            nn.Linear( self.enc_input_size, ngf*4),
+            nn.ReLU(True),
+            nn.Linear( ngf*4, ngf*4),
+            nn.ReLU(True),
+            nn.Linear( ngf*4, ngf*4),
+            nn.ReLU(True),
+            nn.Linear( ngf*4,code_n),
+            nn.ReLU(True),
+            )
         model = []
         for i in range(n_blocks):
             model += [ResnetBlock(ngf * 16, padding_type=padding_type, activation=activation, norm_layer=norm_layer)]
@@ -117,12 +114,10 @@ class TexMeshEncoder(nn.Module):
         tex_encoded = self.CNNencoder(tex)
         tex_encoded = self.resblocks(tex_encoded).view(tex_encoded.shape[0], -1)
         mesh_encoded = self.meshencoder(mesh)
-        # encoded= torch.cat([mesh_encoded, tex_encoded], 1)
-        
-        # identity_code = self.identity_enc(encoded)
-        # expression_code = self.expression_enc(encoded)
-        # return identity_code, expression_code
-        return tex_encoded, mesh_encoded
+        encoded= torch.cat([mesh_encoded, tex_encoded], 1)
+        identity_code = self.identity_enc(encoded)
+        expression_code = self.expression_enc(encoded)
+        return identity_code, expression_code
 
 
 class TexMeshDecoder(nn.Module):
@@ -133,26 +128,26 @@ class TexMeshDecoder(nn.Module):
 
         self.tex_shape = tex_shape
         activation = nn.ReLU(True)   
-        # self.identity_dec = nn.Sequential(
-        #     nn.Linear( code_n, ngf*4),
-        #     nn.ReLU(True),
-        #     nn.Linear( ngf*4, ngf*4),
-        #     nn.ReLU(True),
-        #     # nn.Linear( ngf*4, ngf*4),
-        #     # nn.ReLU(True),
-        #     nn.Linear( ngf*4,ngf*4),
-        #     nn.ReLU(True),
-        #     )
-        # self.exp_dec = nn.Sequential(
-        #     nn.Linear( code_n, ngf*4),
-        #     nn.ReLU(True),
-        #     nn.Linear( ngf*4, ngf*4),
-        #     nn.ReLU(True),
-        #     # nn.Linear( ngf*4, ngf*4),
-        #     # nn.ReLU(True),
-        #     nn.Linear( ngf*4,ngf*4),
-        #     nn.ReLU(True),
-        #     )
+        self.identity_dec = nn.Sequential(
+            nn.Linear( code_n, ngf*4),
+            nn.ReLU(True),
+            nn.Linear( ngf*4, ngf*4),
+            nn.ReLU(True),
+            # nn.Linear( ngf*4, ngf*4),
+            # nn.ReLU(True),
+            nn.Linear( ngf*4,ngf*4),
+            nn.ReLU(True),
+            )
+        self.exp_dec = nn.Sequential(
+            nn.Linear( code_n, ngf*4),
+            nn.ReLU(True),
+            nn.Linear( ngf*4, ngf*4),
+            nn.ReLU(True),
+            # nn.Linear( ngf*4, ngf*4),
+            # nn.ReLU(True),
+            nn.Linear( ngf*4,ngf*4),
+            nn.ReLU(True),
+            )
         self.tex_fc_dec = nn.Sequential(
             nn.Linear( ngf*4 * 2, ngf*16 * 4 * 4),
             nn.ReLU(True)
@@ -204,36 +199,56 @@ class TexMeshDecoder(nn.Module):
         model += [nn.ReflectionPad2d(3), nn.Conv2d(ngf, 3, kernel_size=7, padding=0), nn.Tanh()]    
         self.output_layer = nn.Sequential(*model)
 
-    # def forward(self, id_code, exp_code):
-    #     exp_fea = self.exp_dec(exp_code)
-    #     id_fea = self.identity_dec(id_code)
-    #     feature = torch.cat([exp_fea, id_fea], axis = 1)
-    #     rec_mesh = self.mesh_fc_dec(feature)
+    def forward(self, id_code, exp_code):
+        exp_fea = self.exp_dec(exp_code)
+        id_fea = self.identity_dec(id_code)
+        feature = torch.cat([exp_fea, id_fea], axis = 1)
+        rec_mesh = self.mesh_fc_dec(feature)
 
-    #     tex_dec = self.tex_fc_dec(feature)
-    #     # tex_dec = tex_dec.unsqueeze(2).unsqueeze(3).repeat(1, 1, int(self.tex_shape / 128),int(self.tex_shape / 128)) # not sure 
-        
-    #     tex_dec = tex_dec.view(tex_dec.shape[0], -1, 4,4) # not sure 
-
-    #     decoded = self.tex_decoder(tex_dec)
-    #     rec_tex = self.output_layer(decoded)
-    #     return rec_tex, rec_mesh
-
-    def forward(self, mesh_code, tex_code):
-        # exp_fea = self.exp_dec(exp_code)
-        # id_fea = self.identity_dec(id_code)
-        # feature = torch.cat([exp_fea, id_fea], axis = 1)
-        rec_mesh = self.mesh_fc_dec(mesh_code)
-
-        # tex_dec = self.tex_fc_dec(tex_code)
+        tex_dec = self.tex_fc_dec(feature)
         # tex_dec = tex_dec.unsqueeze(2).unsqueeze(3).repeat(1, 1, int(self.tex_shape / 128),int(self.tex_shape / 128)) # not sure 
         
-        tex_dec = tex_dec.view(tex_code.shape[0], -1, 4,4) # not sure 
+        tex_dec = tex_dec.view(tex_dec.shape[0], -1, 4,4) # not sure 
 
         decoded = self.tex_decoder(tex_dec)
         rec_tex = self.output_layer(decoded)
-        return rec_tex, rec_mesh   
+        return rec_tex, rec_mesh
 
+
+class TexMeshGenerator(nn.Module):
+    def __init__(self, tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+                ngf=64, n_downsampling=5, n_blocks=4, norm_layer='batch', \
+                padding_type='reflect'):
+        super().__init__()
+        norm_layer = get_norm_layer(norm_type=norm_layer)  
+
+        self.texmeshEnc = TexMeshEncoder(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+                ngf, n_downsampling, n_blocks, norm_layer, padding_type)
+
+        self.texmeshDec = TexMeshDecoder(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+                ngf, n_downsampling, n_blocks, norm_layer, padding_type)
+    def forward(self, A_tex, A_mesh, B_tex = None, B_mesh = None ):
+        if B_tex is not None:
+            # A_tex, A_mesh, B_tex, B_mesh = input_lists[0], input_lists[1], input_lists[2], input_lists[3]
+            A_id_code, A_exp_code = self.texmeshEnc(A_tex, A_mesh)
+            B_id_code, B_exp_code = self.texmeshEnc(B_tex, B_mesh)
+
+            # reconstruction
+            rec_tex_A, rec_mesh_A = self.texmeshDec(A_id_code, A_exp_code)
+            rec_tex_B, rec_mesh_B = self.texmeshDec(B_id_code, B_exp_code)
+
+            # mismatch
+            rec_tex_AB, rec_mesh_AB = self.texmeshDec(A_id_code, B_exp_code)
+            rec_tex_BA, rec_mesh_BA = self.texmeshDec(B_id_code, A_exp_code)
+
+            return rec_tex_A, rec_mesh_A, rec_tex_B, rec_mesh_B, rec_tex_AB, rec_mesh_AB, rec_tex_BA, rec_mesh_BA
+        else:
+            # A_tex, A_mesh = input_lists[0], input_lists[1]
+            A_id_code, A_exp_code = self.texmeshEnc(A_tex, A_mesh)
+
+            # reconstruction
+            rec_tex_A, rec_mesh_A = self.texmeshDec(A_id_code, A_exp_code)
+            retu
 class TexMeshGenerator(nn.Module):
     def __init__(self, tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
                 ngf=64, n_downsampling=5, n_blocks=4, norm_layer='batch', \
