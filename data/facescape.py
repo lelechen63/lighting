@@ -237,7 +237,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
             A_vertices = np.array(om_mesh.points()).reshape(-1)
             self.total_tex[data].append(A_vertices)
             if opt.debug:
-                if len(self.total_tex) == 10:
+                if len(self.total_tex) == 64:
                     break
         
     def __getitem__(self, index):
