@@ -450,7 +450,6 @@ class MisMatchTexMeshModule(pl.LightningModule):
          
         
 
-
 class TexMeshModule(pl.LightningModule):
     def __init__(self, opt ):
         super().__init__()
@@ -469,7 +468,6 @@ class TexMeshModule(pl.LightningModule):
             self.CLSloss = lossNet.CLSLoss(opt)
 
         self.visualizer = Visualizer(opt)
-        self.meshrender = MeshRender()
 
         # if len(gpu_ids) and torch.cuda.is_available():
         #     network.cuda()
@@ -554,34 +552,12 @@ class TexMeshModule(pl.LightningModule):
             Atex = util.tensor2im(batch['Atex'][0])
             Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
             Atex = util.writeText(Atex, batch['A_path'][0])
-            if self.opt.debug:
-                tmp = batch['A_path'][0].split('/')
-                gg = batch['Amesh'].data[0].cpu()
-                print(type(gg))
-                print(gg.shape)
-                print('!!!!')
-                gg = gg.numpy()
-                gg = torch.from_numpy(gg.astype(np.float32))
-
-                gt_Amesh = self.meshrender.meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),batch['Amesh'].gg.cpu() )
-                rec_Amesh = self.meshrender.meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), rec_mesh_A.data[0].cpu())
-
-
-                visuals = OrderedDict([
-                ('Atex', Atex),
-                ('Amesh', gt_Amesh),
-                ('rec_tex_A', util.tensor2im(rec_tex_A.data[0])),
-                ('rec_Amesh', rec_Amesh)
-            
-                ])
-            else:
-                visuals = OrderedDict([
-                ('Atex', Atex),
-                # ('Amesh', gt_Amesh),
-                ('rec_tex_A', util.tensor2im(rec_tex_A.data[0])),
-                # ('rec_Amesh', rec_Amesh)
-            
-                ])
+        
+            visuals = OrderedDict([
+            ('Atex', Atex),
+            ('rec_tex_A', util.tensor2im(rec_tex_A.data[0])),
+        
+            ])
             self.visualizer.display_current_results(visuals, self.current_epoch, 1000000) 
 
         # if self.current_epoch % 10 == 0:
