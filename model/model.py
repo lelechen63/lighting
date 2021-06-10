@@ -13,7 +13,6 @@ from collections import OrderedDict
 import util.util as util
 import os
 from util.visualizer import Visualizer
-from util.render_class import MeshRender
 
 # import pickle
 # pickle.dump(some_object)
@@ -288,7 +287,6 @@ class MisMatchTexMeshModule(pl.LightningModule):
             self.CLSloss = lossNet.CLSLoss(opt)
 
         self.visualizer = Visualizer(opt)
-        self.meshrender = MeshRender()
 
 
 
