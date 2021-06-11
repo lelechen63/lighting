@@ -33,18 +33,30 @@ print ( opt.gpu_ids)
 # if opt.debug:
 # trainer = pl.Trainer(gpus=1,  max_epochs= 10000, progress_bar_refresh_rate=20)
 
-# else:
-if len( opt.gpu_ids ) == 1:
-    trainer = pl.Trainer(gpus=1,  max_epochs= 10000, progress_bar_refresh_rate=20)
+if opt.istrain:
+
+    if len( opt.gpu_ids ) == 1:
+        trainer = pl.Trainer(gpus=1,  max_epochs= 10000, progress_bar_refresh_rate=20)
+
+    else:
+        trainer = pl.Trainer(precision=16,gpus= len( opt.gpu_ids ), accelerator='ddp', max_epochs= 10000, progress_bar_refresh_rate=20)
+    # trainer = pl.Trainer(gpus=4, accelerator='dp', max_epochs= 10000, progress_bar_refresh_rate=20)
+
+    checkpoint_callback = ModelCheckpoint(
+        monitor='train_loss',
+        dirpath= os.path.join(opt.checkpoints_dir, opt.name),
+        filename='texmesh-{epoch:02d}-{train_loss:.2f}',
+    )
+
+    trainer.fit(model, dm)
 
 else:
-    trainer = pl.Trainer(precision=16,gpus= len( opt.gpu_ids ), accelerator='ddp', max_epochs= 10000, progress_bar_refresh_rate=20)
-# trainer = pl.Trainer(gpus=4, accelerator='dp', max_epochs= 10000, progress_bar_refresh_rate=20)
+    checkpoint_path = os.path.join(opt.checkpoints_dir, opt.name)
+    print(checkpoint_path)
+    model = modle.load_from_checkpoint(checkpoint_path)
+    model.eval()
 
-checkpoint_callback = ModelCheckpoint(
-    monitor='train_loss',
-    dirpath= os.path.join(opt.checkpoints_dir, opt.name),
-    filename='texmesh-{epoch:02d}-{train_loss:.2f}',
-)
-
-trainer.fit(model, dm)
+    testdata = dm.test_dataloader()
+    for batch in testdata:
+        print(batch.keys())
+        model.forward(  batch['Atex'], batch['Amesh'],batch['Btex'],batch['Bmesh'] )
