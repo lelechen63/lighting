@@ -66,7 +66,7 @@ class BaseOptions():
         if not self.initialized:
             self.initialize()
         self.opt = self.parser.parse_args()
-        self.opt.isTrain = self.isTrain   # train or test
+        # self.opt.isTrain = self.isTrain   # train or test
         self.opt.model = self.opt.name
         str_ids = self.opt.gpu_ids.split(',')
         self.opt.gpu_ids = []
