@@ -33,7 +33,7 @@ print ( opt.gpu_ids)
 # if opt.debug:
 # trainer = pl.Trainer(gpus=1,  max_epochs= 10000, progress_bar_refresh_rate=20)
 
-if opt.istrain:
+if opt.isTrain:
 
     if len( opt.gpu_ids ) == 1:
         trainer = pl.Trainer(gpus=1,  max_epochs= 10000, progress_bar_refresh_rate=20)
