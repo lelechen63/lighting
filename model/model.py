@@ -430,7 +430,19 @@ class MisMatchTexMeshModule(pl.LightningModule):
     def configure_optimizers(self):
         lr = self.opt.lr
         opt_g = torch.optim.Adam(self.generator.parameters(), lr=lr, betas=(self.opt.beta1, 0.999))
-        return [opt_g], []
+        
+        def lr_foo(epoch):
+            if epoch < 10:
+                lr_scale = 0.8 ** (10 - epoch)
+            else:
+                lr_scale = 0.95 ** epoch
+            return lr_scale
+        scheduler = torch.optim.lr_scheduler.LambdaLR(
+            opt_g,
+            lr_lambda=lr_foo
+        )
+
+        return [opt_g], [scheduler]
 
     def on_epoch_end(self):
         batch = self.batch
@@ -554,7 +566,19 @@ class TexMeshModule(pl.LightningModule):
     def configure_optimizers(self):
         lr = self.opt.lr
         opt_g = torch.optim.Adam(self.generator.parameters(), lr=lr, betas=(self.opt.beta1, 0.999))
-        return [opt_g], []
+        
+        def lr_foo(epoch):
+            if epoch < 10:
+                lr_scale = 0.8 ** (10 - epoch)
+            else:
+                lr_scale = 0.95 ** epoch
+            return lr_scale
+        scheduler = torch.optim.lr_scheduler.LambdaLR(
+            opt_g,
+            lr_lambda=lr_foo
+        )
+
+        return [opt_g], [scheduler]
 
     def on_epoch_end(self):
         if self.current_epoch % 10 == 0:
