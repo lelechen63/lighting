@@ -40,5 +40,3 @@ class TrainOptions(BaseOptions):
 
         self.parser.add_argument('--lambda_cls', type=float, default=0.01, help='weight for feature matching loss')                
         self.parser.add_argument('--lambda_mismatch', type=float, default=0.01, help='weight for feature matching loss')                
-        self.parser.add_argument('--isTrain', action='store_false', help='weight for feature matching loss')                
-        # self.istrain = not self.istrain
