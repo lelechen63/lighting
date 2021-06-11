@@ -58,6 +58,7 @@ class BaseOptions():
         self.parser.add_argument('--nef', type=int, default=16, help='# of encoder filters in the first conv layer')        
         self.parser.add_argument('--n_clusters', type=int, default=10, help='number of clusters for features')        
         self.parser.add_argument('--clsname', type=str, default='idcls', help='number of clusters for features')        
+        self.parser.add_argument('--isTrain', action='store_false', help='weight for feature matching loss')                
 
         self.initialized = True
 
