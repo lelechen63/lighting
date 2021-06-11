@@ -206,6 +206,7 @@ class TexMeshDecoder(nn.Module):
         rec_mesh = self.mesh_fc_dec(feature)
 
         tex_dec = self.tex_fc_dec(feature)
+        
         # tex_dec = tex_dec.unsqueeze(2).unsqueeze(3).repeat(1, 1, int(self.tex_shape / 128),int(self.tex_shape / 128)) # not sure 
         
         tex_dec = tex_dec.view(tex_dec.shape[0], -1, 4,4) # not sure 
@@ -215,40 +216,6 @@ class TexMeshDecoder(nn.Module):
         return rec_tex, rec_mesh
 
 
-class TexMeshGenerator(nn.Module):
-    def __init__(self, tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
-                ngf=64, n_downsampling=5, n_blocks=4, norm_layer='batch', \
-                padding_type='reflect'):
-        super().__init__()
-        norm_layer = get_norm_layer(norm_type=norm_layer)  
-
-        self.texmeshEnc = TexMeshEncoder(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
-                ngf, n_downsampling, n_blocks, norm_layer, padding_type)
-
-        self.texmeshDec = TexMeshDecoder(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
-                ngf, n_downsampling, n_blocks, norm_layer, padding_type)
-    def forward(self, A_tex, A_mesh, B_tex = None, B_mesh = None ):
-        if B_tex is not None:
-            # A_tex, A_mesh, B_tex, B_mesh = input_lists[0], input_lists[1], input_lists[2], input_lists[3]
-            A_id_code, A_exp_code = self.texmeshEnc(A_tex, A_mesh)
-            B_id_code, B_exp_code = self.texmeshEnc(B_tex, B_mesh)
-
-            # reconstruction
-            rec_tex_A, rec_mesh_A = self.texmeshDec(A_id_code, A_exp_code)
-            rec_tex_B, rec_mesh_B = self.texmeshDec(B_id_code, B_exp_code)
-
-            # mismatch
-            rec_tex_AB, rec_mesh_AB = self.texmeshDec(A_id_code, B_exp_code)
-            rec_tex_BA, rec_mesh_BA = self.texmeshDec(B_id_code, A_exp_code)
-
-            return rec_tex_A, rec_mesh_A, rec_tex_B, rec_mesh_B, rec_tex_AB, rec_mesh_AB, rec_tex_BA, rec_mesh_BA
-        else:
-            # A_tex, A_mesh = input_lists[0], input_lists[1]
-            A_id_code, A_exp_code = self.texmeshEnc(A_tex, A_mesh)
-
-            # reconstruction
-            rec_tex_A, rec_mesh_A = self.texmeshDec(A_id_code, A_exp_code)
-            retu
 class TexMeshGenerator(nn.Module):
     def __init__(self, tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
                 ngf=64, n_downsampling=5, n_blocks=4, norm_layer='batch', \
