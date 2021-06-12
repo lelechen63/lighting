@@ -14,14 +14,17 @@ import torch.nn as nn
 import pytorch_lightning as pl
 from data.data import FacescapeDataModule
 from options.step1_train_options import TrainOptions
-from model.model2 import TexMeshModule as module 
-# from model.model2 import TexMeshGANModule as module 
 
 from pytorch_lightning.callbacks import ModelCheckpoint
 
 
 
 opt = TrainOptions().parse()
+if opt.modeltype ==2 :
+    from model.model2 import TexMeshModule as module 
+else:
+    from model.model import TexMeshModule as module 
+
 opt.datasetname = "fs_texmesh"
 # opt.name = "texmesh_step1_real" 
 

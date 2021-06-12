@@ -60,6 +60,8 @@ class BaseOptions():
         self.parser.add_argument('--clsname', type=str, default='idcls', help='number of clusters for features')        
         self.parser.add_argument('--isTrain', action='store_false', help='weight for feature matching loss')                
 
+        self.parser.add_argument('--modeltype', type=int, default=2, help='number of clusters for features')        
+
         self.initialized = True
 
     def parse(self, save=True):
