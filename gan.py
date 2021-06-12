@@ -133,4 +133,4 @@ else:
             ('rec_Bmesh', rec_Bmesh)
         
             ])
-        visualizer.display_current_results(visuals, self.current_epoch, 1000000)
+        visualizer.display_current_results(visuals, 1, 1000000)
