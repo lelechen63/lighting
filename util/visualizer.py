@@ -60,6 +60,7 @@ class Visualizer():
             for label, image_numpy in visuals.items():
                
                 img_path = os.path.join(self.img_dir, 'epoch%.3d_%s.jpg' % (epoch, label))
+                print (img_path)
                 util.save_image(image_numpy, img_path)
 
             # update website

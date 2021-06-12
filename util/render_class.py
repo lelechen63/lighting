@@ -66,10 +66,7 @@ def meshrender(id_idx, exp_idx, vertices, cam_idx=1):
     # Rt_TU = torch.from_numpy(Rt_TU).type(torch.float32).to(pyredner.get_device())
     Rt_TU = torch.from_numpy(Rt_TU).type(torch.float32).to("cuda:0")
 
-    print ('Rt_TU', Rt_TU.device)
-
-    print ('om_indices', om_indices.device)
-    print('+++++++')
+ 
     input_vertices = vertices.reshape(-1,3).to("cuda:0")
 
     # input_vertices = vertices.reshape(-1,3).to(pyredner.get_device())
@@ -77,15 +74,11 @@ def meshrender(id_idx, exp_idx, vertices, cam_idx=1):
     input_vertices = input_vertices / scale
     input_vertices = input_vertices.contiguous()
 
-    print ('input_vertices', input_vertices.device)
     m = pyredner.Material(diffuse_reflectance = torch.tensor((0.5, 0.5, 0.5), device = pyredner.get_device()))
     # print ('m', m.device)
 
     obj = pyredner.Object(vertices=input_vertices, indices=om_indices, material=m)
-    print ('obj.vertices', obj.vertices.device)
-    print ('obj.indices', obj.indices.device)
-    obj.normals = pyredner.compute_vertex_normal(obj.vertices, obj.indices)
-    print ('obj.normals', obj.normals.device)
+       obj.normals = pyredner.compute_vertex_normal(obj.vertices, obj.indices)
 
     # obj.normals = pyredner.compute_vertex_normal(obj.vertices.to(pyredner.get_device()), obj.indices.to(pyredner.get_device())).cpu()
 
@@ -132,7 +125,6 @@ def meshrender(id_idx, exp_idx, vertices, cam_idx=1):
     light_dir = (c2w[:3,:3]@light_dir.T).T
     light_dir = light_dir.to("cuda:0")
     # light_dir = light_dir.to(pyredner.get_device())
-    print ('light_dir:', light_dir.device)
     lights = [
         pyredner.DirectionalLight(light_dir, torch.tensor([5.0, 5.0, 5.0], device = pyredner.get_device()))
     ]
@@ -145,7 +137,6 @@ def meshrender(id_idx, exp_idx, vertices, cam_idx=1):
 
     img = img* 255
     img = img.astype(np.uint8)
-    print ('**********************************')
     return img
 
 # import json
