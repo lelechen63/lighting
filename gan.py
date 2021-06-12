@@ -59,7 +59,7 @@ else:
 
     model = model.load_from_checkpoint(checkpoint_path)
     trainer = pl.Trainer()
-    results = trainer.test(model=model, dm, verbose=True)
+    results = trainer.test(model=model, datamodule = dm, verbose=True)
 
 
     # testdata = dm.test_dataloader()
