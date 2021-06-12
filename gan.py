@@ -58,8 +58,8 @@ else:
     print(checkpoint_path)
     checkpoint = torch.load(checkpoint_path)
     print (checkpoint.keys())
-
-    model = model.load_from_checkpoint(checkpoint_path)
+    checkpoint['hyper_parameters'] = {}
+    model = model.load_from_checkpoint(checkpoint)
     trainer = pl.Trainer()
     results = trainer.test(model=model, datamodule = dm, verbose=True)
 
