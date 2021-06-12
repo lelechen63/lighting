@@ -558,7 +558,7 @@ class TexModule(pl.LightningModule):
         self.opt = opt
         input_nc = 3
         # networks
-        self.generator = TexMeshGenerator(opt.loadSize, not opt.no_linearity, 
+        self.generator = TexGenerator(opt.loadSize, not opt.no_linearity, 
             input_nc, opt.code_n,opt.encoder_fc_n, opt.ngf, 
             opt.n_downsample_global, opt.n_blocks_global,opt.norm)
 
@@ -579,15 +579,15 @@ class TexModule(pl.LightningModule):
         #     network.cuda()
 
 
-    def forward(self, A_tex, A_mesh, B_tex, B_mesh):
-        return self.generator(A_tex, A_mesh)
+    def forward(self, A_tex, B_tex):
+        return self.generator(A_tex)
     
     def training_step(self, batch, batch_idx):
         self.batch = batch
         # train generator
         # generate images
         rec_tex_A, rec_mesh_A = \
-        self(batch['Atex'], batch['Amesh'],batch['Btex'],batch['Bmesh'])
+        self(batch['Atex'],batch['Btex'】)
         map_type = batch['map_type']
 
         # VGG loss
@@ -607,14 +607,9 @@ class TexModule(pl.LightningModule):
         if not self.opt.no_pix_loss:
             loss_G_pix += self.l1loss(rec_tex_A, batch['Atex']) * self.opt.lambda_pix
 
-        #mesh loss
-        loss_mesh = 0
-        if not self.opt.no_mesh_loss:
-            loss_mesh += self.l1loss(rec_mesh_A, batch['Amesh'])* self.opt.lambda_mesh
-            # mismatch loss
     
-
-        loss = loss_G_pix + loss_G_VGG + loss_G_CLS + loss_mesh 
+        loss_mesh = 0
+        loss = loss_G_pix + loss_G_VGG + loss_G_CLS  
         tqdm_dict = {'loss_pix': loss_G_pix, 'loss_G_VGG': loss_G_VGG, 'loss_G_CLS': loss_G_CLS, 'loss_mesh': loss_mesh}
         output = OrderedDict({
             'loss': loss,
@@ -655,27 +650,15 @@ class TexModule(pl.LightningModule):
         if self.current_epoch % 10 == 0:
             batch = self.batch
             rec_tex_A, rec_mesh_A = \
-            self(batch['Atex'], batch['Amesh'],batch['Btex'],batch['Bmesh'])
+            self(batch['Atex'], ,batch['Btex'])
 
             Atex = util.tensor2im(batch['Atex'][0])
             Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
             Atex = util.writeText(Atex, batch['A_path'][0])
-            # tmp = batch['A_path'][0].split('/')
-            # gg = batch['Amesh'].data[0].cpu()
-            # gg = gg.numpy()
-            # gg = torch.from_numpy(gg.astype(np.float32))
-            # gt_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gg )
-            
-            # gg =rec_mesh_A.data[0].cpu()
-            # gg = gg.numpy()
-            # gg = torch.from_numpy(gg.astype(np.float32))
-
-            # rec_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gg)
+          
             visuals = OrderedDict([
             ('Atex', Atex),
-            # ('Amesh', gt_Amesh),
             ('rec_tex_A', util.tensor2im(rec_tex_A.data[0])),
-            # ('rec_Amesh', rec_Amesh)
         
             ])
        

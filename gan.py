@@ -22,13 +22,14 @@ import os
 from util.visualizer import Visualizer
 from util.render_class import meshrender
 opt = TrainOptions().parse()
-if opt.modeltype ==2 :
+if opt.modeltype == 'tex' :
+    from model.model2 import TexModule as module 
+elif opt.modeltype == 'texmesh':
     from model.model2 import TexMeshModule as module 
-else:
+elif opt.modeltype == 'texmeshreal':
     from model.model import TexMeshModule as module 
 
 opt.datasetname = "fs_texmesh"
-# opt.name = "texmesh_step1_real" 
 
 
 dm = FacescapeDataModule(opt)
