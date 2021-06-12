@@ -364,7 +364,7 @@ class TexGenerator(nn.Module):
 
         self.texDec = TexDecoder(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
                 ngf, n_downsampling, n_blocks, norm_layer, padding_type)
-    def forward(self, A_tex, B_tex = None, ):
+    def forward(self, A_tex ):
         
         tex_code = self.texEnc(A_tex)
 
@@ -565,7 +565,7 @@ class TexModule(pl.LightningModule):
         #     network.cuda()
 
 
-    def forward(self, A_tex, B_tex):
+    def forward(self, A_tex):
         return self.generator(A_tex)
     
     def training_step(self, batch, batch_idx):
@@ -573,7 +573,7 @@ class TexModule(pl.LightningModule):
         # train generator
         # generate images
         rec_tex_A, rec_mesh_A = \
-        self(batch['Atex'],batch['Btex'])
+        self(batch['Atex'] )
         map_type = batch['map_type']
 
         # VGG loss
