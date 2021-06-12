@@ -86,7 +86,7 @@ else:
     # trainer = pl.Trainer()
     # results = trainer.test(model=model, datamodule = dm, verbose=True)
 
-
+    dm.setup()
     testdata = dm.test_dataloader()
     for batch in testdata:
         print(batch.keys())
