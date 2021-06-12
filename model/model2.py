@@ -418,8 +418,6 @@ class TexMeshModule(pl.LightningModule):
             input_nc, opt.code_n,opt.encoder_fc_n, opt.ngf, 
             opt.n_downsample_global, opt.n_blocks_global,opt.norm)
 
-        self.discriminator = MultiscaleDiscriminator(input_nc = 6)   
-
         self.l1loss = torch.nn.L1Loss()
         self.l2loss = torch.nn.MSELoss()
         if not opt.no_vgg_loss:             
@@ -547,8 +545,6 @@ class TexModule(pl.LightningModule):
         self.generator = TexGenerator(opt.loadSize, not opt.no_linearity, 
             input_nc, opt.code_n,opt.encoder_fc_n, opt.ngf, 
             opt.n_downsample_global, opt.n_blocks_global,opt.norm)
-
-        self.discriminator = MultiscaleDiscriminator(input_nc = 6)   
 
         self.l1loss = torch.nn.L1Loss()
         self.l2loss = torch.nn.MSELoss()
