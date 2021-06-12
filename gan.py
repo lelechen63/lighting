@@ -22,11 +22,11 @@ import os
 from util.visualizer import Visualizer
 from util.render_class import meshrender
 opt = TrainOptions().parse()
-if opt.modeltype == 'tex' :
+if opt.name == 'tex' :
     from model.model2 import TexModule as module 
-elif opt.modeltype == 'texmesh':
+elif opt.name == 'texmesh':
     from model.model2 import TexMeshModule as module 
-elif opt.modeltype == 'texmeshreal':
+elif opt.name == 'texmeshreal':
     from model.model import TexMeshModule as module 
 
 opt.datasetname = "fs_texmesh"
