@@ -54,7 +54,7 @@ if opt.isTrain:
     trainer.fit(model, dm)
 
 else:
-    checkpoint_path = os.path.join(opt.checkpoints_dir, opt.name)
+    checkpoint_path = '/data/home/us000042/lelechen/github/lighting/lightning_logs/version_30/checkpoints/epoch=720-step=152851.ckpt'
     print(checkpoint_path)
     model = model.load_from_checkpoint(checkpoint_path)
     model.eval()
