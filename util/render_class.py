@@ -78,7 +78,7 @@ def meshrender(id_idx, exp_idx, vertices, cam_idx=1):
     # print ('m', m.device)
 
     obj = pyredner.Object(vertices=input_vertices, indices=om_indices, material=m)
-       obj.normals = pyredner.compute_vertex_normal(obj.vertices, obj.indices)
+    obj.normals = pyredner.compute_vertex_normal(obj.vertices, obj.indices)
 
     # obj.normals = pyredner.compute_vertex_normal(obj.vertices.to(pyredner.get_device()), obj.indices.to(pyredner.get_device())).cpu()
 
