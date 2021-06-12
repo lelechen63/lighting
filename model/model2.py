@@ -553,7 +553,6 @@ class TexModule(pl.LightningModule):
         if not opt.no_cls_loss:
             self.CLSloss = lossNet.CLSLoss(opt)
 
-        self.GANloss = lossNet.GANLoss()
         self.visualizer = Visualizer(opt)
         # self.meshrender = MeshRender()
 
@@ -568,8 +567,7 @@ class TexModule(pl.LightningModule):
         self.batch = batch
         # train generator
         # generate images
-        rec_tex_A, rec_mesh_A = \
-        self(batch['Atex'] )
+        rec_tex_A =  self(batch['Atex'] )
         map_type = batch['map_type']
 
         # VGG loss
