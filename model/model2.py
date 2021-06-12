@@ -629,8 +629,7 @@ class TexModule(pl.LightningModule):
     def on_epoch_end(self):
         if self.current_epoch % 10 == 0:
             batch = self.batch
-            rec_tex_A, rec_mesh_A = \
-            self(batch['Atex'] ,batch['Btex'])
+            rec_tex_A =  self(batch['Atex'])
 
             Atex = util.tensor2im(batch['Atex'][0])
             Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
