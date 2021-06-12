@@ -56,7 +56,7 @@ if opt.isTrain:
 else:
     checkpoint_path = os.path.join(opt.checkpoints_dir, opt.name)
     print(checkpoint_path)
-    model = modle.load_from_checkpoint(checkpoint_path)
+    model = model.load_from_checkpoint(checkpoint_path)
     model.eval()
 
     testdata = dm.test_dataloader()
