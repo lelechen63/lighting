@@ -18,8 +18,8 @@ class Visualizer():
         self.win_size = opt.display_winsize
         self.name = opt.name
 
-        if not os.path.exists( os.path.joint( opt.checkpoints_dir, opt.name )):
-            os.mkdir(os.path.joint( opt.checkpoints_dir, opt.name ))
+        if not os.path.exists( os.path.join( opt.checkpoints_dir, opt.name )):
+            os.mkdir(os.path.join( opt.checkpoints_dir, opt.name ))
 
         if self.tf_log:
             import tensorflow as tf
