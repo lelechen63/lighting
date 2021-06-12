@@ -365,26 +365,12 @@ class TexGenerator(nn.Module):
         self.texDec = TexDecoder(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
                 ngf, n_downsampling, n_blocks, norm_layer, padding_type)
     def forward(self, A_tex, B_tex = None, ):
-        if B_tex is not None:
-            # A_tex, A_mesh, B_tex, B_mesh = input_lists[0], input_lists[1], input_lists[2], input_lists[3]
-            A_id_code, A_exp_code = self.texEnc(A_tex)
-            B_id_code, B_exp_code = self.texEnc(B_tex)
+        
+        tex_code = self.texEnc(A_tex)
 
-            # reconstruction
-            rec_tex_A = self.texDec(A_id_code, A_exp_code)
-            rec_tex_B = self.texDec(B_id_code, B_exp_code)
-
-            # mismatch
-            rec_tex_AB = self.texDec(A_id_code, B_exp_code)
-            rec_tex_BA = self.texDec(B_id_code, A_exp_code)
-
-            return rec_tex_A, rec_tex_B, rec_tex_AB, rec_tex_BA
-        else:
-            tex_code = self.texEnc(A_tex)
-
-            # reconstruction
-            rec_tex_A = self.texDec(tex_code, mesh_code)
-            return rec_tex_A
+        # reconstruction
+        rec_tex_A = self.texDec(tex_code)
+        return rec_tex_A
 
 class TexMeshGenerator(nn.Module):
     def __init__(self, tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
