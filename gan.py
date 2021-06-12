@@ -73,6 +73,8 @@ else:
         state_dict = checkpoint
         new_state_dict = OrderedDict()
         for k, v in state_dict.items():
+            if 'discriminator' in k:
+                continue
             name = k[10:]
             new_state_dict[name] = v
         return new_state_dict
