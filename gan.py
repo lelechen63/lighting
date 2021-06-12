@@ -97,7 +97,7 @@ else:
     visualizer = Visualizer(opt)
 
 
-    for batch in testdata:
+    for num,batch in enumerate(testdata):
         rec_tex_A, rec_mesh_A, rec_tex_B, rec_mesh_B, \
         rec_tex_AB, rec_mesh_AB, rec_tex_BA, rec_mesh_BA = \
         module(  batch['Atex'], batch['Amesh'],batch['Btex'],batch['Bmesh'] )
@@ -133,4 +133,4 @@ else:
             ('rec_Bmesh', rec_Bmesh)
         
             ])
-        visualizer.display_current_results(visuals, 1, 1000000)
+        visualizer.display_current_results(visuals, num, 1000000)
