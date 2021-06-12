@@ -90,6 +90,13 @@ else:
 
     dm.setup()
     testdata = dm.test_dataloader()
+    
+    opt.name = opt.name + '_test'
+
+
+    visualizer = Visualizer(opt)
+
+
     for batch in testdata:
         rec_tex_A, rec_mesh_A, rec_tex_B, rec_mesh_B, \
         rec_tex_AB, rec_mesh_AB, rec_tex_BA, rec_mesh_BA = \
@@ -126,3 +133,4 @@ else:
             ('rec_Bmesh', rec_Bmesh)
         
             ])
+        visualizer.display_current_results(visuals, self.current_epoch, 1000000)
