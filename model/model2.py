@@ -587,7 +587,7 @@ class TexModule(pl.LightningModule):
         # train generator
         # generate images
         rec_tex_A, rec_mesh_A = \
-        self(batch['Atex'],batch['Btex'】)
+        self(batch['Atex'],batch['Btex'])
         map_type = batch['map_type']
 
         # VGG loss
