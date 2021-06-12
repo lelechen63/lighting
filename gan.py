@@ -65,7 +65,7 @@ else:
     else:
         from model.model import TexMeshGenerator as module
 
-    module =  TexMeshGenerator(opt.loadSize, not opt.no_linearity, 
+    module =  module(opt.loadSize, not opt.no_linearity, 
             3, opt.code_n,opt.encoder_fc_n, opt.ngf, 
             opt.n_downsample_global, opt.n_blocks_global,opt.norm)
 
