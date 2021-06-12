@@ -56,8 +56,10 @@ if opt.isTrain:
 else:
     checkpoint_path = '/data/home/us000042/lelechen/github/lighting/lightning_logs/version_30/checkpoints/epoch=720-step=152851.ckpt'
     print(checkpoint_path)
+    checkpoint = torch.load(checkpoint_path)
+    print (checkpoint.keys())
 
-    model = model.load_from_checkpoint(checkpoint_path, opt)
+    model = model.load_from_checkpoint(checkpoint_path)
     trainer = pl.Trainer()
     results = trainer.test(model=model, datamodule = dm, verbose=True)
 
