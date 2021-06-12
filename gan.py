@@ -17,8 +17,10 @@ from options.step1_train_options import TrainOptions
 
 from pytorch_lightning.callbacks import ModelCheckpoint
 
-
-
+import util.util as util
+import os
+from util.visualizer import Visualizer
+from util.render_class import meshrender
 opt = TrainOptions().parse()
 if opt.modeltype ==2 :
     from model.model2 import TexMeshModule as module 
@@ -89,7 +91,38 @@ else:
     dm.setup()
     testdata = dm.test_dataloader()
     for batch in testdata:
-        print(batch.keys())
         rec_tex_A, rec_mesh_A, rec_tex_B, rec_mesh_B, \
         rec_tex_AB, rec_mesh_AB, rec_tex_BA, rec_mesh_BA = \
         module(  batch['Atex'], batch['Amesh'],batch['Btex'],batch['Bmesh'] )
+        
+
+        Atex = util.tensor2im(batch['Atex'][0])
+        Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
+        Atex = util.writeText(Atex, batch['A_path'][0])
+        
+        Btex = util.tensor2im(batch['Btex'][0])
+        Btex = np.ascontiguousarray(Btex, dtype=np.uint8)
+        Btex = util.writeText(Btex, batch['B_path'][0])
+
+        tmp = batch['A_path'][0].split('/')
+        gt_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),batch['Amesh'].data[0] )
+        rec_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), rec_mesh_A.data[0])
+
+        tmp = batch['B_path'][0].split('/')
+        gt_Bmesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),batch['Bmesh'].data[0] )
+        rec_Bmesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), rec_mesh_B.data[0])
+
+
+        visuals = OrderedDict([
+            ('Atex', Atex),
+            ('Btex', Btex),
+            ('rec_tex_A', util.tensor2im(rec_tex_A.data[0])),
+            ('rec_tex_B', util.tensor2im(rec_tex_B.data[0])),
+            ('rec_tex_AB', util.tensor2im(rec_tex_AB.data[0])),
+            ('rec_tex_BA', util.tensor2im(rec_tex_BA.data[0])),
+            ('gt_Amesh', gt_Amesh),
+            ('rec_Amesh', rec_Amesh),
+            ('gt_Bmesh', gt_Bmesh),
+            ('rec_Bmesh', rec_Bmesh)
+        
+            ])
