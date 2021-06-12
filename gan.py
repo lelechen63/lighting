@@ -30,6 +30,11 @@ elif opt.name == 'texmeshreal':
     from model.model import TexMeshModule as module 
 
 opt.datasetname = "fs_texmesh"
+if opt.no_vgg_loss:
+    opt.name += '_novgg'
+if opt.no_cls_loss:
+    opt.name += '_nocls'
+
 
 
 dm = FacescapeDataModule(opt)
