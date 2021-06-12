@@ -17,6 +17,10 @@ class Visualizer():
         self.use_html = opt.isTrain and not opt.no_html
         self.win_size = opt.display_winsize
         self.name = opt.name
+
+        if not os.path.exists( os.path.joint( opt.checkpoints_dir, opt.name )):
+            os.mkdir(os.path.joint( opt.checkpoints_dir, opt.name ))
+
         if self.tf_log:
             import tensorflow as tf
             self.tf = tf
