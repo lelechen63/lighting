@@ -56,23 +56,15 @@ if opt.isTrain:
 else:
     checkpoint_path = '/data/home/us000042/lelechen/github/lighting/lightning_logs/version_30/checkpoints/epoch=720-step=152851.ckpt'
     print(checkpoint_path)
-    if opt.modeltype == 2:
-        
-        from model.model2 import TexMeshGenerator as module
-    else:
-        from model.model import TexMeshGenerator as module
-    
-    testmodel = module(opt.loadSize, not opt.no_linearity, 
-            3, opt.code_n,opt.encoder_fc_n, opt.ngf, 
-            opt.n_downsample_global, opt.n_blocks_global,opt.norm)
+
+    model = model.load_from_checkpoint(checkpoint_path)
+    trainer = pl.Trainer()
+    results = trainer.test(model=model, dm, verbose=True)
 
 
-    testmodel = testmodel.load_from_checkpoint(checkpoint_path)
-  
-
-    testdata = dm.test_dataloader()
-    for batch in testdata:
-        print(batch.keys())
-        rec_tex_A, rec_mesh_A, rec_tex_B, rec_mesh_B, \
-        rec_tex_AB, rec_mesh_AB, rec_tex_BA, rec_mesh_BA = \
-        testmodel.forward(  batch['Atex'], batch['Amesh'],batch['Btex'],batch['Bmesh'] )
+    # testdata = dm.test_dataloader()
+    # for batch in testdata:
+    #     print(batch.keys())
+    #     rec_tex_A, rec_mesh_A, rec_tex_B, rec_mesh_B, \
+    #     rec_tex_AB, rec_mesh_AB, rec_tex_BA, rec_mesh_BA = \
+    #     testmodel.forward(  batch['Atex'], batch['Amesh'],batch['Btex'],batch['Bmesh'] )
