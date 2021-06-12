@@ -69,7 +69,16 @@ else:
             3, opt.code_n,opt.encoder_fc_n, opt.ngf, 
             opt.n_downsample_global, opt.n_blocks_global,opt.norm)
 
-    module = module.load_state_dict(checkpoint['state_dict'])
+    def pl2normal(checkpoint):
+        state_dict = checkpoint
+        new_state_dict = OrderedDict()
+        for k, v in state_dict.items():
+            name = k[10:]
+            new_state_dict[name] = v
+        return new_state_dict
+       
+
+    module = module.load_state_dict(pl2normal(checkpoint['state_dict']))
 
     # model = model.load_from_checkpoint(checkpoint)
     # trainer = pl.Trainer()
