@@ -92,4 +92,4 @@ else:
         print(batch.keys())
         rec_tex_A, rec_mesh_A, rec_tex_B, rec_mesh_B, \
         rec_tex_AB, rec_mesh_AB, rec_tex_BA, rec_mesh_BA = \
-        module.forward(  batch['Atex'], batch['Amesh'],batch['Btex'],batch['Bmesh'] )
+        module(  batch['Atex'], batch['Amesh'],batch['Btex'],batch['Bmesh'] )
