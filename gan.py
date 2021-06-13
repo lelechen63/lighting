@@ -28,7 +28,8 @@ elif opt.name == 'texmesh':
     from model.model2 import TexMeshModule as module 
 elif opt.name == 'texmeshreal':
     from model.model import TexMeshModule as module 
-
+elif opt.name == 'texgan':
+    from model.model import TexGANModule as module 
 opt.datasetname = "fs_texmesh"
 if opt.no_vgg_loss:
     opt.name += '_novgg'
