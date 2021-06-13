@@ -87,12 +87,16 @@ else:
         for k, v in state_dict.items():
             if 'discriminator' in k:
                 continue
+            
             name = k[10:]
             new_state_dict[name] = v
         return new_state_dict
-       
+    
+    if opt.name =='mesh':
+        module.load_state_dict(checkpoint['state_dict'])
 
-    module.load_state_dict(pl2normal(checkpoint['state_dict']))
+    elif opt.name =='texmesh':
+        module.load_state_dict(pl2normal(checkpoint['state_dict']))
 
     # model = model.load_from_checkpoint(checkpoint)
     # trainer = pl.Trainer()
