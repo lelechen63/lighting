@@ -75,7 +75,7 @@ else:
         
         # from model.model2 import TexMeshGenerator as module 
     elif opt.name =='mesh':
-        checkpoint_path = '/data/home/us000042/lelechen/github/lighting/lightning_logs/version_58/checkpoints'
+        checkpoint_path = '/data/home/us000042/lelechen/github/lighting/lightning_logs/version_58/checkpoints/epoch=2116-step=673205.ckpt'
 
     print(checkpoint_path)
     checkpoint = torch.load(checkpoint_path)
