@@ -38,13 +38,14 @@ opt.datasetname = "fs_texmesh"
 
 
 dm = FacescapeDataModule(opt)
-model = module(opt)
-print ( opt.gpu_ids)
+
 # trainer = pl.Trainer(gpus= opt.gpu_ids, max_epochs= 200, progress_bar_refresh_rate=20)
 # if opt.debug:
 # trainer = pl.Trainer(gpus=1,  max_epochs= 10000, progress_bar_refresh_rate=20)
 
 if opt.isTrain:
+    model = module(opt)
+    print ( opt.gpu_ids)
     if opt.no_vgg_loss:
         opt.name += '_novgg'
     if opt.no_cls_loss:
