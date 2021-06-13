@@ -471,7 +471,7 @@ class MeshGenerator(nn.Module):
         self.meshEnc = MeshEncoder(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
                 ngf, n_downsampling, n_blocks, norm_layer, padding_type)
 
-        self.texmeshDec = MeshDecoder(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+        self.meshDec = MeshDecoder(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
                 ngf, n_downsampling, n_blocks, norm_layer, padding_type)
     def forward(self,  A_mesh ):
         
