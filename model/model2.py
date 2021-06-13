@@ -475,7 +475,7 @@ class MeshGenerator(nn.Module):
                 ngf, n_downsampling, n_blocks, norm_layer, padding_type)
     def forward(self,  A_mesh ):
         
-            mesh_code = self.meshEnc(A_tex, A_mesh)
+            mesh_code = self.meshEnc( A_mesh)
 
             # reconstruction
             rec_mesh_A = self.meshDec(mesh_code)
