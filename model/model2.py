@@ -633,8 +633,8 @@ class MeshModule(pl.LightningModule):
         #     network.cuda()
 
 
-    def forward(self, A_tex, A_mesh, B_tex, B_mesh):
-        return self.generator(A_tex, A_mesh)
+    def forward(self, A_mesh):
+        return self.generator(A_mesh)
     
     def training_step(self, batch, batch_idx):
         self.batch = batch
