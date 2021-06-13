@@ -896,7 +896,6 @@ class TexGANModule(pl.LightningModule):
         if optimizer_idx == 1:
 
             real_loss = self.GANloss(self.discriminator( torch.cat((batch['Atex'], batch['Atex']), dim=1)), True)
-
             fake_loss = self.GANloss( self.discriminator( torch.cat((batch['Atex'], rec_tex_A.detach() ), dim = 1) ), False)
 
             # discriminator loss is the average of these
