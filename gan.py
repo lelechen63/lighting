@@ -71,17 +71,16 @@ else:
         pass
     elif opt.name =='texmesh':
         checkpoint_path = '/data/home/us000042/lelechen/github/lighting/lightning_logs/version_30/checkpoints/epoch=720-step=152851.ckpt'
-        print(checkpoint_path)
-        checkpoint = torch.load(checkpoint_path)
-        print (checkpoint.keys())
+        
         # from model.model2 import TexMeshGenerator as module 
     elif opt.name =='mesh':
         checkpoint_path = '/data/home/us000042/lelechen/github/lighting/lightning_logs/version_58/checkpoints'
 
+    print(checkpoint_path)
+    checkpoint = torch.load(checkpoint_path)
+    print (checkpoint.keys())
 
-    module =  module(opt.loadSize, not opt.no_linearity,  \
-            3, opt.code_n,opt.encoder_fc_n, opt.ngf, \
-            opt.n_downsample_global, opt.n_blocks_global,opt.norm)
+    module =  module(opt.loadSize, not opt.no_linearity, 3, opt.code_n,opt.encoder_fc_n, opt.ngf,opt.n_downsample_global, opt.n_blocks_global,opt.norm)
 
     def pl2normal(checkpoint):
         state_dict = checkpoint
