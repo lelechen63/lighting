@@ -696,7 +696,7 @@ class TexGANModule(pl.LightningModule):
             if not self.opt.no_pix_loss:
                 loss_G_pix += self.l1loss(rec_tex_A, batch['Atex']) * self.opt.lambda_pix
 
-            
+            loss_mesh = 0 
             g_loss = self.GANloss(self.discriminator(  torch.cat((batch['Atex'], rec_tex_A), dim=1) ), True)
 
             loss = loss_G_pix + loss_G_VGG + loss_G_CLS + loss_mesh + g_loss
