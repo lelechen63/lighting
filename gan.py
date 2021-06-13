@@ -79,7 +79,7 @@ else:
         checkpoint_path = '/data/home/us000042/lelechen/github/lighting/lightning_logs/version_58/checkpoints'
 
 
-    module =  module(opt.loadSize, not opt.no_linearity, \
+    module =  module(opt.loadSize, not opt.no_linearity,  \
             3, opt.code_n,opt.encoder_fc_n, opt.ngf, \
             opt.n_downsample_global, opt.n_blocks_global,opt.norm)
 
