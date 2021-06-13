@@ -127,7 +127,7 @@ class TexMeshEncoder(nn.Module):
 
 
 
-class TexMeshEncoder(nn.Module):
+class MeshEncoder(nn.Module):
     def __init__(self,  tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
                 ngf=64, n_downsampling=5, n_blocks=4, norm_layer= nn.BatchNorm2d, \
                 padding_type='reflect'):
