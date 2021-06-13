@@ -125,6 +125,34 @@ class TexMeshEncoder(nn.Module):
         # return identity_code, expression_code
         return tex_encoded, mesh_encoded
 
+
+
+class TexMeshEncoder(nn.Module):
+    def __init__(self,  tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+                ngf=64, n_downsampling=5, n_blocks=4, norm_layer= nn.BatchNorm2d, \
+                padding_type='reflect'):
+        super().__init__()
+        self.tex_shape = tex_shape
+        activation = nn.ReLU(True)
+
+    
+        self.meshencoder = nn.Sequential(
+            nn.Linear( 78951, ngf*2),
+            nn.ReLU(True),
+            nn.Linear( ngf*2, ngf*2),
+            nn.ReLU(True),
+            nn.Linear( ngf*2, ngf*2),
+            nn.ReLU(True),
+            nn.Linear( ngf*2, ngf*2),
+            nn.ReLU(True),
+            nn.Linear( ngf*2, ngf*4),
+            nn.ReLU(True)
+            )
+
+    def forward(self, mesh):
+        mesh_encoded = self.meshencoder(mesh)
+    
+        return mesh_encoded
 class TexEncoder(nn.Module):
     def __init__(self,  tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
                 ngf=64, n_downsampling=5, n_blocks=4, norm_layer= nn.BatchNorm2d, \
@@ -238,6 +266,32 @@ class TexDecoder(nn.Module):
         decoded = self.tex_decoder(tex_dec)
         rec_tex = self.output_layer(decoded)
         return rec_tex   
+
+
+class MeshDecoder(nn.Module):
+    def __init__(self,  tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+                ngf=64, n_downsampling=5, n_blocks=4, norm_layer = nn.BatchNorm2d, \
+                padding_type='reflect'):
+        super().__init__()
+
+        self.tex_shape = tex_shape
+        activation = nn.ReLU(True)   
+        
+        self.mesh_fc_dec = nn.Sequential(
+            nn.Linear( ngf*4, ngf*4),
+            nn.ReLU(True),
+            nn.Linear( ngf*4, ngf*4),
+            nn.ReLU(True),
+            nn.Linear( ngf*4, ngf*4),
+            nn.ReLU(True),
+            nn.Linear( ngf*4, 78951),
+            )
+     
+    def forward(self, mesh_code):
+        rec_mesh = self.mesh_fc_dec(mesh_code)
+
+     
+        return rec_mesh   
 
 
 
@@ -407,6 +461,25 @@ class TexMeshGenerator(nn.Module):
             rec_tex_A, rec_mesh_A = self.texmeshDec(tex_code, mesh_code)
             return rec_tex_A, rec_mesh_A
 
+class MeshGenerator(nn.Module):
+    def __init__(self, tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+                ngf=64, n_downsampling=5, n_blocks=4, norm_layer='batch', \
+                padding_type='reflect'):
+        super().__init__()
+        norm_layer = get_norm_layer(norm_type=norm_layer)  
+
+        self.meshEnc = MeshEncoder(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+                ngf, n_downsampling, n_blocks, norm_layer, padding_type)
+
+        self.texmeshDec = MeshDecoder(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+                ngf, n_downsampling, n_blocks, norm_layer, padding_type)
+    def forward(self,  A_mesh ):
+        
+            mesh_code = self.meshEnc(A_tex, A_mesh)
+
+            # reconstruction
+            rec_mesh_A = self.meshDec(mesh_code)
+            return rec_mesh_A
 
 class TexMeshModule(pl.LightningModule):
     def __init__(self, opt ):
@@ -535,6 +608,115 @@ class TexMeshModule(pl.LightningModule):
        
             self.visualizer.display_current_results(visuals, self.current_epoch, 1000000) 
 
+
+class MeshModule(pl.LightningModule):
+    def __init__(self, opt ):
+        super().__init__()
+        self.opt = opt
+        input_nc = 3
+        # networks
+        self.generator = MeshGenerator(opt.loadSize, not opt.no_linearity, 
+            input_nc, opt.code_n,opt.encoder_fc_n, opt.ngf, 
+            opt.n_downsample_global, opt.n_blocks_global,opt.norm)
+
+        self.l1loss = torch.nn.L1Loss()
+        self.l2loss = torch.nn.MSELoss()
+        if not opt.no_vgg_loss:             
+            self.VGGloss = lossNet.VGGLoss()
+        if not opt.no_cls_loss:
+            self.CLSloss = lossNet.CLSLoss(opt)
+
+        self.visualizer = Visualizer(opt)
+        # self.meshrender = MeshRender()
+
+        # if len(gpu_ids) and torch.cuda.is_available():
+        #     network.cuda()
+
+
+    def forward(self, A_tex, A_mesh, B_tex, B_mesh):
+        return self.generator(A_tex, A_mesh)
+    
+    def training_step(self, batch, batch_idx):
+        self.batch = batch
+        # train generator
+        # generate images
+        rec_mesh_A = \
+        self(batch['Amesh'])
+        map_type = batch['map_type']
+
+     
+        loss_mesh = 0
+        loss_mesh += self.l1loss(rec_mesh_A, batch['Amesh'])* self.opt.lambda_mesh
+            # mismatch loss
+    
+
+        loss = loss_mesh 
+        tqdm_dict = { 'loss_mesh': loss_mesh}
+        output = OrderedDict({
+            'loss': loss,
+            'progress_bar': tqdm_dict,
+            'log': tqdm_dict
+        })
+
+        errors = {k: v.data.item() if not isinstance(v, int) else v for k, v in tqdm_dict.items()}            
+        self.visualizer.print_current_errors(self.current_epoch, batch_idx, errors, 0)
+        self.visualizer.plot_current_errors(errors, batch_idx)
+        return output
+          
+    def configure_optimizers(self):
+        lr = self.opt.lr
+        opt_g = torch.optim.Adam(self.generator.parameters(), lr=lr, betas=(self.opt.beta1, 0.999))
+        
+        def lr_foo(epoch):
+            if epoch < 10:
+                lr_scale = 0.8 ** (10 - epoch)
+            else:
+                lr_scale = 0.95 ** epoch
+            return lr_scale
+        scheduler = torch.optim.lr_scheduler.LambdaLR(
+            opt_g,
+            lr_lambda=lr_foo
+        )
+
+        return [opt_g], [scheduler]
+    
+    # def optimizer_step(self, epoch_nb, batch_nb, optimizer, optimizer_i, opt_closure):
+    #     if self.trainer.global_step > 30:
+    #         for pg in optimizer.param_groups:
+    #             pg['lr'] = 0.8 * self.opt.lr
+    #     optimizer.step()
+    #     optimizer.zero_grad()
+
+    def on_epoch_end(self):
+        pass
+        # if self.current_epoch % 10 == 0:
+        #     batch = self.batch
+        #     rec_mesh_A = \
+        #     self(batch['Atex'], batch['Amesh'],batch['Btex'],batch['Bmesh'])
+
+        #     Atex = util.tensor2im(batch['Atex'][0])
+        #     Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
+        #     Atex = util.writeText(Atex, batch['A_path'][0])
+        #     # tmp = batch['A_path'][0].split('/')
+        #     # gg = batch['Amesh'].data[0].cpu()
+        #     # gg = gg.numpy()
+        #     # gg = torch.from_numpy(gg.astype(np.float32))
+        #     # gt_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gg )
+            
+        #     # gg =rec_mesh_A.data[0].cpu()
+        #     # gg = gg.numpy()
+        #     # gg = torch.from_numpy(gg.astype(np.float32))
+
+        #     # rec_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gg)
+        #     visuals = OrderedDict([
+        #     ('Atex', Atex),
+        #     # ('Amesh', gt_Amesh),
+        #     ('rec_tex_A', util.tensor2im(rec_tex_A.data[0])),
+        #     # ('rec_Amesh', rec_Amesh)
+        
+        #     ])
+       
+        #     self.visualizer.display_current_results(visuals, self.current_epoch, 1000000) 
 
 class TexModule(pl.LightningModule):
     def __init__(self, opt ):

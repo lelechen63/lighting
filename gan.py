@@ -24,6 +24,8 @@ from util.render_class import meshrender
 opt = TrainOptions().parse()
 if opt.name == 'tex' :
     from model.model2 import TexModule as module 
+if opt.name == 'mesh' :
+    from model.model2 import MeshModule as module 
 elif opt.name == 'texmesh':
     from model.model2 import TexMeshModule as module 
 elif opt.name == 'texmeshreal':
