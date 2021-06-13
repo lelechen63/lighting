@@ -33,10 +33,7 @@ elif opt.name == 'texmeshreal':
 elif opt.name == 'texgan':
     from model.model2 import TexGANModule as module 
 opt.datasetname = "fs_texmesh"
-if opt.no_vgg_loss:
-    opt.name += '_novgg'
-if opt.no_cls_loss:
-    opt.name += '_nocls'
+
 
 
 
@@ -48,7 +45,10 @@ print ( opt.gpu_ids)
 # trainer = pl.Trainer(gpus=1,  max_epochs= 10000, progress_bar_refresh_rate=20)
 
 if opt.isTrain:
-
+    if opt.no_vgg_loss:
+        opt.name += '_novgg'
+    if opt.no_cls_loss:
+        opt.name += '_nocls'
     checkpoint_callback = ModelCheckpoint(
         monitor='train_loss',
         dirpath= os.path.join(opt.checkpoints_dir, opt.name),
