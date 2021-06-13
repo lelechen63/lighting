@@ -39,10 +39,6 @@ opt.datasetname = "fs_texmesh"
 
 dm = FacescapeDataModule(opt)
 
-# trainer = pl.Trainer(gpus= opt.gpu_ids, max_epochs= 200, progress_bar_refresh_rate=20)
-# if opt.debug:
-# trainer = pl.Trainer(gpus=1,  max_epochs= 10000, progress_bar_refresh_rate=20)
-
 if opt.isTrain:
     model = module(opt)
     print ( opt.gpu_ids)
@@ -74,8 +70,9 @@ else:
     elif opt.name =='texmesh':
         checkpoint_path = '/data/home/us000042/lelechen/github/lighting/lightning_logs/version_30/checkpoints/epoch=720-step=152851.ckpt'
         
-        # from model.model2 import TexMeshGenerator as module 
+        from model.model2 import TexMeshGenerator as module 
     elif opt.name =='mesh':
+        from model.model2 import MeshGenerator as module 
         checkpoint_path = '/data/home/us000042/lelechen/github/lighting/lightning_logs/version_58/checkpoints/epoch=2116-step=673205.ckpt'
 
     print(checkpoint_path)
