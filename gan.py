@@ -67,6 +67,7 @@ if opt.isTrain:
     trainer.fit(model, dm)
 
 else:
+    print ('!!!!!!' + opt.name +'~!!!!!!!!')
     if opt.name == 'tex' :
         pass
     elif opt.name =='texmesh':
