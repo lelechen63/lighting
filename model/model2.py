@@ -651,7 +651,7 @@ class MeshModule(pl.LightningModule):
         return self.generator(A_mesh)
     
     def training_step(self, batch, batch_idx):
-        self.batch = batch
+        # self.batch = batch
         # train generator
         # generate images
         idmesh, rec_mesh_A = \
@@ -664,8 +664,6 @@ class MeshModule(pl.LightningModule):
         loss_mesh += self.l2loss(idmesh, batch['Aidmesh'])* self.opt.lambda_mesh
         # mesh loss
         loss_mesh += self.l2loss(rec_mesh_A, batch['Amesh'])* self.opt.lambda_mesh
-
-
 
         loss = loss_mesh 
         tqdm_dict = { 'loss_mesh': loss_mesh}
@@ -689,12 +687,13 @@ class MeshModule(pl.LightningModule):
             if epoch < 10:
                 lr_scale = 0.8 ** (10 - epoch)
             else:
-                lr_scale = 0.95 ** epoch
+                lr_scale = 0.95 ** int(epoch/10)
+                # if lr_scale < 0.05:
+                #     lr_scale = 0.05
             return lr_scale
-        scheduler = torch.optim.lr_scheduler.LambdaLR(
-            opt_g,
-            lr_lambda=lr_foo
-        )
+        scheduler = {'scheduler': torch.optim.lr_scheduler.LambdaLR(opt_g, lr_lambda=lr_foo )
+                        'name': 'my_logging_name'}
+        
 
         return [opt_g], [scheduler]
     
