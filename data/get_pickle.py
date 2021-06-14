@@ -204,7 +204,7 @@ def get_mean():
     mean_shape = np.mean(total_mesh, axis=0)
     mean_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),batch['Amesh'].data[0] )
     util.save_image(mean_Amesh, './gg.png')
-
+get_mean()
 # gettexmesh_pid_expid()
 
 # get_paired_texmesh_pickle()
