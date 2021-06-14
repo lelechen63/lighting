@@ -7,7 +7,7 @@ import numpy as np
 import sys
 sys.path.append("/data/home/us000042/lelechen/github/lighting")
 from util.render_class import meshrender
-
+from tqdm import tqdm
 
 def get_image_pickle():
     
