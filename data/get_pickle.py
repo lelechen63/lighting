@@ -202,7 +202,7 @@ def get_mean():
     
     total_mesh = np.asarray(total_mesh)
     mean_shape = np.mean(total_mesh, axis=0)
-    mean_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),batch['Amesh'].data[0] )
+    mean_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),mean_Amesh )
     util.save_image(mean_Amesh, './gg.png')
 get_mean()
 # gettexmesh_pid_expid()
