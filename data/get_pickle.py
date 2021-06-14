@@ -4,8 +4,8 @@ import random
 import openmesh
 from PIL import Image
 import numpy as np
-import util.util as util
-
+import sys
+sys.path.append("/data/home/us000042/lelechen/github/lighting")
 from util.render_class import meshrender
 
 
