@@ -208,8 +208,8 @@ def get_mean():
         else:
             total_mesh[tmp[0]].append(A_vertices)
 
-        if cc == 100:
-            break
+        # if cc == 100:
+        #     break
     for k in total_mesh.keys():
         print (k)
         c_mesh = total_mesh[k]
