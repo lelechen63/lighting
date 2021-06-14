@@ -662,9 +662,9 @@ class MeshModule(pl.LightningModule):
         loss_mesh = 0
 
         # id loss
-        loss_mesh += self.l2loss(idmesh, batch['Aidmesh'])* self.opt.lambda_mesh
+        loss_mesh += self.l2loss(idmesh, batch['Aidmesh'])
         # mesh loss
-        loss_mesh += self.l2loss(rec_mesh_A, batch['Amesh'])* self.opt.lambda_mesh
+        loss_mesh += self.l2loss(rec_mesh_A, batch['Amesh'])
 
         loss = loss_mesh 
         tqdm_dict = { 'loss_mesh': loss_mesh}
