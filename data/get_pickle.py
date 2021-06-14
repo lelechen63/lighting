@@ -192,6 +192,8 @@ def get_mean():
     if not os.path.exists( os.path.join(dataroot, "meanmesh")   ):
         os.mkdir(os.path.join(dataroot, "meanmesh"))
     data_list = pickle.load(_file)#[:1]
+    _file = open(os.path.join(dataroot, "lists/texmesh_test.pkl"), "rb")
+    data_list.extend(pickle.load(_file))
     total_mesh = {}
     cc = 0
     for data in tqdm(data_list):
