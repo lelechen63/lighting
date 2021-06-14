@@ -73,7 +73,7 @@ else:
         from model.model2 import TexMeshGenerator as module 
     elif opt.name =='mesh':
         from model.model2 import MeshGenerator as module 
-        checkpoint_path = '/data/home/us000042/lelechen/github/lighting/checkpoints/mesh/00200.ckpt'
+        checkpoint_path = '/data/home/us000042/lelechen/github/lighting/checkpoints/mesh/00300.ckpt'
 
     print(checkpoint_path)
     checkpoint = torch.load(checkpoint_path)
