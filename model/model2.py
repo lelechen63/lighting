@@ -329,7 +329,7 @@ class MeshGenerator(nn.Module):
             idcode, expcode = self.meshEnc( A_mesh)
 
             # reconstruction
-            idmesh, recmesh = self.meshDec(idcoe, expcode)
+            idmesh, recmesh = self.meshDec(idcode, expcode)
             return idmesh, recmesh
 
 
