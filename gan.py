@@ -149,7 +149,7 @@ else:
             
                 ])
         
-        elif opt.name =='mesh':
+        elif opt.name.split('_')[0] =='mesh':
             rec_mesh_A = module(   batch['Amesh'] )
             print ('!!!!!!!')
             tmp = batch['A_path'][0].split('/')
