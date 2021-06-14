@@ -114,7 +114,7 @@ else:
 
 
     for num,batch in enumerate(testdata):
-        if opt.name == 'texmesh':
+        if opt.name.split('_')[0] == 'texmesh':
             rec_tex_A, rec_mesh_A, rec_tex_B, rec_mesh_B, \
             rec_tex_AB, rec_mesh_AB, rec_tex_BA, rec_mesh_BA = \
             module(  batch['Atex'], batch['Amesh'],batch['Btex'],batch['Bmesh'] )
