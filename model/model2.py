@@ -127,32 +127,6 @@ class TexMeshEncoder(nn.Module):
 
 
 
-class MeshEncoder(nn.Module):
-    def __init__(self,  tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
-                ngf=64, n_downsampling=5, n_blocks=4, norm_layer= nn.BatchNorm2d, \
-                padding_type='reflect'):
-        super().__init__()
-        self.tex_shape = tex_shape
-        activation = nn.ReLU(True)
-
-    
-        self.meshencoder = nn.Sequential(
-            nn.Linear( 78951, ngf*2),
-            nn.ReLU(True),
-            nn.Linear( ngf*2, ngf*2),
-            nn.ReLU(True),
-            nn.Linear( ngf*2, ngf*2),
-            nn.ReLU(True),
-            nn.Linear( ngf*2, ngf*2),
-            nn.ReLU(True),
-            nn.Linear( ngf*2, ngf*4),
-            nn.ReLU(True)
-            )
-
-    def forward(self, mesh):
-        mesh_encoded = self.meshencoder(mesh)
-    
-        return mesh_encoded
 class TexEncoder(nn.Module):
     def __init__(self,  tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
                 ngf=64, n_downsampling=5, n_blocks=4, norm_layer= nn.BatchNorm2d, \
@@ -268,6 +242,39 @@ class TexDecoder(nn.Module):
         return rec_tex   
 
 
+class MeshEncoder(nn.Module):
+    def __init__(self,  tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+                ngf=64, n_downsampling=5, n_blocks=4, norm_layer= nn.BatchNorm2d, \
+                padding_type='reflect'):
+        super().__init__()
+        self.tex_shape = tex_shape
+        activation = nn.ReLU(True)    
+        self.meshencoder = nn.Sequential(
+            nn.Linear( 78951, ngf*2),
+            nn.ReLU(True),
+            nn.Linear( ngf*2, ngf*2),
+            nn.ReLU(True),
+            nn.Linear( ngf*2, ngf*2),
+            nn.ReLU(True)
+        }
+        self.idenc = nn.Sequential(
+            nn.Linear( ngf*2, ngf*2),
+            nn.ReLU(True),
+            nn.Linear( ngf*2, ngf*4),
+            nn.ReLU(True)
+            )
+        self.expenc = nn.Sequential(
+            nn.Linear( ngf*2, ngf*2),
+            nn.ReLU(True),
+            nn.Linear( ngf*2, ngf*4),
+            nn.ReLU(True)
+            )
+
+    def forward(self, mesh):
+        mesh_encoded = self.meshencoder(mesh)
+        encoded_id = self.idenc(mesh_encoded)
+        encoded_exp = self.expenc(mesh_encoded)
+        return encoded_id, encoded_exp
 class MeshDecoder(nn.Module):
     def __init__(self,  tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
                 ngf=64, n_downsampling=5, n_blocks=4, norm_layer = nn.BatchNorm2d, \
@@ -277,22 +284,53 @@ class MeshDecoder(nn.Module):
         self.tex_shape = tex_shape
         activation = nn.ReLU(True)   
         
-        self.mesh_fc_dec = nn.Sequential(
-            nn.Linear( ngf*4, ngf*4),
-            nn.ReLU(True),
-            nn.Linear( ngf*4, ngf*4),
-            nn.ReLU(True),
-            nn.Linear( ngf*4, ngf*4),
-            nn.ReLU(True),
-            nn.Linear( ngf*4, 78951),
-            )
-     
-    def forward(self, mesh_code):
-        rec_mesh = self.mesh_fc_dec(mesh_code)
 
+        self.id_dex = nn.Sequential(
+            nn.Linear( ngf*4, ngf*4),
+            nn.ReLU(True),
+            nn.Linear( ngf*4, ngf*4),
+            nn.ReLU(True),
+            nn.Linear( ngf*4, ngf*4),
+            nn.ReLU(True),
+            nn.Linear( ngf*4, 78951)
+        )
+        self.exp_dex = nn.Sequential(
+            nn.Linear( ngf*8, ngf*4),
+            nn.ReLU(True),
+            nn.Linear( ngf*4, ngf*4),
+            nn.ReLU(True),
+            nn.Linear( ngf*4, ngf*4),
+            nn.ReLU(True),
+            nn.Linear( ngf*4, 78951)
+        )
      
-        return rec_mesh   
+    def forward(self, id_code, exp_code):
+        id_rec = self.id_dex(id_code)
 
+        exp_rec = self.exp_dex(torch.cat([id_code, exp_code],  1))
+        rec_mesh = id_rec + exp_rec
+        return id_rec,rec_mesh
+
+
+class MeshGenerator(nn.Module):
+    def __init__(self, tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+                ngf=64, n_downsampling=5, n_blocks=4, norm_layer='batch', \
+                padding_type='reflect'):
+        super().__init__()
+        norm_layer = get_norm_layer(norm_type=norm_layer)  
+
+        self.meshEnc = MeshEncoder(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+                ngf, n_downsampling, n_blocks, norm_layer, padding_type)
+
+        self.meshDec = MeshDecoder(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+                ngf, n_downsampling, n_blocks, norm_layer, padding_type)
+    def forward(self,  A_mesh ):
+        
+            idcode, expcode = self.meshEnc( A_mesh)
+
+            # reconstruction
+            idmesh, recmesh = self.meshDec(idcoe, expcode)
+            return idmesh, recmesh
 
 
 class TexMeshDecoder(nn.Module):
@@ -461,26 +499,6 @@ class TexMeshGenerator(nn.Module):
             rec_tex_A, rec_mesh_A = self.texmeshDec(tex_code, mesh_code)
             return rec_tex_A, rec_mesh_A
 
-class MeshGenerator(nn.Module):
-    def __init__(self, tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
-                ngf=64, n_downsampling=5, n_blocks=4, norm_layer='batch', \
-                padding_type='reflect'):
-        super().__init__()
-        norm_layer = get_norm_layer(norm_type=norm_layer)  
-
-        self.meshEnc = MeshEncoder(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
-                ngf, n_downsampling, n_blocks, norm_layer, padding_type)
-
-        self.meshDec = MeshDecoder(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
-                ngf, n_downsampling, n_blocks, norm_layer, padding_type)
-    def forward(self,  A_mesh ):
-        
-            mesh_code = self.meshEnc( A_mesh)
-
-            # reconstruction
-            rec_mesh_A = self.meshDec(mesh_code)
-            return rec_mesh_A
-
 class TexMeshModule(pl.LightningModule):
     def __init__(self, opt ):
         super().__init__()
@@ -621,8 +639,6 @@ class MeshModule(pl.LightningModule):
 
         self.l1loss = torch.nn.L1Loss()
         self.l2loss = torch.nn.MSELoss()
-        if not opt.no_vgg_loss:             
-            self.VGGloss = lossNet.VGGLoss()
         if not opt.no_cls_loss:
             self.CLSloss = lossNet.CLSLoss(opt)
 
@@ -640,15 +656,18 @@ class MeshModule(pl.LightningModule):
         self.batch = batch
         # train generator
         # generate images
-        rec_mesh_A = \
+        idmesh, rec_mesh_A = \
         self(batch['Amesh'])
         map_type = batch['map_type']
 
-     
         loss_mesh = 0
-        loss_mesh += self.l1loss(rec_mesh_A, batch['Amesh'])* self.opt.lambda_mesh
-            # mismatch loss
-    
+
+        # id loss
+        loss_mesh += self.l2loss(idmesh, batch['Aidmesh'])* self.opt.lambda_mesh
+        # mesh loss
+        loss_mesh += self.l2loss(rec_mesh_A, batch['Amesh'])* self.opt.lambda_mesh
+
+
 
         loss = loss_mesh 
         tqdm_dict = { 'loss_mesh': loss_mesh}
