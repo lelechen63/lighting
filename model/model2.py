@@ -333,7 +333,7 @@ class MeshGenerator(nn.Module):
             return idmesh, recmesh
 
 
-class TexMeshDecoder(nn.Module):
+class  (nn.Module):
     def __init__(self,  tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
                 ngf=64, n_downsampling=5, n_blocks=4, norm_layer = nn.BatchNorm2d, \
                 padding_type='reflect'):
@@ -664,7 +664,7 @@ class MeshModule(pl.LightningModule):
         # id loss
         loss_id = self.l2loss(idmesh, batch['Aidmesh'])
         # mesh loss
-        loss_final = self.l2loss(rec_mesh_A, batch['Amesh'])
+        loss_final = self.l2loss(rec_mesh_A, batch['Amesh'] - batch['Aidmesh'] )
         loss_mesh = loss_id + loss_final
         loss = loss_mesh 
         tqdm_dict = { 'loss_id': loss_id, 'loss_final': loss_final }
@@ -700,35 +700,7 @@ class MeshModule(pl.LightningModule):
         if self.current_epoch % 50 == 0:
             print ('!!!!!save model')
             self.trainer.save_checkpoint( os.path.join( self.ckpt_path, '%05d.ckpt'%self.current_epoch) )
-        # if self.current_epoch % 10 == 0:
-        #     batch = self.batch
-        #     rec_mesh_A = \
-        #     self(batch['Atex'], batch['Amesh'],batch['Btex'],batch['Bmesh'])
-
-        #     Atex = util.tensor2im(batch['Atex'][0])
-        #     Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
-        #     Atex = util.writeText(Atex, batch['A_path'][0])
-        #     # tmp = batch['A_path'][0].split('/')
-        #     # gg = batch['Amesh'].data[0].cpu()
-        #     # gg = gg.numpy()
-        #     # gg = torch.from_numpy(gg.astype(np.float32))
-        #     # gt_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gg )
-            
-        #     # gg =rec_mesh_A.data[0].cpu()
-        #     # gg = gg.numpy()
-        #     # gg = torch.from_numpy(gg.astype(np.float32))
-
-        #     # rec_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gg)
-        #     visuals = OrderedDict([
-        #     ('Atex', Atex),
-        #     # ('Amesh', gt_Amesh),
-        #     ('rec_tex_A', util.tensor2im(rec_tex_A.data[0])),
-        #     # ('rec_Amesh', rec_Amesh)
-        
-        #     ])
        
-        #     self.visualizer.display_current_results(visuals, self.current_epoch, 1000000) 
-
 class TexModule(pl.LightningModule):
     def __init__(self, opt ):
         super().__init__()
