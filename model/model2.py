@@ -256,7 +256,6 @@ class MeshEncoder(nn.Module):
             nn.ReLU(True),
             nn.Linear( ngf*2, ngf*2),
             nn.ReLU(True)
-        }
         self.idenc = nn.Sequential(
             nn.Linear( ngf*2, ngf*2),
             nn.ReLU(True),
