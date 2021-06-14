@@ -211,6 +211,8 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         ids = open(os.path.join(opt.dataroot, "lists/ids.pkl"), "rb")
         self.id_set = set(pickle.load(ids))
         self.exp_set = get_exp()
+
+        self.meanmesh = get_meanmesh()
         print ('===========================')
         print ('id_set:',self.id_set)
     
@@ -266,6 +268,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         A_tex_tensor = transform(tex)
         A_vertices = self.total_tex[self.data_list[index]][1]
 
+        Aidmesh = self.meanmesh[tmp[0]]
         toss = random.getrandbits(1)
 
         # toss 0-> same iden, diff exp
@@ -296,7 +299,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
                 B_tex_tensor = transform(tex)
              
                 B_vertices = self.total_tex[tex_index][1]
-
+                Bidmesh = self.meanmesh[str(B_id)]
                 if B_vertices.shape[0] != 78951:
                     print('!!!!',B_vertices.shape )
                     continue
@@ -306,7 +309,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
                 'A_path': self.data_list[index], 'Btex':B_tex_tensor,
                 'Bmesh': torch.FloatTensor(B_vertices), 'B_path': os.path.join( B_id, 'models_reg' , B_exp),
                 'map_type':toss, 'Aid': int(A_id) - 1, 'Aexp': int(A_exp) -1,
-                'Bid':int(B_id) - 1, 'Bexp':int(B_exp.split('_')[0]) - 1 }
+                'Bid':int(B_id) - 1, 'Bexp':int(B_exp.split('_')[0]) - 1 , 'Aidmesh': Aidmesh, 'Bidmesh': Bidmesh }
 
         return input_dict
 
