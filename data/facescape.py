@@ -203,7 +203,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
             _file = open(os.path.join(opt.dataroot, "lists/texmesh_train.pkl"), "rb")
             
         else:
-            _file = open(os.path.join(opt.dataroot, "lists/texmesh_test.pkl"), "rb")
+            _file = open(os.path.join(opt.dataroot, "lists/texmesh_train.pkl"), "rb")
        
         self.data_list = pickle.load(_file)#[:1]
         _file.close()

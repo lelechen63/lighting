@@ -139,14 +139,16 @@ else:
                 ])
         
         elif opt.name.split('_')[0] =='mesh':
-            rec_mesh_A = module(   batch['Amesh'] )
+            idmesh, rec_mesh_A = module(   batch['Amesh'] )
             print ('!!!!!!!')
             tmp = batch['A_path'][0].split('/')
             gt_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),batch['Amesh'].data[0] )
             rec_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), rec_mesh_A.data[0])
+            rec_id = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), idmesh.data[0])
 
             visuals = OrderedDict([
                 ('gt_Amesh', gt_Amesh),
+                ('rec_id', rec_id),
                 ('rec_Amesh', rec_Amesh),
             
                 ])
