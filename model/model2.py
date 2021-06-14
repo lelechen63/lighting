@@ -644,6 +644,7 @@ class MeshModule(pl.LightningModule):
             self.CLSloss = lossNet.CLSLoss(opt)
 
         self.visualizer = Visualizer(opt)
+        self.ckpt_path = os.join(opt.checkpoints_dir, opt.name)
     
 
 
@@ -703,7 +704,9 @@ class MeshModule(pl.LightningModule):
     #     optimizer.zero_grad()
 
     def on_epoch_end(self):
-        pass
+        if self.current_epoch % 50 == 0:
+            print ('!!!!!save model')
+            self.trainer.save_checkpoint( os.path.join( self.ckpt_path, '%05d.ckpt'%self.current_epoch) )
         # if self.current_epoch % 10 == 0:
         #     batch = self.batch
         #     rec_mesh_A = \
