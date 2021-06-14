@@ -89,7 +89,8 @@ else:
                 continue
             if 'vgg' in k :
                 continue 
-            
+            if 'cls' in k :
+                continue 
             name = k[10:]
             new_state_dict[name] = v
         return new_state_dict
