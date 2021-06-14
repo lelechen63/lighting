@@ -189,25 +189,36 @@ def get_mean():
     dataroot = '/data/home/us000042/lelechen/data/Facescape/'
     _file = open(os.path.join(dataroot, "lists/texmesh_train.pkl"), "rb")
     dir_A = os.path.join(dataroot, "textured_meshes")  
-       
+    if not os.path.exists( os.path.join(dataroot, "meanmesh")   ):
+        os.mkdir(os.path.join(dataroot, "meanmesh"))
     data_list = pickle.load(_file)#[:1]
-    total_mesh = []
+    total_mesh = {}
     for data in tqdm(data_list):
 
         mesh_path = os.path.join( dir_A , data + '.obj')
         om_mesh = openmesh.read_trimesh(mesh_path)
         A_vertices = np.array(om_mesh.points()).reshape(-1)
-        total_mesh.append(A_vertices)
+        
         tmp = data.split('/')
+        if tmp[0] not in total_mesh.keys():
+            total_mesh[tmp[0]] = [A_vertices]
+        else:
+            total_mesh[tmp[0]].append(A_vertices)
+
         if len(total_mesh) == 13:
             break
-    
-    total_mesh = np.asarray(total_mesh)
-    mean_shape = np.mean(total_mesh, axis=0)
-    print (mean_shape.shape)
-    mean_shape = torch.FloatTensor(mean_shape)
-    mean_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),mean_shape )
-    util.save_image(mean_Amesh, './gg.png')
+    for k in total_mesh.keys():
+        c_mesh = total_mesh[k]
+        c_mesh = np.asarray(c_mesh)
+        print (c_mesh.shape, 'c_mesh')
+        mean_shape = np.mean(c_mesh, axis=0)
+        print (mean_shape.shape)
+        mean_shape = torch.FloatTensor(mean_shape)
+        np_path = os.path.join(dataroot, "meanmesh" , k + '.npy') 
+        np.save( np_path, mean_shape  )
+        mean_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),mean_shape )
+        vis_path = os.path.join(dataroot, "meanmesh" , k + '.png') 
+        util.save_image(mean_Amesh, vis_path)
 get_mean()
 # gettexmesh_pid_expid()
 
