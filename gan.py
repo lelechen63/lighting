@@ -151,7 +151,7 @@ else:
         
         elif opt.name =='mesh':
             rec_mesh_A = module(   batch['Amesh'] )
-
+            print ('!!!!!!!')
             tmp = batch['A_path'][0].split('/')
             gt_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),batch['Amesh'].data[0] )
             rec_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), rec_mesh_A.data[0])
