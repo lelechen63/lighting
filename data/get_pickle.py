@@ -209,6 +209,7 @@ def get_mean():
         if cc == 100:
             break
     for k in total_mesh.keys():
+        print (k)
         c_mesh = total_mesh[k]
         c_mesh = np.asarray(c_mesh)
         print (c_mesh.shape, 'c_mesh')
