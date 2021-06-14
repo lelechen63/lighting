@@ -9,6 +9,8 @@ sys.path.append("/data/home/us000042/lelechen/github/lighting")
 from util.render_class import meshrender
 from tqdm import tqdm
 import torch
+import util.util as util
+
 def get_image_pickle():
     
     base_p = '/raid/celong/FaceScape/ffhq_aligned_img'
