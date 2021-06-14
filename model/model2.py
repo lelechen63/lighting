@@ -361,7 +361,7 @@ class MeshModule(pl.LightningModule):
         # train generator
         # generate images
         idmesh, rec_mesh_A = \
-        self(batch['Amesh'])
+        self(batch['Amesh'] - batch['Aidmesh'])
         map_type = batch['map_type']
 
         loss_mesh = 0
