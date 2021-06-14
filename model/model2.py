@@ -630,6 +630,7 @@ class TexMeshModule(pl.LightningModule):
 class MeshModule(pl.LightningModule):
     def __init__(self, opt ):
         super().__init__()
+        self.save_hyperparameters()
         self.opt = opt
         input_nc = 3
         # networks
@@ -643,10 +644,7 @@ class MeshModule(pl.LightningModule):
             self.CLSloss = lossNet.CLSLoss(opt)
 
         self.visualizer = Visualizer(opt)
-        # self.meshrender = MeshRender()
-
-        # if len(gpu_ids) and torch.cuda.is_available():
-        #     network.cuda()
+    
 
 
     def forward(self, A_mesh):
@@ -680,6 +678,7 @@ class MeshModule(pl.LightningModule):
         errors = {k: v.data.item() if not isinstance(v, int) else v for k, v in tqdm_dict.items()}            
         self.visualizer.print_current_errors(self.current_epoch, batch_idx, errors, 0)
         self.visualizer.plot_current_errors(errors, batch_idx)
+        print (scheduler.get_lr())
         return output
           
     def configure_optimizers(self):
