@@ -95,7 +95,7 @@ else:
         return new_state_dict
     
     # if opt.name =='mesh':
-    module.load_state_dict(checkpoint['state_dict'])
+    module.load_state_dict(pl2normal(checkpoint['state_dict']))
 
     # elif opt.name =='texmesh':
         # module.load_state_dict(pl2normal(checkpoint['state_dict']))
