@@ -580,7 +580,7 @@ class TexMeshModule(pl.LightningModule):
             if epoch < 10:
                 lr_scale = 0.8 ** (10 - epoch)
             else:
-                lr_scale = 0.95 ** epoch
+                lr_scale = 0.95 ** int(epoch/10)
             return lr_scale
         scheduler = torch.optim.lr_scheduler.LambdaLR(
             opt_g,
@@ -806,7 +806,7 @@ class TexModule(pl.LightningModule):
             if epoch < 10:
                 lr_scale = 0.8 ** (10 - epoch)
             else:
-                lr_scale = 0.95 ** epoch
+                lr_scale = 0.95 ** int(epoch/10)
             return lr_scale
         scheduler = torch.optim.lr_scheduler.LambdaLR(
             opt_g,

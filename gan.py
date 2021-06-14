@@ -94,24 +94,12 @@ else:
             new_state_dict[name] = v
         return new_state_dict
     
-    # if opt.name =='mesh':
     module.load_state_dict(pl2normal(checkpoint['state_dict']))
-
-    # elif opt.name =='texmesh':
-        # module.load_state_dict(pl2normal(checkpoint['state_dict']))
-
-    # model = model.load_from_checkpoint(checkpoint)
-    # trainer = pl.Trainer()
-    # results = trainer.test(model=model, datamodule = dm, verbose=True)
 
     dm.setup()
     testdata = dm.test_dataloader()
-    
     opt.name = opt.name + '_test'
-
-
     visualizer = Visualizer(opt)
-
 
     for num,batch in enumerate(testdata):
         if opt.name.split('_')[0] == 'texmesh':
