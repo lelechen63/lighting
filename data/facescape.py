@@ -41,6 +41,16 @@ def get_exp():
     for i in range(1,21):
         exps.append(expressions[i])
     return set(exps)
+
+def get_meanmesh():
+    dataroot = '/data/home/us000042/lelechen/data/Facescape/'
+    meanmeshpath = os.path.join(dataroot, "meanmesh")
+    total = os.listdir( meanmeshpath)
+    meanmesh = {}
+    for kk in total:
+        if kk[-3:] == 'npy':
+            meanmesh[kk[:-4]] = np.load( os.path.join( meanmeshpath, kk)  )
+    return meanmesh
 def get_anlge_list():
     angle_lists =  open("/raid/celong/lele/github/idinvert_pytorch/predef/angle_list2.txt", 'r')
     total_list = {}
@@ -248,30 +258,13 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         # id_p , 'models_reg', motion_p
         # tex 
         tex_path = os.path.join( self.dir_tex , tmp[0], tmp[-1] + '.png')
-        # tex_path = '/raid/celong/FaceScape/texture_mapping/target/1/9_mouth_right.png'
-        # mesh 
-        # tex = Image.open(tex_path).convert('RGB')#.resize(self.img_size)
-        # tex  = np.array(tex) 
-        # # tex = cv2.resize(tex, self.img_size, interpolation = cv2.INTER_AREA)
-        # tex = tex * self.facial_seg
-        # tex = tex[self.y:self.y+self.l,self.x :self.x +self.l,:]
+    
         tex = self.total_tex[self.data_list[index]][0]
         tex = Image.fromarray(np.uint8(tex))
         params = get_params(self.opt, tex.size)
         transform = get_transform(self.opt, params)      
         A_tex_tensor = transform(tex)
-
-        # mesh_path = os.path.join( self.dir_A , self.data_list[index] + '.obj')
-        # # mesh = trimesh.load(mesh_path, process=False)
-        # # vertices = mesh.vertices
-        # om_mesh = openmesh.read_trimesh(mesh_path)
-        # A_vertices = np.array(om_mesh.points()).reshape(-1)
         A_vertices = self.total_tex[self.data_list[index]][1]
-
-        # if A_vertices.shape[0] != 78951:
-             
-        # vertices=vertices.reshape(-1, 4, 3)
-        # A_vertices = vertices[:, 0, :].reshape(-1)
 
         toss = random.getrandbits(1)
 
@@ -282,17 +275,13 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
                     pool = self.exp_set - set(tmp[-1])
                     B_exp = random.sample(pool, 1)[0]
                     B_id = tmp[0]
-                    # Bid = 20
                 # toss 1 -> same exp, diff iden
                 else:
                     pool = self.id_set - set(tmp[0])
                     B_id = random.sample(pool, 1)[0]
                     B_exp = tmp[-1]
-                    # Bid = 301
                 
                 # tex
-                # DEBUG!!
-                
                 tex_index = os.path.join( B_id , 'models_reg', B_exp  )
                 
                 if self.opt.debug:
@@ -300,31 +289,19 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
 
                 if tex_index not in self.total_tex.keys():
                     continue 
-                # tex_path = os.path.join( self.dir_tex , B_id, B_exp + '.png')
-                # # tex_path = '/raid/celong/FaceScape/texture_mapping/target/1/9_mouth_right.png'
-                # # mesh 
-                # tex = Image.open(tex_path).convert('RGB')#.resize(self.img_size)
-                # tex  = np.array(tex ) 
-                # tex = tex * self.facial_seg
-                # tex = tex[self.y:self.y+self.l,self.x :self.x +self.l,:]
+               
                 tex = self.total_tex[tex_index][0]
                 tex = Image.fromarray(np.uint8(tex))
                 
                 B_tex_tensor = transform(tex)
-                # mesh_path = os.path.join( self.dir_A , B_id, 'models_reg' , B_exp + '.obj')
-                # om_mesh = openmesh.read_trimesh(mesh_path)
-                # B_vertices = np.array(om_mesh.points()).reshape(-1)
+             
                 B_vertices = self.total_tex[tex_index][1]
 
                 if B_vertices.shape[0] != 78951:
                     print('!!!!',B_vertices.shape )
                     continue
                 break
-            # except:
-            #     print('!!!!!', tex_index)
-            #     continue
-        # vertices=vertices.reshape(-1, 4, 3)
-        # B_vertices = vertices[:, 0, :].reshape(-1)
+            
         input_dict = { 'Atex': A_tex_tensor, 'Amesh': torch.FloatTensor(A_vertices),
                 'A_path': self.data_list[index], 'Btex':B_tex_tensor,
                 'Bmesh': torch.FloatTensor(B_vertices), 'B_path': os.path.join( B_id, 'models_reg' , B_exp),
