@@ -644,7 +644,7 @@ class MeshModule(pl.LightningModule):
             self.CLSloss = lossNet.CLSLoss(opt)
 
         self.visualizer = Visualizer(opt)
-        self.ckpt_path = os.join(opt.checkpoints_dir, opt.name)
+        self.ckpt_path = os.path.join(opt.checkpoints_dir, opt.name)
     
 
 
