@@ -193,8 +193,9 @@ def get_mean():
         os.mkdir(os.path.join(dataroot, "meanmesh"))
     data_list = pickle.load(_file)#[:1]
     total_mesh = {}
+    cc = 0
     for data in tqdm(data_list):
-
+        cc += 1
         mesh_path = os.path.join( dir_A , data + '.obj')
         om_mesh = openmesh.read_trimesh(mesh_path)
         A_vertices = np.array(om_mesh.points()).reshape(-1)
@@ -205,7 +206,7 @@ def get_mean():
         else:
             total_mesh[tmp[0]].append(A_vertices)
 
-        if len(total_mesh) == 13:
+        if cc == 100:
             break
     for k in total_mesh.keys():
         c_mesh = total_mesh[k]
