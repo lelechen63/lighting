@@ -139,7 +139,7 @@ else:
                 ])
         
         elif opt.name.split('_')[0] =='mesh':
-            idmesh, rec_mesh_A = module(   batch['Amesh'] )
+            idmesh, rec_mesh_A = module(   batch['Amesh'] - batch['Aidmesh'] )
             print ('!!!!!!!')
             tmp = batch['A_path'][0].split('/')
             gt_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),batch['Amesh'].data[0] )
