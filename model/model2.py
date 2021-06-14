@@ -308,8 +308,8 @@ class MeshDecoder(nn.Module):
         id_rec = self.id_dex(id_code)
 
         exp_rec = self.exp_dex(torch.cat([id_code, exp_code],  1))
-        rec_mesh = id_rec + exp_rec
-        return id_rec,rec_mesh
+        # rec_mesh = id_rec + exp_rec
+        return id_rec,exp_rec
 
 
 class MeshGenerator(nn.Module):
@@ -332,6 +332,80 @@ class MeshGenerator(nn.Module):
             idmesh, recmesh = self.meshDec(idcode, expcode)
             return idmesh, recmesh
 
+class MeshModule(pl.LightningModule):
+    def __init__(self, opt ):
+        super().__init__()
+        self.save_hyperparameters()
+        self.opt = opt
+        input_nc = 3
+        # networks
+        self.generator = MeshGenerator(opt.loadSize, not opt.no_linearity, 
+            input_nc, opt.code_n,opt.encoder_fc_n, opt.ngf, 
+            opt.n_downsample_global, opt.n_blocks_global,opt.norm)
+
+        self.l1loss = torch.nn.L1Loss()
+        self.l2loss = torch.nn.MSELoss()
+        if not opt.no_cls_loss:
+            self.CLSloss = lossNet.CLSLoss(opt)
+
+        self.visualizer = Visualizer(opt)
+        self.ckpt_path = os.path.join(opt.checkpoints_dir, opt.name)
+    
+
+
+    def forward(self, A_mesh):
+        return self.generator(A_mesh)
+    
+    def training_step(self, batch, batch_idx):
+        # self.batch = batch
+        # train generator
+        # generate images
+        idmesh, rec_mesh_A = \
+        self(batch['Amesh'])
+        map_type = batch['map_type']
+
+        loss_mesh = 0
+
+        # id loss
+        loss_id = self.l2loss(idmesh, batch['Aidmesh'])
+        # mesh loss
+        loss_final = self.l2loss(rec_mesh_A, batch['Amesh'] - batch['Aidmesh'] )
+        loss_mesh = loss_id + loss_final
+        loss = loss_mesh 
+        tqdm_dict = { 'loss_id': loss_id, 'loss_final': loss_final }
+        output = OrderedDict({
+            'loss': loss,
+            'progress_bar': tqdm_dict,
+            'log': tqdm_dict
+        })
+
+        errors = {k: v.data.item() if not isinstance(v, int) else v for k, v in tqdm_dict.items()}            
+        self.visualizer.print_current_errors(self.current_epoch, batch_idx, errors, 0)
+        self.visualizer.plot_current_errors(errors, batch_idx)
+        return output
+          
+    def configure_optimizers(self):
+        lr = self.opt.lr
+        opt_g = torch.optim.Adam(self.generator.parameters(), lr=lr, betas=(self.opt.beta1, 0.999))
+        # return [opt_g]
+        def lr_foo(epoch):
+            if epoch < 10:
+                lr_scale = 0.8 ** (10 - epoch)
+            else:
+                lr_scale = 0.95 ** int(epoch/10)
+            return lr_scale
+        scheduler = torch.optim.lr_scheduler.LambdaLR(opt_g, lr_lambda=lr_foo )
+                        
+
+        return [opt_g], [scheduler]
+    
+
+
+    def on_epoch_end(self):
+        if self.current_epoch % 50 == 0:
+            print ('!!!!!save model')
+            self.trainer.save_checkpoint( os.path.join( self.ckpt_path, '%05d.ckpt'%self.current_epoch) )
+       
 
 class  TexMeshDecoder(nn.Module):
     def __init__(self,  tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
@@ -627,80 +701,6 @@ class TexMeshModule(pl.LightningModule):
             self.visualizer.display_current_results(visuals, self.current_epoch, 1000000) 
 
 
-class MeshModule(pl.LightningModule):
-    def __init__(self, opt ):
-        super().__init__()
-        self.save_hyperparameters()
-        self.opt = opt
-        input_nc = 3
-        # networks
-        self.generator = MeshGenerator(opt.loadSize, not opt.no_linearity, 
-            input_nc, opt.code_n,opt.encoder_fc_n, opt.ngf, 
-            opt.n_downsample_global, opt.n_blocks_global,opt.norm)
-
-        self.l1loss = torch.nn.L1Loss()
-        self.l2loss = torch.nn.MSELoss()
-        if not opt.no_cls_loss:
-            self.CLSloss = lossNet.CLSLoss(opt)
-
-        self.visualizer = Visualizer(opt)
-        self.ckpt_path = os.path.join(opt.checkpoints_dir, opt.name)
-    
-
-
-    def forward(self, A_mesh):
-        return self.generator(A_mesh)
-    
-    def training_step(self, batch, batch_idx):
-        # self.batch = batch
-        # train generator
-        # generate images
-        idmesh, rec_mesh_A = \
-        self(batch['Amesh'])
-        map_type = batch['map_type']
-
-        loss_mesh = 0
-
-        # id loss
-        loss_id = self.l2loss(idmesh, batch['Aidmesh'])
-        # mesh loss
-        loss_final = self.l2loss(rec_mesh_A, batch['Amesh'] - batch['Aidmesh'] )
-        loss_mesh = loss_id + loss_final
-        loss = loss_mesh 
-        tqdm_dict = { 'loss_id': loss_id, 'loss_final': loss_final }
-        output = OrderedDict({
-            'loss': loss,
-            'progress_bar': tqdm_dict,
-            'log': tqdm_dict
-        })
-
-        errors = {k: v.data.item() if not isinstance(v, int) else v for k, v in tqdm_dict.items()}            
-        self.visualizer.print_current_errors(self.current_epoch, batch_idx, errors, 0)
-        self.visualizer.plot_current_errors(errors, batch_idx)
-        return output
-          
-    def configure_optimizers(self):
-        lr = self.opt.lr
-        opt_g = torch.optim.Adam(self.generator.parameters(), lr=lr, betas=(self.opt.beta1, 0.999))
-        # return [opt_g]
-        def lr_foo(epoch):
-            if epoch < 10:
-                lr_scale = 0.8 ** (10 - epoch)
-            else:
-                lr_scale = 0.95 ** int(epoch/10)
-            return lr_scale
-        scheduler = torch.optim.lr_scheduler.LambdaLR(opt_g, lr_lambda=lr_foo )
-                        
-
-        return [opt_g], [scheduler]
-    
-
-
-    def on_epoch_end(self):
-        if self.current_epoch % 50 == 0:
-            print ('!!!!!save model')
-            self.trainer.save_checkpoint( os.path.join( self.ckpt_path, '%05d.ckpt'%self.current_epoch) )
-       
 class TexModule(pl.LightningModule):
     def __init__(self, opt ):
         super().__init__()
