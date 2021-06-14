@@ -8,7 +8,7 @@ import sys
 sys.path.append("/data/home/us000042/lelechen/github/lighting")
 from util.render_class import meshrender
 from tqdm import tqdm
-
+import torch
 def get_image_pickle():
     
     base_p = '/raid/celong/FaceScape/ffhq_aligned_img'
@@ -203,6 +203,7 @@ def get_mean():
     total_mesh = np.asarray(total_mesh)
     mean_shape = np.mean(total_mesh, axis=0)
     print (mean_shape.shape)
+    mean_shape = torch.FloatTensor(mean_shape)
     mean_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),mean_shape )
     util.save_image(mean_Amesh, './gg.png')
 get_mean()
