@@ -676,7 +676,6 @@ class MeshModule(pl.LightningModule):
         errors = {k: v.data.item() if not isinstance(v, int) else v for k, v in tqdm_dict.items()}            
         self.visualizer.print_current_errors(self.current_epoch, batch_idx, errors, 0)
         self.visualizer.plot_current_errors(errors, batch_idx)
-        print (scheduler.get_lr())
         return output
           
     def configure_optimizers(self):
@@ -691,9 +690,8 @@ class MeshModule(pl.LightningModule):
                 # if lr_scale < 0.05:
                 #     lr_scale = 0.05
             return lr_scale
-        scheduler = {'scheduler': torch.optim.lr_scheduler.LambdaLR(opt_g, lr_lambda=lr_foo )
-                        'name': 'my_logging_name'}
-        
+        scheduler = torch.optim.lr_scheduler.LambdaLR(opt_g, lr_lambda=lr_foo )
+                        
 
         return [opt_g], [scheduler]
     
