@@ -4,6 +4,9 @@ import random
 import openmesh
 from PIL import Image
 import numpy as np
+from util.render_class import meshrender
+
+
 def get_image_pickle():
     
     base_p = '/raid/celong/FaceScape/ffhq_aligned_img'
@@ -177,7 +180,30 @@ def gettexmesh_pid_expid():
     print(pid)
     with open('/raid/celong/FaceScape/lists/ids.pkl', 'wb') as handle:
         pickle.dump(pid, handle, protocol=pickle.HIGHEST_PROTOCOL)
-gettexmesh_pid_expid()
+
+def get_mean():
+    dataroot = '/data/home/us000042/lelechen/data/Facescape/'
+    _file = open(os.path.join(dataroot, "lists/texmesh_train.pkl"), "rb")
+    dir_A = os.path.join(dataroot, "textured_meshes")  
+       
+    data_list = pickle.load(_file)#[:1]
+    total_mesh = []
+    for data in tqdm(data_list):
+
+        mesh_path = os.path.join( dir_A , data + '.obj')
+        om_mesh = openmesh.read_trimesh(mesh_path)
+        A_vertices = np.array(om_mesh.points()).reshape(-1)
+        total_mesh.append(A_vertices)
+        tmp = data.split('/')
+        if len(total_mesh) == 13:
+            break
+    
+    total_mesh = np.asarray(total_mesh)
+    mean_shape = np.mean(total_mesh, axis=0)
+    mean_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),batch['Amesh'].data[0] )
+    util.save_image(mean_Amesh, './gg.png')
+
+# gettexmesh_pid_expid()
 
 # get_paired_texmesh_pickle()
 # get_texmesh_pickle()
