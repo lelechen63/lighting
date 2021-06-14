@@ -4,6 +4,8 @@ import random
 import openmesh
 from PIL import Image
 import numpy as np
+import util.util as util
+
 from util.render_class import meshrender
 
 
