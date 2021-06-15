@@ -10,6 +10,7 @@ from util.render_class import meshrender
 from tqdm import tqdm
 import torch
 import util.util as util
+import matplotlib.pyplot as plt
 
 def get_image_pickle():
     
@@ -263,9 +264,24 @@ def get_mesh_normparam():
     big = big -  totalmeanmesh
     print (big.max(), big.min())
 
-        
+def tmp():
+    big = np.load( '/data/home/us000042/lelechen/data/Facescape/bigmesh' )
+    totalmeanmesh = np.load( '/data/home/us000042/lelechen/github/lighting/predef/meanmesh.npy' )
+    big = big -  totalmeanmesh
+    maxv = []
+    minv = []
+    for i in big.shape[0]:
+        maxv.append(big[i].max())
+        minv.append(big[i].min())
 
-get_mesh_normparam()
+    plt.plot(maxv,minv, 'o',color='b')
+    plt.show()
+    plt.savefig('./gg.png')
+
+
+
+
+tmp()
 # get_mean()
 # gettexmesh_pid_expid()
 
