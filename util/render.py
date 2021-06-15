@@ -169,27 +169,28 @@ def render(id_idx, exp_idx, vertices, cam_idx=12):
 
     return img
 
-# if __name__ == '__main__':
-#     id_idx = 140
-#     exp_idx = 4
-#     cam_idx = 1
+if __name__ == '__main__':
+    id_idx = 1
+    exp_idx = 1
+    cam_idx = 1
     
-#     mesh_path = f"{mesh_root}/{id_idx}/models_reg/{expressions[exp_idx]}.obj"
+    mesh_path = f"{mesh_root}/{id_idx}/models_reg/{expressions[exp_idx]}.obj"
 
-#     om_mesh = openmesh.read_trimesh(mesh_path)
-#     om_vertices = np.array(om_mesh.points()).reshape(-1)
-#     om_vertices = torch.from_numpy(om_vertices.astype(np.float32))
-#     print (om_vertices.shape)
-#     print (type(om_vertices))
-#     img = render(id_idx, exp_idx, om_vertices)
+    om_mesh = openmesh.read_trimesh(mesh_path)
+    om_vertices = np.array(om_mesh.points()).reshape(-1)
+    om_vertices = torch.from_numpy(om_vertices.astype(np.float32))
+    print (om_vertices.shape)
+    print (type(om_vertices))
+    for cam_idx in range(1,50):
+        img = render(id_idx, exp_idx, om_vertices, cam_idx)
 
-#     print (type(img))
-#     print (img.shape)
-#     img = img* 255
-#     img = img.astype(np.uint8)
-#     image_pil = Image.fromarray(img)
-#     image_pil.save("fkass.png")
-    # imageio.imwrite("fkass.png", img)
+        print (type(img))
+        print (img.shape)
+        img = img* 255
+        img = img.astype(np.uint8)
+        image_pil = Image.fromarray(img)
+        # image_pil.save("fkass.png")
+        imageio.imwrite("./gg/%d.png"%cam_idx, img)
 
 #     exit(0)
 #     for id_idx in range(1,400):
