@@ -308,7 +308,7 @@ class MeshDecoder(nn.Module):
         id_rec = self.id_dex(id_code)
 
         exp_rec = self.exp_dex(torch.cat([id_code, exp_code],  1))
-        rec_mesh = id_rec + exp_rec
+        # rec_mesh = id_rec + exp_rec
         return id_rec,exp_rec
 
 
@@ -362,7 +362,7 @@ class MeshModule(pl.LightningModule):
         # train generator
         # generate images
         idmesh, rec_mesh_A = \
-        self(batch['Amesh'] )
+        self(batch['Amesh'] -  batch['Aidmesh']  )
         map_type = batch['map_type']
 
         loss_mesh = 0
@@ -388,17 +388,17 @@ class MeshModule(pl.LightningModule):
     def configure_optimizers(self):
         lr = self.opt.lr
         opt_g = torch.optim.Adam(self.generator.parameters(), lr=lr, betas=(self.opt.beta1, 0.999))
-        return [opt_g]
-        # def lr_foo(epoch):
-        #     # if epoch < 10:
-        #     #     lr_scale = 0.8 ** (10 - epoch)
-        #     # else:
-        #     lr_scale = 0.95 ** int(epoch/10)
-        #     return lr_scale
-        # scheduler = torch.optim.lr_scheduler.LambdaLR(opt_g, lr_lambda=lr_foo )
+        # return [opt_g]
+        def lr_foo(epoch):
+            # if epoch < 10:
+            #     lr_scale = 0.8 ** (10 - epoch)
+            # else:
+            lr_scale = 0.95 ** int(epoch/10)
+            return lr_scale
+        scheduler = torch.optim.lr_scheduler.LambdaLR(opt_g, lr_lambda=lr_foo )
                         
 
-        # return [opt_g], [scheduler]
+        return [opt_g], [scheduler]
     
 
 
