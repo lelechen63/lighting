@@ -11,7 +11,7 @@ from tqdm import tqdm
 import torch
 import util.util as util
 import matplotlib.pyplot as plt
-
+import cv2
 def get_image_pickle():
     
     base_p = '/raid/celong/FaceScape/ffhq_aligned_img'
@@ -319,7 +319,7 @@ def get_tex_total():
         tex = cv2.resize(tex, (256,256), interpolation = cv2.INTER_AREA)
         total_tex.append(tex)
     big = np.asarray(big)
-    np.save( '/data/home/us000042/lelechen/data/Facescape/bigtex256.npy', big )
+    np.save( '/data/home/us000042/lelechen/data/Facescape/bigtex256train.npy', big )
 
 
 get_tex_total()
