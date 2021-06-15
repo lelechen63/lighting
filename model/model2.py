@@ -308,8 +308,8 @@ class MeshDecoder(nn.Module):
         id_rec = self.id_dex(id_code)
 
         exp_rec = self.exp_dex(torch.cat([id_code, exp_code],  1))
-        # rec_mesh = id_rec + exp_rec
-        return id_rec,exp_rec
+        rec_mesh = id_rec + exp_rec
+        return id_rec, rec_mesh
 
 
 class MeshGenerator(nn.Module):
