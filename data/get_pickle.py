@@ -185,7 +185,7 @@ def gettexmesh_pid_expid():
     with open('/raid/celong/FaceScape/lists/ids.pkl', 'wb') as handle:
         pickle.dump(pid, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-def get_mean():
+def get_mesh_mean_id():
     dataroot = '/data/home/us000042/lelechen/data/Facescape/'
     _file = open(os.path.join(dataroot, "lists/texmesh_train.pkl"), "rb")
     dir_A = os.path.join(dataroot, "textured_meshes")  
@@ -223,7 +223,24 @@ def get_mean():
         mean_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),mean_shape )
         vis_path = os.path.join(dataroot, "meanmesh" , k + '.png') 
         util.save_image(mean_Amesh, vis_path)
-get_mean()
+
+
+def get_meanmesh():
+    dataroot = '/data/home/us000042/lelechen/data/Facescape/'
+    meanmeshpath = os.path.join(dataroot, "meanmesh")
+    total = os.listdir( meanmeshpath)
+    meanmesh = []
+    for kk in total:
+        if kk[-3:] == 'npy':
+            meanmesh.append(np.load( os.path.join( meanmeshpath, kk)  ))
+    meanmesh = np.asarray(meanmesh)
+    print (meanmesh.shape, 'meanmesh')
+    meanmesh = np.mean(meanmesh, axis=0)
+    save_p = '/data/home/us000042/lelechen/github/lighting/predef/meanmesh.npy'
+
+    np.save( save_p, meanmesh )
+get_meanmesh()
+# get_mean()
 # gettexmesh_pid_expid()
 
 # get_paired_texmesh_pickle()
