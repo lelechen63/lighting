@@ -251,7 +251,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
             
             tmp = data.split('/')
             tex = self.total_t[cc]
-            self.total_tex[data] = [tex - meantex]
+            self.total_tex[data] = [tex - self.totalmeantex]
             # self.total_tex[data].append(tex)
 
             # mesh_path = os.path.join( self.dir_A , data + '.obj')
