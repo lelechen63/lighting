@@ -308,7 +308,7 @@ class MeshDecoder(nn.Module):
         id_rec = self.id_dex(id_code)
 
         exp_rec = self.exp_dex(torch.cat([id_code, exp_code],  1))
-        # rec_mesh = id_rec + exp_rec
+        rec_mesh = id_rec + exp_rec
         return id_rec,exp_rec
 
 
@@ -338,6 +338,8 @@ class MeshModule(pl.LightningModule):
         self.save_hyperparameters()
         self.opt = opt
         input_nc = 3
+        # self.totalmeanmesh = torch.FloatTensor( np.load( "./predef/meanmesh.npy" ) ) 
+
         # networks
         self.generator = MeshGenerator(opt.loadSize, not opt.no_linearity, 
             input_nc, opt.code_n,opt.encoder_fc_n, opt.ngf, 
@@ -352,7 +354,6 @@ class MeshModule(pl.LightningModule):
         self.ckpt_path = os.path.join(opt.checkpoints_dir, opt.name)
     
 
-
     def forward(self, A_mesh):
         return self.generator(A_mesh)
     
@@ -361,15 +362,15 @@ class MeshModule(pl.LightningModule):
         # train generator
         # generate images
         idmesh, rec_mesh_A = \
-        self(batch['Amesh'] - batch['Aidmesh'])
+        self(batch['Amesh'])
         map_type = batch['map_type']
 
         loss_mesh = 0
 
         # id loss
-        loss_id = self.l2loss(idmesh, batch['Aidmesh'])
+        loss_id = self.l2loss(idmesh, batch['Aidmesh'] )
         # mesh loss
-        loss_final = self.l2loss(rec_mesh_A, batch['Amesh'] - batch['Aidmesh'] )
+        loss_final = self.l2loss(rec_mesh_A, batch[ 'Amesh' ])
         loss_mesh = loss_id + loss_final
         loss = loss_mesh 
         tqdm_dict = { 'loss_id': loss_id, 'loss_final': loss_final }

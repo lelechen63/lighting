@@ -222,6 +222,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
 
         print ('===========================')
 
+        self.totalmeanmesh = np.load( "./predef/meanmesh.npy" )
         # self.facial_seg = cv2.imread("./predef/facial_mask_v10.png")[:,:,::-1]
         self.facial_seg = Image.open("./predef/facial_mask_v10.png")
         # self.facial_seg  = self.facial_seg.resize(self.img_size)
@@ -246,7 +247,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
 
             mesh_path = os.path.join( self.dir_A , data + '.obj')
             om_mesh = openmesh.read_trimesh(mesh_path)
-            A_vertices = np.array(om_mesh.points()).reshape(-1)
+            A_vertices = np.array(om_mesh.points()).reshape(-1) - self.totalmeanmesh
             self.total_tex[data].append(A_vertices)
             if opt.debug:
                 if len(self.total_tex) == 13:
@@ -268,7 +269,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         A_tex_tensor = transform(tex)
         A_vertices = self.total_tex[self.data_list[index]][1]
 
-        Aidmesh = self.meanmesh[tmp[0]]
+        Aidmesh = self.meanmesh[tmp[0]]- self.totalmeanmesh
         toss = random.getrandbits(1)
 
         # toss 0-> same iden, diff exp
