@@ -288,7 +288,7 @@ def getmeshnorm():
 
 def get_tex_total():
     dataroot = '/data/home/us000042/lelechen/data/Facescape/'
-    _file = open(os.path.join(dataroot, "lists/texmesh_train.pkl"), "rb")
+    _file = open(os.path.join(dataroot, "lists/texmesh_test.pkl"), "rb")
     dir_A = os.path.join(dataroot, "textured_meshes")  
     
     data_list = pickle.load(_file)#[:1]
@@ -317,11 +317,11 @@ def get_tex_total():
         tex = cv2.resize(tex, (256,256), interpolation = cv2.INTER_AREA)
         big.append(tex)
     big = np.asarray(big)
-    np.save( '/data/home/us000042/lelechen/data/Facescape/bigtex256train.npy', big )
+    np.save( '/data/home/us000042/lelechen/data/Facescape/bigtex256test.npy', big )
 
 
-# get_tex_total()
-get_mesh_total()
+get_tex_total()
+# get_mesh_total()
 # tmp()
 # get_mean()
 # gettexmesh_pid_expid()
