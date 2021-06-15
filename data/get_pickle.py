@@ -265,6 +265,11 @@ def get_mesh_normparam():
     print (big.max(), big.min())
 
 def tmp():
+    _file = open(os.path.join(dataroot, "lists/texmesh_train.pkl"), "rb")
+    data_list = pickle.load(_file)
+    _file = open(os.path.join(dataroot, "lists/texmesh_test.pkl"), "rb")
+    data_list.extend(pickle.load(_file))
+
     big = np.load( '/data/home/us000042/lelechen/data/Facescape/bigmesh.npy' )
     totalmeanmesh = np.load( '/data/home/us000042/lelechen/github/lighting/predef/meanmesh.npy' )
     big = big -  totalmeanmesh
@@ -273,6 +278,8 @@ def tmp():
     for i in range(big.shape[0]):
         maxv.append(big[i].max())
         minv.append(big[i].min())
+        if big[i].max() > 60 or big[i].min() < -50:
+            print(data_list[i])
 
     plt.plot(maxv,minv, 'o',color='b')
     plt.show()
