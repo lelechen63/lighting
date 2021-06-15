@@ -245,18 +245,23 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         for data in tqdm(self.data_list):
             cc = 0
             tmp = data.split('/')
-            
+            tex = self.total_t[cc]
             self.total_tex[data] = [tex]
             # self.total_tex[data].append(tex)
 
-            mesh_path = os.path.join( self.dir_A , data + '.obj')
-            om_mesh = openmesh.read_trimesh(mesh_path)
-            A_vertices = np.array(om_mesh.points()).reshape(-1) - self.totalmeanmesh
+            # mesh_path = os.path.join( self.dir_A , data + '.obj')
+            # om_mesh = openmesh.read_trimesh(mesh_path)
+            # A_vertices = np.array(om_mesh.points()).reshape(-1) - self.totalmeanmesh
+
+            A_vertices = self.total_m[cc] - self.totalmeanmesh
             self.total_tex[data].append(normmesh(A_vertices))
+            cc += 1
             if opt.debug:
                 if len(self.total_tex) == 13:
                     break
-        
+        # free the memory
+        self.total_t = []
+        self.total_m = []
     def __getitem__(self, index):
         t = time.time()
         tmp = self.data_list[index].split('/')
