@@ -208,10 +208,12 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
 
         if opt.isTrain:
             _file = open(os.path.join(opt.dataroot, "lists/texmesh_train.pkl"), "rb")
-            
+            total_m = '/data/home/us000042/lelechen/data/Facescape/bigmeshtrain.npy'
+            total_t = '/data/home/us000042/lelechen/data/Facescape/bigtex256train.npy'
         else:
             _file = open(os.path.join(opt.dataroot, "lists/texmesh_train.pkl"), "rb")
-       
+            total_m = '/data/home/us000042/lelechen/data/Facescape/bigmeshtest.npy'
+            total_t = '/data/home/us000042/lelechen/data/Facescape/bigtex256test.npy'
         self.data_list = pickle.load(_file)#[:1]
         _file.close()
         
@@ -222,11 +224,8 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         self.meanmesh = get_meanmesh()
         print ('===========================')
         print ('id_set:',self.id_set)
-    
         print('+++++++++++++++++++++++++++')
-
         print ('exp_set:',self.exp_set)
-
         print ('===========================')
 
         self.totalmeanmesh = np.load( "./predef/meanmesh.npy" )
@@ -241,14 +240,12 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         self.h = 1334
         self.l = max(self.w ,self.h)
         self.total_tex = {}
+        self.total_t = np.load(total_t)
+        self.total_m = np.load(total_m)
         for data in tqdm(self.data_list):
+            cc = 0
             tmp = data.split('/')
-            tex_path = os.path.join( self.dir_tex , tmp[0], tmp[-1] + '.png')
-            tex = Image.open(tex_path).convert('RGB')#.resize(self.img_size)
-            tex  = np.array(tex)
-            tex = tex * self.facial_seg
-            tex =  tex[self.y:self.y+self.l,self.x :self.x +self.l,:]
-            tex = cv2.resize(tex, (opt.loadSize,opt.loadSize), interpolation = cv2.INTER_AREA)
+            
             self.total_tex[data] = [tex]
             # self.total_tex[data].append(tex)
 

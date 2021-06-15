@@ -244,7 +244,7 @@ def get_meanmesh():
 
 def get_mesh_total():
     dataroot = '/data/home/us000042/lelechen/data/Facescape/'
-    _file = open(os.path.join(dataroot, "lists/texmesh_train.pkl"), "rb")
+    _file = open(os.path.join(dataroot, "lists/texmesh_test.pkl"), "rb")
     dir_A = os.path.join(dataroot, "textured_meshes")  
     if not os.path.exists( os.path.join(dataroot, "meanmesh")   ):
         os.mkdir(os.path.join(dataroot, "meanmesh"))
@@ -261,7 +261,7 @@ def get_mesh_total():
         A_vertices = np.array(om_mesh.points()).reshape(-1)
         big.append(A_vertices)
     big = np.asarray(big)
-    np.save( '/data/home/us000042/lelechen/data/Facescape/bigmeshtrain.npy', big )
+    np.save( '/data/home/us000042/lelechen/data/Facescape/bigmeshtest.npy', big )
 
 def getmeshnorm():
     dataroot = '/data/home/us000042/lelechen/data/Facescape/'
