@@ -5,6 +5,7 @@ from collections import OrderedDict
 import numpy as np
 import torch
 import torch.nn as nn
+import random
 # import torch.nn.functional as F
 # import torchvision
 # import torchvision.transforms as transforms
@@ -99,6 +100,7 @@ else:
 
     dm.setup()
     testdata = dm.test_dataloader()
+    testdata = random.shuffle(testdata)
     opt.name = opt.name + '_test'
     visualizer = Visualizer(opt)
 
@@ -140,7 +142,6 @@ else:
         
         elif opt.name.split('_')[0] =='mesh':
             idmesh, rec_mesh_A = module(   batch['Amesh'] )
-            print ('!!!!!!!')
             tmp = batch['A_path'][0].split('/')
             gt_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),( batch['Amesh'].data[0] ) *110-50 + totalmeanmesh )
             rec_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), (rec_mesh_A.data[0] )*110-50 + totalmeanmesh  )
