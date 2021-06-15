@@ -362,7 +362,7 @@ class MeshModule(pl.LightningModule):
         # train generator
         # generate images
         idmesh, rec_mesh_A = \
-        self(batch['Amesh'])
+        self(batch['Amesh'] )
         map_type = batch['map_type']
 
         loss_mesh = 0
@@ -370,7 +370,7 @@ class MeshModule(pl.LightningModule):
         # id loss
         loss_id = self.l2loss(idmesh, batch['Aidmesh'] )
         # mesh loss
-        loss_final = self.l2loss(rec_mesh_A, batch[ 'Amesh' ])
+        loss_final = self.l2loss(rec_mesh_A, batch[ 'Amesh' ] -  batch['Aidmesh'] )
         loss_mesh = loss_id + loss_final
         loss = loss_mesh 
         tqdm_dict = { 'loss_id': loss_id, 'loss_final': loss_final }
