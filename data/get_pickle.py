@@ -329,7 +329,7 @@ def get_texnorm():
     big = np.load( '/data/home/us000042/lelechen/data/Facescape/bigtex256train.npy' )
     meantex = np.mean(big, axis=0)
     np.save( '/data/home/us000042/lelechen/github/lighting/predef/meanmesh.npy', meantex)
-get_tex_total()
+get_texnorm()
 # get_mesh_total()
 # tmp()
 # get_mean()
