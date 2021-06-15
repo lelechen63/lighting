@@ -238,8 +238,9 @@ def get_meanmesh():
     print (meanmesh.shape, 'meanmesh')
     meanmesh = np.mean(meanmesh, axis=0)
     save_p = '/data/home/us000042/lelechen/github/lighting/predef/meanmesh.npy'
-
     np.save( save_p, meanmesh )
+
+
 
 def get_mesh_normparam():
     dataroot = '/data/home/us000042/lelechen/data/Facescape/'
@@ -287,9 +288,42 @@ def tmp():
     plt.savefig('./gg.png')
 
 
+def get_tex_total():
+    dataroot = '/data/home/us000042/lelechen/data/Facescape/'
+    _file = open(os.path.join(dataroot, "lists/texmesh_train.pkl"), "rb")
+    dir_A = os.path.join(dataroot, "textured_meshes")  
+    
+    # data_list = pickle.load(_file)#[:1]
+    # _file = open(os.path.join(dataroot, "lists/texmesh_test.pkl"), "rb")
+    totalmeanmesh = np.load( '/data/home/us000042/lelechen/github/lighting/predef/meanmesh.npy' )
+    # data_list.extend(pickle.load(_file))
+    dir_tex  = os.path.join(dataroot, "texture_mapping", 'target')
+    cc = 0
+    big = []
+    facial_seg = Image.open("/data/home/us000042/lelechen/github/lighting/predef/facial_mask_v10.png")
+    facial_seg  = np.array(facial_seg ) / 255.0
+    facial_seg = np.expand_dims(facial_seg, axis=2)
+    x = 1169-150
+    y =600-100
+    w =2000
+    h = 1334
+    l = max(w ,h)
+    for data in tqdm(data_list):
+        cc += 1
+        tmp = data.split('/')
+        tex_path = os.path.join( dir_tex , tmp[0], tmp[-1] + '.png')
+        tex = Image.open(tex_path).convert('RGB')#.resize(img_size)
+        tex  = np.array(tex)
+        tex = tex * facial_seg
+        tex =  tex[y:y+l,x :x +l,:]
+        tex = cv2.resize(tex, (256,256), interpolation = cv2.INTER_AREA)
+        total_tex.append(tex)
+    big = np.asarray(big)
+    np.save( '/data/home/us000042/lelechen/data/Facescape/bigtex256.npy', big )
 
 
-tmp()
+get_tex_total()
+# tmp()
 # get_mean()
 # gettexmesh_pid_expid()
 

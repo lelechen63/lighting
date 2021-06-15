@@ -51,6 +51,10 @@ def get_meanmesh():
         if kk[-3:] == 'npy':
             meanmesh[kk[:-4]] = np.load( os.path.join( meanmeshpath, kk)  )
     return meanmesh
+
+def normmesh(mesh):
+    mesh =( mesh + 50 )/ 110
+    return mesh
 def get_anlge_list():
     angle_lists =  open("/raid/celong/lele/github/idinvert_pytorch/predef/angle_list2.txt", 'r')
     total_list = {}
@@ -251,7 +255,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
             mesh_path = os.path.join( self.dir_A , data + '.obj')
             om_mesh = openmesh.read_trimesh(mesh_path)
             A_vertices = np.array(om_mesh.points()).reshape(-1) - self.totalmeanmesh
-            self.total_tex[data].append(A_vertices)
+            self.total_tex[data].append(normmesh(A_vertices))
             if opt.debug:
                 if len(self.total_tex) == 13:
                     break
