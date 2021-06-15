@@ -260,12 +260,12 @@ def get_mesh_normparam():
         A_vertices = np.array(om_mesh.points()).reshape(-1)
         big.append(A_vertices)
     big = np.asarray(big)
-    np.save( '/data/home/us000042/lelechen/data/Facescape/bigmesh', big )
+    np.save( '/data/home/us000042/lelechen/data/Facescape/bigmesh.npy', big )
     big = big -  totalmeanmesh
     print (big.max(), big.min())
 
 def tmp():
-    big = np.load( '/data/home/us000042/lelechen/data/Facescape/bigmesh' )
+    big = np.load( '/data/home/us000042/lelechen/data/Facescape/bigmesh.npy' )
     totalmeanmesh = np.load( '/data/home/us000042/lelechen/github/lighting/predef/meanmesh.npy' )
     big = big -  totalmeanmesh
     maxv = []
