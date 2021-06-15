@@ -271,7 +271,8 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
                 self.data_list.remove(element)
             except:
                 print(element)
-        print ('******************', len(self.total_list), len(self.total_tex))
+                
+        print ('******************', len(self.data_list), len(self.total_tex))
         # free the memory
         self.total_t = []
         self.total_m = []
