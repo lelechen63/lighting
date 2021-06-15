@@ -266,8 +266,11 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
 
         # remove blacklisted item
         for element in bk:
-            del self.total_tex[element]
-            self.data_list.remove(element)
+            try:
+                del self.total_tex[element]
+                self.data_list.remove(element)
+            except:
+                print(element)
         print ('******************', len(self.total_list), len(self.total_tex))
         # free the memory
         self.total_t = []
