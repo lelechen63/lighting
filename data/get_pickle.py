@@ -325,7 +325,7 @@ def get_texnorm():
     np.save( '/data/home/us000042/lelechen/github/lighting/predef/meantex.npy', meantex)
     cv2.imwrite('./gg.png', meantex)
 get_meanmesh()
-gettexnorm()
+get_texnorm()
 # get_mesh_total()
 # tmp()
 # get_mean()
