@@ -927,7 +927,7 @@ class TexGANModule(pl.LightningModule):
             rec_tex_A_vis = util.tensor2im(rec_tex_A.data[0])
             rec_tex_A_vis = rec_tex_A_vis + self.totalmeantex
             rec_tex_A_vis = np.ascontiguousarray(rec_tex_A_vis, dtype=np.uint8)
-
+            rec_tex_A_vis = np.clip(rec_tex_A_vis, 0, 255)
             visuals = OrderedDict([
             ('Atex', Atex),
             ('rec_tex_A', rec_tex_A_vis ),
