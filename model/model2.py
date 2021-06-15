@@ -371,9 +371,11 @@ class MeshModule(pl.LightningModule):
         loss_id = 0 # self.l2loss(idmesh, batch['Aidmesh'] )
         # mesh loss
         loss_final = self.l2loss(rec_mesh_A, batch[ 'Amesh' ] )
-        loss_mesh = loss_id + loss_final
-        loss = loss_mesh 
-        tqdm_dict = { 'loss_id': loss_id, 'loss_final': loss_final }
+        loss = loss_final
+        # loss = loss_id + loss_final
+        tqdm_dict = {'loss_final': loss_final }
+
+        # tqdm_dict = { 'loss_id': loss_id, 'loss_final': loss_final }
         output = OrderedDict({
             'loss': loss,
             'progress_bar': tqdm_dict,
