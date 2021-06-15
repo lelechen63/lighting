@@ -34,7 +34,7 @@ elif opt.name == 'texgan':
     from model.model2 import TexGANModule as module 
 opt.datasetname = "fs_texmesh"
 
-
+totalmeanmesh = torch.FloatTensor( np.load( "./predef/meanmesh.npy" ) ) 
 
 
 dm = FacescapeDataModule(opt)
@@ -139,12 +139,12 @@ else:
                 ])
         
         elif opt.name.split('_')[0] =='mesh':
-            idmesh, rec_mesh_A = module(   batch['Amesh'] - batch['Aidmesh'] )
+            idmesh, rec_mesh_A = module(   batch['Amesh'] )
             print ('!!!!!!!')
             tmp = batch['A_path'][0].split('/')
-            gt_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),batch['Amesh'].data[0] )
-            rec_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), rec_mesh_A.data[0] + idmesh.data[0] )
-            rec_id = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), idmesh.data[0])
+            gt_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),batch['Amesh'].data[0] + totalmeanmesh )
+            rec_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), rec_mesh_A.data[0] + totalmeanmesh )
+            rec_id = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), idmesh.data[0] + totalmeanmesh)
 
             visuals = OrderedDict([
                 ('gt_Amesh', gt_Amesh),
