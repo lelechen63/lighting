@@ -390,10 +390,10 @@ class MeshModule(pl.LightningModule):
         opt_g = torch.optim.Adam(self.generator.parameters(), lr=lr, betas=(self.opt.beta1, 0.999))
         # return [opt_g]
         def lr_foo(epoch):
-            if epoch < 10:
-                lr_scale = 0.8 ** (10 - epoch)
-            else:
-                lr_scale = 0.95 ** int(epoch/10)
+            # if epoch < 10:
+            #     lr_scale = 0.8 ** (10 - epoch)
+            # else:
+            lr_scale = 0.95 ** int(epoch/10)
             return lr_scale
         scheduler = torch.optim.lr_scheduler.LambdaLR(opt_g, lr_lambda=lr_foo )
                         
