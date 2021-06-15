@@ -55,6 +55,7 @@ class FacescapeDataModule(pl.LightningDataModule):
         self.dataset = self.get_dataset()        
 
     def train_dataloader(self):
+        print ('############ train dataloader ###################')
         return DataLoader(self.dataset, shuffle=True, batch_size=self.batch_size, num_workers=self.num_workers, pin_memory=True)
 
 
