@@ -103,7 +103,7 @@ else:
     # testdata = random.shuffle(testdata)
     opt.name = opt.name + '_test'
     visualizer = Visualizer(opt)
-
+    l2loss = torch.nn.MSELoss()
     for num,batch in enumerate(testdata):
         if opt.name.split('_')[0] == 'texmesh':
             rec_tex_A, rec_mesh_A, rec_tex_B, rec_mesh_B, \
@@ -142,6 +142,8 @@ else:
         
         elif opt.name.split('_')[0] =='mesh':
             idmesh, rec_mesh_A = module(   batch['Amesh'] )
+            loss = l2loss(rec_mesh_A, batch[ 'Amesh' ] )
+            print (loss)
             tmp = batch['A_path'][0].split('/')
             gt_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),( batch['Amesh'].data[0] ) *110-50 + totalmeanmesh )
             rec_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), (rec_mesh_A.data[0] )*110-50 + totalmeanmesh  )
