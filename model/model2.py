@@ -800,9 +800,7 @@ class TexModule(pl.LightningModule):
             rec_tex_A =  self(batch['Atex'])
 
             Atex = util.tensor2im(batch['Atex'][0])
-            print (Atex.shape)
-            print (self.totalmeantex.shape)
-            Atex = Atex -totalmeantex
+            
             Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
             Atex = util.writeText(Atex, batch['A_path'][0])
           
@@ -836,7 +834,7 @@ class TexGANModule(pl.LightningModule):
 
         self.GANloss = lossNet.GANLoss()
         self.visualizer = Visualizer(opt)
-
+        self.totalmeantex = np.load( "./predef/meantex.npy" )
 
     def forward(self, A_tex):
         return self.generator(A_tex)
@@ -918,6 +916,10 @@ class TexGANModule(pl.LightningModule):
 
             Atex = util.tensor2im(batch['Atex'][0])
             Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
+            print (Atex.shape)
+            print (self.totalmeantex.shape)
+            Atex = Atex -self.totalmeantex
+            
             Atex = util.writeText(Atex, batch['A_path'][0])
         
             visuals = OrderedDict([
