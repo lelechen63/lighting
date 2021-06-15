@@ -270,6 +270,8 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         A_vertices = self.total_tex[self.data_list[index]][1]
 
         Aidmesh = self.meanmesh[tmp[0]]- self.totalmeanmesh
+        print (Aidmesh)
+        print(ggggg)
         toss = random.getrandbits(1)
 
         # toss 0-> same iden, diff exp
