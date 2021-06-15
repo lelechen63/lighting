@@ -65,6 +65,9 @@ def get_anlge_list():
         total_list[tmp[0] +'/' + tmp[1] ][tmp[2]] = [float(tmp[3]),float(tmp[4]), float(tmp[5])]
 
     return total_list
+def get_blacklist():
+    bl = ['66/models_reg/15_lip_roll', "267/models_reg/3_mouth_stretch","191/models_reg/17_cheek_blowing"]
+    return bl
 class FacescapeDirDataset(torch.utils.data.Dataset):
     def __init__(self, opt):
         self.opt = opt
