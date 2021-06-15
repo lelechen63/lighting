@@ -242,16 +242,16 @@ def get_meanmesh():
 
 
 
-def get_mesh_normparam():
+def get_mesh_total():
     dataroot = '/data/home/us000042/lelechen/data/Facescape/'
     _file = open(os.path.join(dataroot, "lists/texmesh_train.pkl"), "rb")
     dir_A = os.path.join(dataroot, "textured_meshes")  
     if not os.path.exists( os.path.join(dataroot, "meanmesh")   ):
         os.mkdir(os.path.join(dataroot, "meanmesh"))
     data_list = pickle.load(_file)#[:1]
-    _file = open(os.path.join(dataroot, "lists/texmesh_test.pkl"), "rb")
+    # _file = open(os.path.join(dataroot, "lists/texmesh_test.pkl"), "rb")
     totalmeanmesh = np.load( '/data/home/us000042/lelechen/github/lighting/predef/meanmesh.npy' )
-    data_list.extend(pickle.load(_file))
+    # data_list.extend(pickle.load(_file))
     cc = 0
     big = []
     for data in tqdm(data_list):
@@ -261,11 +261,9 @@ def get_mesh_normparam():
         A_vertices = np.array(om_mesh.points()).reshape(-1)
         big.append(A_vertices)
     big = np.asarray(big)
-    np.save( '/data/home/us000042/lelechen/data/Facescape/bigmesh.npy', big )
-    big = big -  totalmeanmesh
-    print (big.max(), big.min())
+    np.save( '/data/home/us000042/lelechen/data/Facescape/bigmeshtrain.npy', big )
 
-def tmp():
+def getmeshnorm():
     dataroot = '/data/home/us000042/lelechen/data/Facescape/'
     _file = open(os.path.join(dataroot, "lists/texmesh_train.pkl"), "rb")
     data_list = pickle.load(_file)
@@ -322,7 +320,8 @@ def get_tex_total():
     np.save( '/data/home/us000042/lelechen/data/Facescape/bigtex256train.npy', big )
 
 
-get_tex_total()
+# get_tex_total()
+get_mesh_total()
 # tmp()
 # get_mean()
 # gettexmesh_pid_expid()
