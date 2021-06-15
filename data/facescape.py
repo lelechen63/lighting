@@ -211,9 +211,9 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
             total_m = '/data/home/us000042/lelechen/data/Facescape/bigmeshtrain.npy'
             total_t = '/data/home/us000042/lelechen/data/Facescape/bigtex256train.npy'
         else:
-            _file = open(os.path.join(opt.dataroot, "lists/texmesh_train.pkl"), "rb")
-            total_m = '/data/home/us000042/lelechen/data/Facescape/bigmeshtrain.npy'
-            total_t = '/data/home/us000042/lelechen/data/Facescape/bigtex256train.npy'
+            _file = open(os.path.join(opt.dataroot, "lists/texmesh_test.pkl"), "rb")
+            total_m = '/data/home/us000042/lelechen/data/Facescape/bigmeshtest.npy'
+            total_t = '/data/home/us000042/lelechen/data/Facescape/bigtex256test.npy'
         self.data_list = pickle.load(_file)#[:1]
 
 

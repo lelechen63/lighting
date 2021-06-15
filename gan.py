@@ -100,7 +100,7 @@ else:
 
     dm.setup()
     testdata = dm.test_dataloader()
-    testdata = random.shuffle(testdata)
+    # testdata = random.shuffle(testdata)
     opt.name = opt.name + '_test'
     visualizer = Visualizer(opt)
 
