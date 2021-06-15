@@ -248,26 +248,26 @@ class MeshEncoder(nn.Module):
                 padding_type='reflect'):
         super().__init__()
         self.tex_shape = tex_shape
-        activation = nn.ReLU(True)    
+        activation = nn.LeakyReLU(0.2, True)  
         self.meshencoder = nn.Sequential(
             nn.Linear( 78951, ngf*2),
-            nn.ReLU(True),
+            activation,
             nn.Linear( ngf*2, ngf*2),
-            nn.ReLU(True),
+            activation,
             nn.Linear( ngf*2, ngf*2),
-            nn.ReLU(True)
+            activation
         )
         self.idenc = nn.Sequential(
             nn.Linear( ngf*2, ngf*2),
-            nn.ReLU(True),
+            activation,
             nn.Linear( ngf*2, ngf*4),
-            nn.ReLU(True)
+            activation
             )
         self.expenc = nn.Sequential(
             nn.Linear( ngf*2, ngf*2),
-            nn.ReLU(True),
+            activation,
             nn.Linear( ngf*2, ngf*4),
-            nn.ReLU(True)
+            activation
             )
 
     def forward(self, mesh):
@@ -282,25 +282,25 @@ class MeshDecoder(nn.Module):
         super().__init__()
 
         self.tex_shape = tex_shape
-        activation = nn.ReLU(True)   
+        activation = nn.LeakyReLU(0.2, True)     
         
 
         self.id_dex = nn.Sequential(
             nn.Linear( ngf*4, ngf*4),
-            nn.ReLU(True),
+            activation,
             nn.Linear( ngf*4, ngf*4),
-            nn.ReLU(True),
+            activation,
             nn.Linear( ngf*4, ngf*4),
-            nn.ReLU(True),
+            activation,
             nn.Linear( ngf*4, 78951)
         )
         self.exp_dex = nn.Sequential(
             nn.Linear( ngf*8, ngf*4),
-            nn.ReLU(True),
+            activation,
             nn.Linear( ngf*4, ngf*4),
-            nn.ReLU(True),
+            activation,
             nn.Linear( ngf*4, ngf*4),
-            nn.ReLU(True),
+            activation,
             nn.Linear( ngf*4, 78951)
         )
      
