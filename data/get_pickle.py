@@ -280,7 +280,7 @@ def tmp():
         maxv.append(big[i].max())
         minv.append(big[i].min())
         if big[i].max() > 40 or big[i].min() < -40:
-            print( '/data/home/us000042/lelechen/data/Facescape/textured_meshes/' + data_list[i], big[i].max())
+            print( '/data/home/us000042/lelechen/data/Facescape/textured_meshes/' + data_list[i], big[i].max(),big[i].min() )
 
     plt.plot(maxv,minv, 'o',color='b')
     plt.show()
