@@ -116,9 +116,10 @@ def render(id_idx, exp_idx, vertices, cam_idx=1):
     obj.normals = pyredner.compute_vertex_normal(obj.vertices, obj.indices)
 
     img_dir = f"{image_data_root}/{id_idx}/{expressions[exp_idx]}"
-    with open(f"{img_dir}/params.json", 'r') as f:
+    # with open(f"{img_dir}/params.json", 'r') as f:
+    #     params = json.load(f)
+    with open('/data/home/us000042/lelechen/data/Facescape/jsons/1/1_neutral/params.json', 'r') as f:
         params = json.load(f)
-
     K = np.array(params['%d_K' % cam_idx])
     Rt = np.array(params['%d_Rt' % cam_idx])
     # dist = np.array(params['%d_distortion' % cam_idx], dtype = float)
@@ -214,8 +215,9 @@ if __name__ == '__main__':
             # objects[0].indices = f_front
 
             img_dir = f"{image_data_root}/{id_idx}/{expressions[exp_idx]}"
-            with open(f"{img_dir}/params.json", 'r') as f:
-                params = json.load(f)
+            # with open(f"{img_dir}/params.json", 'r') as f:
+            #     params = json.load(f)
+            with open ('/data/home/us000042/lelechen/data/Facescape/fsmview_images/1')
             imgs = glob.glob(f"{img_dir}/*.jpg")
             rendering_dir = f"{rendering_root}/{id_idx}/{expressions[exp_idx]}"
             

@@ -710,7 +710,7 @@ class TexModule(pl.LightningModule):
         super().__init__()
         self.opt = opt
         input_nc = 3
-
+        self.totalmeantex = np.load( "./predef/meantex.npy" )
         self.save_hyperparameters()
 
         self.generator = TexGenerator(opt.loadSize, not opt.no_linearity, 
@@ -800,13 +800,14 @@ class TexModule(pl.LightningModule):
             rec_tex_A =  self(batch['Atex'])
 
             Atex = util.tensor2im(batch['Atex'][0])
+            print (Atex.shape)
+            print (self.totalmeantex.shape)
             Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
             Atex = util.writeText(Atex, batch['A_path'][0])
           
             visuals = OrderedDict([
             ('Atex', Atex),
-            ('rec_tex_A', util.tensor2im(rec_tex_A.data[0])),
-        
+            ('rec_tex_A', util.tensor2im(rec_tex_A.data[0]))
             ])
        
             self.visualizer.display_current_results(visuals, self.current_epoch, 1000000) 
