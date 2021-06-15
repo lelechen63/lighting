@@ -265,6 +265,7 @@ def get_mesh_normparam():
     print (big.max(), big.min())
 
 def tmp():
+    dataroot = '/data/home/us000042/lelechen/data/Facescape/'
     _file = open(os.path.join(dataroot, "lists/texmesh_train.pkl"), "rb")
     data_list = pickle.load(_file)
     _file = open(os.path.join(dataroot, "lists/texmesh_test.pkl"), "rb")
