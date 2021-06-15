@@ -919,7 +919,7 @@ class TexGANModule(pl.LightningModule):
             print (Atex.shape)
             print (self.totalmeantex.shape)
 
-            Atex = Atex -self.totalmeantex
+            Atex = Atex + self.totalmeantex
             Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
 
             Atex = util.writeText(Atex, batch['A_path'][0])
