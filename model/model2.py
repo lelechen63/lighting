@@ -923,10 +923,14 @@ class TexGANModule(pl.LightningModule):
             Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
 
             Atex = util.writeText(Atex, batch['A_path'][0])
-        
+
+            rec_tex_A_vis = util.tensor2im(rec_tex_A.data[0])
+            rec_tex_A_vis = rec_tex_A_vis + self.totalmeantex
+            rec_tex_A_vis = np.ascontiguousarray(rec_tex_A_vis, dtype=np.uint8)
+
             visuals = OrderedDict([
             ('Atex', Atex),
-            ('rec_tex_A', util.tensor2im(rec_tex_A.data[0])),
+            ('rec_tex_A', rec_tex_A_vis ),
         
             ])
        
