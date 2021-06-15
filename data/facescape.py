@@ -244,7 +244,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         self.total_tex = {}
         self.total_t = np.load(total_t)
         self.total_m = np.load(total_m)
-        self.bk = get_blacklist()
+        bk = get_blacklist()
         for data in tqdm(self.data_list):
             cc = 0
             
