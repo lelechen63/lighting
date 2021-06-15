@@ -319,6 +319,15 @@ def get_tex_total():
     big = np.asarray(big)
     np.save( '/data/home/us000042/lelechen/data/Facescape/bigtex256test.npy', big )
 
+def get_texnorm():
+    dataroot = '/data/home/us000042/lelechen/data/Facescape/'
+    _file = open(os.path.join(dataroot, "lists/texmesh_train.pkl"), "rb")
+    data_list = pickle.load(_file)
+    _file = open(os.path.join(dataroot, "lists/texmesh_test.pkl"), "rb")
+    data_list.extend(pickle.load(_file))
+
+    big = np.load( '/data/home/us000042/lelechen/data/Facescape/bigtex256train.npy' )
+    meantex = np.mean(big, axis=0)
 
 get_tex_total()
 # get_mesh_total()

@@ -405,10 +405,11 @@ class MeshModule(pl.LightningModule):
 
 
     def on_epoch_end(self):
-        if self.current_epoch % 50 == 0:
+        if self.current_epoch % 5 == 0:
             print ('!!!!!save model')
             self.trainer.save_checkpoint( os.path.join( self.ckpt_path, '%05d.ckpt'%self.current_epoch) )
-       
+        self.trainer.save_checkpoint( os.path.join( self.ckpt_path, 'latest.ckpt') )
+
 
 class  TexMeshDecoder(nn.Module):
     def __init__(self,  tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
