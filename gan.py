@@ -144,11 +144,11 @@ else:
             tmp = batch['A_path'][0].split('/')
             gt_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),( batch['Amesh'].data[0] ) *110-50 + totalmeanmesh )
             rec_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), (rec_mesh_A.data[0] )*110-50 + totalmeanmesh  )
-            rec_id = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), idmesh.data[0] + totalmeanmesh)
+            # rec_id = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), idmesh.data[0] + totalmeanmesh)
 
             visuals = OrderedDict([
                 ('gt_Amesh', gt_Amesh),
-                ('rec_id', rec_id),
+                # ('rec_id', rec_id),
                 ('rec_Amesh', rec_Amesh),
             
                 ])
