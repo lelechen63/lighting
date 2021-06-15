@@ -73,7 +73,7 @@ else:
         from model.model2 import TexMeshGenerator as module 
     elif opt.name =='mesh':
         from model.model2 import MeshGenerator as module 
-        checkpoint_path = '/data/home/us000042/lelechen/github/lighting/checkpoints/mesh/latest.ckpt'
+        checkpoint_path = '/data/home/us000042/lelechen/github/lighting/checkpoints/mesh/00800.ckpt'
 
     print(checkpoint_path)
     checkpoint = torch.load(checkpoint_path)
@@ -142,8 +142,8 @@ else:
             idmesh, rec_mesh_A = module(   batch['Amesh'] )
             print ('!!!!!!!')
             tmp = batch['A_path'][0].split('/')
-            gt_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),( batch['Amesh'].data[0] + totalmeanmesh) *110-50 )
-            rec_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), (rec_mesh_A.data[0] + totalmeanmesh )*110-50 )
+            gt_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),( batch['Amesh'].data[0] ) *110-50 + totalmeanmesh )
+            rec_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), (rec_mesh_A.data[0] )*110-50 + totalmeanmesh  )
             rec_id = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), idmesh.data[0] + totalmeanmesh)
 
             visuals = OrderedDict([
