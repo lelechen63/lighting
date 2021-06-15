@@ -270,7 +270,7 @@ def tmp():
     big = big -  totalmeanmesh
     maxv = []
     minv = []
-    for i in big.shape[0]:
+    for i in range(big.shape[0]):
         maxv.append(big[i].max())
         minv.append(big[i].min())
 
