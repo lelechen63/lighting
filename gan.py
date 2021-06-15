@@ -147,6 +147,9 @@ else:
             rec_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), (rec_mesh_A.data[0] )*110-50 + totalmeanmesh  )
             # rec_id = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), idmesh.data[0] + totalmeanmesh)
 
+            gt_Amesh = np.ascontiguousarray(gt_Amesh, dtype=np.uint8)
+            gt_Amesh = util.writeText(gt_Amesh, batch['A_path'][0])
+
             visuals = OrderedDict([
                 ('gt_Amesh', gt_Amesh),
                 # ('rec_id', rec_id),
