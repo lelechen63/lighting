@@ -293,7 +293,7 @@ def get_tex_total():
     _file = open(os.path.join(dataroot, "lists/texmesh_train.pkl"), "rb")
     dir_A = os.path.join(dataroot, "textured_meshes")  
     
-    # data_list = pickle.load(_file)#[:1]
+    data_list = pickle.load(_file)#[:1]
     # _file = open(os.path.join(dataroot, "lists/texmesh_test.pkl"), "rb")
     totalmeanmesh = np.load( '/data/home/us000042/lelechen/github/lighting/predef/meanmesh.npy' )
     # data_list.extend(pickle.load(_file))
