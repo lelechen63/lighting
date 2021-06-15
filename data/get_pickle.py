@@ -317,7 +317,7 @@ def get_tex_total():
         tex = tex * facial_seg
         tex =  tex[y:y+l,x :x +l,:]
         tex = cv2.resize(tex, (256,256), interpolation = cv2.INTER_AREA)
-        total_tex.append(tex)
+        big.append(tex)
     big = np.asarray(big)
     np.save( '/data/home/us000042/lelechen/data/Facescape/bigtex256train.npy', big )
 
