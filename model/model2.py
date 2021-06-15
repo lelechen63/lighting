@@ -834,7 +834,7 @@ class TexGANModule(pl.LightningModule):
 
         self.GANloss = lossNet.GANLoss()
         self.visualizer = Visualizer(opt)
-        self.totalmeantex = np.load( "./predef/meantex.npy" )[:,:,::-1]
+        self.totalmeantex = np.load( "./predef/meantex.npy" )
 
     def forward(self, A_tex):
         return self.generator(A_tex)
