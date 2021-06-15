@@ -215,6 +215,8 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
             total_m = '/data/home/us000042/lelechen/data/Facescape/bigmeshtest.npy'
             total_t = '/data/home/us000042/lelechen/data/Facescape/bigtex256test.npy'
         self.data_list = pickle.load(_file)#[:1]
+
+
         _file.close()
         
         ids = open(os.path.join(opt.dataroot, "lists/ids.pkl"), "rb")
@@ -242,8 +244,10 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         self.total_tex = {}
         self.total_t = np.load(total_t)
         self.total_m = np.load(total_m)
+        self.bk = get_blacklist()
         for data in tqdm(self.data_list):
             cc = 0
+            
             tmp = data.split('/')
             tex = self.total_t[cc]
             self.total_tex[data] = [tex]
@@ -259,6 +263,12 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
             if opt.debug:
                 if len(self.total_tex) == 13:
                     break
+
+        # remove blacklisted item
+            for element in bk:
+                self.data_list.remove(element)
+                self.total_tex.remove(element)    
+
         # free the memory
         self.total_t = []
         self.total_m = []
