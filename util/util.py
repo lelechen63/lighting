@@ -25,9 +25,9 @@ def tensor2im(image_tensor, imtype=np.uint8, normalize=True):
     return image_numpy.astype(imtype)
 
 
-def writeText(img, text):
+def writeText(img, text, font = 0.5):
     composite_img = cv2.putText(img, text, (25, 25), cv2.FONT_HERSHEY_SIMPLEX,
-                                0.5, (255, 255, 255), 1, cv2.LINE_AA, False)
+                                font, (255, 255, 255), 1, cv2.LINE_AA, False)
     return composite_img
 
 
