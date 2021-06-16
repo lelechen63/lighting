@@ -255,6 +255,7 @@ def get_mesh_total():
     cc = 0
     big = []
     for data in tqdm(data_list):
+        print (data)
         cc += 1
         mesh_path = os.path.join( dir_A , data + '.obj')
         om_mesh = openmesh.read_trimesh(mesh_path)
@@ -308,6 +309,7 @@ def get_tex_total():
     l = max(w ,h)
     for data in tqdm(data_list):
         cc += 1
+        print (data)
         tmp = data.split('/')
         tex_path = os.path.join( dir_tex , tmp[0], tmp[-1] + '.png')
         tex = Image.open(tex_path).convert('RGB')#.resize(img_size)
@@ -324,9 +326,9 @@ def get_texnorm():
     meantex = np.mean(big, axis=0)
     np.save( '/data/home/us000042/lelechen/github/lighting/predef/meantex.npy', meantex)
     cv2.imwrite('./gg.png', meantex)
-get_meanmesh()
-get_texnorm()
-# get_mesh_total()
+# get_meanmesh()
+# get_texnorm()
+get_mesh_total()
 # tmp()
 # get_mean()
 # gettexmesh_pid_expid()
