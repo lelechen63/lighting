@@ -835,7 +835,7 @@ class TexGANModule(pl.LightningModule):
         self.GANloss = lossNet.GANLoss()
         self.visualizer = Visualizer(opt)
         self.totalmeantex = np.load( "./predef/meantex.npy" )
-
+        self.ckpt_path = os.path.join(opt.checkpoints_dir, opt.name)
     def forward(self, A_tex):
         return self.generator(A_tex)
     
@@ -936,6 +936,7 @@ class TexGANModule(pl.LightningModule):
        
             self.visualizer.display_current_results(visuals, self.current_epoch, 1000000) 
 
+            self.trainer.save_checkpoint( os.path.join( self.ckpt_path, 'latest.ckpt') )
 
 
 class MultiscaleDiscriminator(nn.Module):
