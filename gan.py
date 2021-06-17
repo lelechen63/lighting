@@ -46,7 +46,7 @@ if opt.isTrain:
         opt.name += '_novgg'
     if opt.no_cls_loss:
         opt.name += '_nocls'
-        
+
     model = module(opt)
     
     
@@ -153,7 +153,7 @@ else:
             # rec_id = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), idmesh.data[0] + totalmeanmesh)
 
             gt_Amesh = np.ascontiguousarray(gt_Amesh, dtype=np.uint8)
-            gt_Amesh = util.writeText(gt_Amesh, batch['A_path'][0], 3)
+            gt_Amesh = util.writeText(gt_Amesh, batch['A_path'][0], 10)
 
             visuals = OrderedDict([
                 ('gt_Amesh', gt_Amesh),
