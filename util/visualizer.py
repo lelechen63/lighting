@@ -20,7 +20,8 @@ class Visualizer():
 
         if not os.path.exists( os.path.join( opt.checkpoints_dir, opt.name )):
             os.mkdir(os.path.join( opt.checkpoints_dir, opt.name ))
-
+        print ('############################################')
+        print (os.path.join( opt.checkpoints_dir, opt.name ))
         if self.tf_log:
             import tensorflow as tf
             self.tf = tf
