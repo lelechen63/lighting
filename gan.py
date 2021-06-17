@@ -41,12 +41,15 @@ totalmeanmesh = torch.FloatTensor( np.load( "./predef/meanmesh.npy" ) )
 dm = FacescapeDataModule(opt)
 
 if opt.isTrain:
-    model = module(opt)
     print ( opt.gpu_ids)
     if opt.no_vgg_loss:
         opt.name += '_novgg'
     if opt.no_cls_loss:
         opt.name += '_nocls'
+        
+    model = module(opt)
+    
+    
     checkpoint_callback = ModelCheckpoint(
         monitor='train_loss',
         dirpath= os.path.join(opt.checkpoints_dir, opt.name),
