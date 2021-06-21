@@ -244,7 +244,7 @@ def get_meanmesh():
 
 def get_mesh_total():
     dataroot = '/data/home/us000042/lelechen/data/Facescape/'
-    _file = open(os.path.join(dataroot, "lists/texmesh_test.pkl"), "rb")
+    _file = open(os.path.join(dataroot, "lists/texmesh_train.pkl"), "rb")
     dir_A = os.path.join(dataroot, "textured_meshes")  
     if not os.path.exists( os.path.join(dataroot, "meanmesh")   ):
         os.mkdir(os.path.join(dataroot, "meanmesh"))
@@ -262,29 +262,34 @@ def get_mesh_total():
         A_vertices = np.array(om_mesh.points()).reshape(-1)
         big.append(A_vertices)
     big = np.asarray(big)
-    np.save( '/data/home/us000042/lelechen/data/Facescape/bigmeshtest.npy', big )
+    np.save( '/data/home/us000042/lelechen/data/Facescape/bigmeshtrain.npy', big )
 
 def getmeshnorm():
-    dataroot = '/data/home/us000042/lelechen/data/Facescape/'
-    _file = open(os.path.join(dataroot, "lists/texmesh_train.pkl"), "rb")
-    data_list = pickle.load(_file)
-    _file = open(os.path.join(dataroot, "lists/texmesh_test.pkl"), "rb")
-    data_list.extend(pickle.load(_file))
+    # dataroot = '/data/home/us000042/lelechen/data/Facescape/'
+    # _file = open(os.path.join(dataroot, "lists/texmesh_train.pkl"), "rb")
+    # data_list = pickle.load(_file)
+    # _file = open(os.path.join(dataroot, "lists/texmesh_test.pkl"), "rb")
+    # data_list.extend(pickle.load(_file))
 
-    big = np.load( '/data/home/us000042/lelechen/data/Facescape/bigmesh.npy' )
-    totalmeanmesh = np.load( '/data/home/us000042/lelechen/github/lighting/predef/meanmesh.npy' )
-    big = big -  totalmeanmesh
-    maxv = []
-    minv = []
-    for i in range(big.shape[0]):
-        maxv.append(big[i].max())
-        minv.append(big[i].min())
-        if big[i].max() > 40 or big[i].min() < -40:
-            print( '/data/home/us000042/lelechen/data/Facescape/textured_meshes/' + data_list[i], big[i].max(),big[i].min() )
+    big = np.load( '/data/home/us000042/lelechen/data/Facescape/bigmeshtrain.npy' )
+    print (big.shape)
+    trainmean = big.mean()
+    trainstd = big.std()
+    print (trainmean.shape, trainstd.shape)
 
-    plt.plot(maxv,minv, 'o',color='b')
-    plt.show()
-    plt.savefig('./gg.png')
+    # totalmeanmesh = np.load( '/data/home/us000042/lelechen/github/lighting/predef/meanmesh.npy' )
+    # big = big -  totalmeanmesh
+    # maxv = []
+    # minv = []
+    # for i in range(big.shape[0]):
+    #     maxv.append(big[i].max())
+    #     minv.append(big[i].min())
+    #     if big[i].max() > 40 or big[i].min() < -40:
+    #         print( '/data/home/us000042/lelechen/data/Facescape/textured_meshes/' + data_list[i], big[i].max(),big[i].min() )
+
+    # plt.plot(maxv,minv, 'o',color='b')
+    # plt.show()
+    # plt.savefig('./gg.png')
 
 
 def get_tex_total():
@@ -328,7 +333,8 @@ def get_texnorm():
     cv2.imwrite('./gg.png', meantex)
 # get_meanmesh()
 # get_texnorm()
-get_mesh_total()
+# get_mesh_total()
+getmeshnorm()
 # tmp()
 # get_mean()
 # gettexmesh_pid_expid()
