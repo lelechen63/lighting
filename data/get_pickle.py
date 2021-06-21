@@ -271,11 +271,13 @@ def getmeshnorm():
     # _file = open(os.path.join(dataroot, "lists/texmesh_test.pkl"), "rb")
     # data_list.extend(pickle.load(_file))
 
-    big = np.load( '/data/home/us000042/lelechen/data/Facescape/bigmeshtest.npy' )
+    big = np.load( '/data/home/us000042/lelechen/data/Facescape/bigmeshtrain.npy' )
     print (big.shape)
     trainmean = np.mean(big, axis = 0)
     trainstd = np.std(big, axis = 0)
     print (trainmean.shape, trainstd.shape)
+    np.save( '/data/home/us000042/lelechen/github/lighting/predef/meshmean.npy', trainmean )
+    np.save( '/data/home/us000042/lelechen/github/lighting/predef/stdmean.npy', trainstd )
 
     # totalmeanmesh = np.load( '/data/home/us000042/lelechen/github/lighting/predef/meanmesh.npy' )
     # big = big -  totalmeanmesh
