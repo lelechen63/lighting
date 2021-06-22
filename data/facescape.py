@@ -230,7 +230,8 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         print ('exp_set:',self.exp_set)
         print ('===========================')
 
-        self.totalmeanmesh = np.load( "./predef/meanmesh.npy" )
+        self.totalmeanmesh = np.load( "./predef/meshmean.npy" )
+        self.totalstdmesh = np.load( "./predef/meshstd.npy" )
         self.totalmeantex = np.load( "./predef/meantex.npy" )
         # self.facial_seg = cv2.imread("./predef/facial_mask_v10.png")[:,:,::-1]
         self.facial_seg = Image.open("./predef/facial_mask_v10.png")
@@ -238,7 +239,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         self.facial_seg  = np.array(self.facial_seg ) / 255.0
         self.facial_seg = np.expand_dims(self.facial_seg, axis=2)
         self.x = 1169-150
-        self.y =600-100
+        self.y =500
         self.w =2000
         self.h = 1334
         self.l = max(self.w ,self.h)

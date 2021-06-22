@@ -257,12 +257,12 @@ class MeshEncoder(nn.Module):
             nn.Linear( ngf*2, ngf*2),
             activation
         )
-        self.idenc = nn.Sequential(
-            nn.Linear( ngf*2, ngf*2),
-            activation,
-            nn.Linear( ngf*2, ngf*4),
-            activation
-            )
+        # self.idenc = nn.Sequential(
+        #     nn.Linear( ngf*2, ngf*2),
+        #     activation,
+        #     nn.Linear( ngf*2, ngf*4),
+        #     activation
+        #     )
         self.expenc = nn.Sequential(
             nn.Linear( ngf*2, ngf*2),
             activation,
@@ -272,9 +272,10 @@ class MeshEncoder(nn.Module):
 
     def forward(self, mesh):
         mesh_encoded = self.meshencoder(mesh)
-        encoded_id = self.idenc(mesh_encoded)
+        # encoded_id = self.idenc(mesh_encoded)
         encoded_exp = self.expenc(mesh_encoded)
-        return encoded_id, encoded_exp
+        return encoded_exp
+        # return encoded_id, encoded_exp
 class MeshDecoder(nn.Module):
     def __init__(self,  tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
                 ngf=64, n_downsampling=5, n_blocks=4, norm_layer = nn.BatchNorm2d, \
@@ -294,22 +295,22 @@ class MeshDecoder(nn.Module):
             activation,
             nn.Linear( ngf*4, 78951)
         )
-        self.exp_dex = nn.Sequential(
-            nn.Linear( ngf*8, ngf*4),
-            activation,
-            nn.Linear( ngf*4, ngf*4),
-            activation,
-            nn.Linear( ngf*4, ngf*4),
-            activation,
-            nn.Linear( ngf*4, 78951)
-        )
-     
-    def forward(self, id_code, exp_code):
-        id_rec = self.id_dex(id_code)
-
-        exp_rec = self.exp_dex(torch.cat([id_code, exp_code],  1))
-        rec_mesh = id_rec + exp_rec
-        return id_rec, rec_mesh
+        # self.exp_dex = nn.Sequential(
+        #     nn.Linear( ngf*8, ngf*4),
+        #     activation,
+        #     nn.Linear( ngf*4, ngf*4),
+        #     activation,
+        #     nn.Linear( ngf*4, ngf*4),
+        #     activation,
+        #     nn.Linear( ngf*4, 78951)
+        # )
+    def forward(self, exp_code):
+    # def forward(self, id_code, exp_code):
+        id_rec = self.id_dex(exp_code)
+        return id_rec
+        # exp_rec = self.exp_dex(torch.cat([id_code, exp_code],  1))
+        # rec_mesh = id_rec + exp_rec
+        # return id_rec, rec_mesh
 
 
 class MeshGenerator(nn.Module):
@@ -326,11 +327,11 @@ class MeshGenerator(nn.Module):
                 ngf, n_downsampling, n_blocks, norm_layer, padding_type)
     def forward(self,  A_mesh ):
         
-            idcode, expcode = self.meshEnc( A_mesh)
-
+            # idcode, expcode = self.meshEnc( A_mesh)
+            expcode = self.meshEnc( A_mesh)
             # reconstruction
-            idmesh, recmesh = self.meshDec(idcode, expcode)
-            return idmesh, recmesh
+            recmesh = self.meshDec( expcode)
+            return recmesh
 
 class MeshModule(pl.LightningModule):
     def __init__(self, opt ):
@@ -361,7 +362,7 @@ class MeshModule(pl.LightningModule):
         # self.batch = batch
         # train generator
         # generate images
-        idmesh, rec_mesh_A = \
+        rec_mesh_A = \
         self(batch['Amesh'])
         map_type = batch['map_type']
 
