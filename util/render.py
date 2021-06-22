@@ -116,10 +116,10 @@ def render(id_idx, exp_idx, vertices, cam_idx=1):
     obj.normals = pyredner.compute_vertex_normal(obj.vertices, obj.indices)
 
     img_dir = f"{image_data_root}/{id_idx}/{expressions[exp_idx]}"
-    with open(f"{img_dir}/params.json", 'r') as f:
-        params = json.load(f)
-    # with open('/data/home/us000042/lelechen/data/Facescape/jsons/1/1_neutral/params.json', 'r') as f:
+    # with open(f"{img_dir}/params.json", 'r') as f:
     #     params = json.load(f)
+    with open('/data/home/us000042/lelechen/data/Facescape/jsons/1/1_neutral/params.json', 'r') as f:
+        params = json.load(f)
     K = np.array(params['%d_K' % cam_idx])
     Rt = np.array(params['%d_Rt' % cam_idx])
     # dist = np.array(params['%d_distortion' % cam_idx], dtype = float)
@@ -169,28 +169,29 @@ def render(id_idx, exp_idx, vertices, cam_idx=1):
 
     return img
 
-# if __name__ == '__main__':
-#     id_idx = 1
-#     exp_idx = 1
-#     cam_idx = 1
-    
-#     mesh_path = f"{mesh_root}/{id_idx}/models_reg/{expressions[exp_idx]}.obj"
+if __name__ == '__main__':
+    for id_idx in range(1,20):
+        # id_idx = 1
+        exp_idx = 1
+        cam_idx = 1
+        
+        mesh_path = f"{mesh_root}/{id_idx}/models_reg/{expressions[exp_idx]}.obj"
 
-#     om_mesh = openmesh.read_trimesh(mesh_path)
-#     om_vertices = np.array(om_mesh.points()).reshape(-1)
-#     om_vertices = torch.from_numpy(om_vertices.astype(np.float32))
-#     print (om_vertices.shape)
-#     print (type(om_vertices))
-#     for cam_idx in range(1,50):
-#         img = render(id_idx, exp_idx, om_vertices, cam_idx)
+        om_mesh = openmesh.read_trimesh(mesh_path)
+        om_vertices = np.array(om_mesh.points()).reshape(-1)
+        om_vertices = torch.from_numpy(om_vertices.astype(np.float32))
+        # print (om_vertices.shape)
+        # print (type(om_vertices))
+        # for cam_idx in range(1,50):
+        img = render(id_idx, exp_idx, om_vertices, cam_idx)
 
-#         print (type(img))
-#         print (img.shape)
-#         img = img* 255
-#         img = img.astype(np.uint8)
-#         image_pil = Image.fromarray(img)
-#         # image_pil.save("fkass.png")
-#         imageio.imwrite("./gg/%d.png"%cam_idx, img)
+        # print (type(img))
+        print (img.shape)
+        img = img* 255
+        img = img.astype(np.uint8)
+        image_pil = Image.fromarray(img)
+        # image_pil.save("fkass.png")
+        imageio.imwrite("./gg/%d.png"%id_idx, img)
 
 #     exit(0)
 #     for id_idx in range(1,400):
