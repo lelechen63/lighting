@@ -144,7 +144,7 @@ else:
                 ])
         
         elif opt.name.split('_')[0] =='mesh':
-            idmesh, rec_mesh_A = module(   batch['Amesh'] )
+            rec_mesh_A = module(   batch['Amesh'] )
             loss = l2loss(rec_mesh_A, batch[ 'Amesh' ] )
             print (batch['A_path'][0], loss.data)
             tmp = batch['A_path'][0].split('/')
