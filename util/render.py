@@ -95,6 +95,8 @@ om_indices = torch.from_numpy(om_indices).type(torch.int32).to(pyredner.get_devi
     
 
 def render(id_idx, exp_idx, vertices, cam_idx=1):  
+    id_idx = 1 
+    exp_idx = 1
     """
     # id_idx: int
     # exp_idx: int
