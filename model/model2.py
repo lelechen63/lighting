@@ -255,6 +255,8 @@ class MeshEncoder(nn.Module):
             nn.Linear( ngf*2, ngf*2),
             activation,
             nn.Linear( ngf*2, ngf*2),
+            activation,
+            nn.Linear( ngf*2, ngf*2),
             activation
         )
         # self.idenc = nn.Sequential(
@@ -287,13 +289,17 @@ class MeshDecoder(nn.Module):
         
 
         self.id_dex = nn.Sequential(
-            nn.Linear( ngf*4, ngf*4),
+            nn.Linear( ngf*4, ngf*2),
             activation,
-            nn.Linear( ngf*4, ngf*4),
+            nn.Linear( ngf*2, ngf*2),
             activation,
-            nn.Linear( ngf*4, ngf*4),
+            nn.Linear( ngf*2, ngf*2),
             activation,
-            nn.Linear( ngf*4, 78951)
+            nn.Linear( ngf*2, ngf*2),
+            activation,
+            nn.Linear( ngf*2, ngf*2),
+            activation,
+            nn.Linear( ngf*2, 78951)
         )
         # self.exp_dex = nn.Sequential(
         #     nn.Linear( ngf*8, ngf*4),
@@ -371,7 +377,7 @@ class MeshModule(pl.LightningModule):
         # id loss
         loss_id = 0 # self.l2loss(idmesh, batch['Aidmesh'] )
         # mesh loss
-        loss_final = self.l2loss(rec_mesh_A, batch[ 'Amesh' ] )
+        loss_final = self.l2loss(rec_mesh_A, batch[ 'Amesh' ].detach() )
         loss = loss_final
         # loss = loss_id + loss_final
         tqdm_dict = {'loss_final': loss_final }
