@@ -17,7 +17,7 @@ from util.visualizer import Visualizer
 from util.render_class import meshrender
 from model.meshnetwork import AE
 from util import  mesh_sampling
-# import pickle
+import pickle
 # pickle.dump(some_object)
 
 def get_norm_layer(norm_type='instance'):
