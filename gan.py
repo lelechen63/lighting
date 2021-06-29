@@ -33,6 +33,8 @@ elif opt.name == 'texmeshreal':
     from model.model import TexMeshModule as module 
 elif opt.name == 'texgan':
     from model.model2 import TexGANModule as module 
+elif opt.name == 'gmesh' :
+    from model.model2 import GraphConvMeshModule as module 
 opt.datasetname = "fs_texmesh"
 
 totalmeanmesh = torch.FloatTensor( np.load( "./predef/meanmesh.npy" ) ) 

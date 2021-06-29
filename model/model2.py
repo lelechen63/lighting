@@ -14,7 +14,8 @@ import util.util as util
 import os
 from util.visualizer import Visualizer
 from util.render_class import meshrender
-
+from model.meshnetwork import AE
+from util import  mesh_sampling
 # import pickle
 # pickle.dump(some_object)
 
@@ -370,6 +371,127 @@ class MeshModule(pl.LightningModule):
         # generate images
         rec_mesh_A = \
         self(batch['Amesh'])
+        map_type = batch['map_type']
+
+        loss_mesh = 0
+
+        # id loss
+        loss_id = 0 # self.l2loss(idmesh, batch['Aidmesh'] )
+        # mesh loss
+        loss_final = self.l2loss(rec_mesh_A, batch[ 'Amesh' ].detach() )
+        loss = loss_final
+        # loss = loss_id + loss_final
+        tqdm_dict = {'loss_final': loss_final }
+
+        # tqdm_dict = { 'loss_id': loss_id, 'loss_final': loss_final }
+        output = OrderedDict({
+            'loss': loss,
+            'progress_bar': tqdm_dict,
+            'log': tqdm_dict
+        })
+
+        errors = {k: v.data.item() if not isinstance(v, int) else v for k, v in tqdm_dict.items()}            
+        self.visualizer.print_current_errors(self.current_epoch, batch_idx, errors, 0)
+        self.visualizer.plot_current_errors(errors, batch_idx)
+        return output
+          
+    def configure_optimizers(self):
+        lr = self.opt.lr
+        opt_g = torch.optim.Adam(self.generator.parameters(), lr=lr, betas=(self.opt.beta1, 0.999))
+        # return [opt_g]
+        def lr_foo(epoch):
+            # if epoch < 10:
+            #     lr_scale = 0.8 ** (10 - epoch)
+            # else:
+            lr_scale = 0.95 ** int(epoch/10)
+            return lr_scale
+        scheduler = torch.optim.lr_scheduler.LambdaLR(opt_g, lr_lambda=lr_foo )
+                        
+
+        return [opt_g], [scheduler]
+    
+
+
+    def on_epoch_end(self):
+        if self.current_epoch % 5 == 0:
+            print ('!!!!!save model')
+            self.trainer.save_checkpoint( os.path.join( self.ckpt_path, '%05d.ckpt'%self.current_epoch) )
+        self.trainer.save_checkpoint( os.path.join( self.ckpt_path, 'latest.ckpt') )
+
+
+class GraphConvMeshModule(pl.LightningModule):
+    def __init__(self, opt ):
+        super().__init__()
+        self.save_hyperparameters()
+        self.opt = opt
+        input_nc = 3
+
+        homepath = './predef'
+
+        template_fp = osp.join(homepath, 'meshmean.obj')
+
+        transform_fp = osp.join(homepath, 'transform.pkl')
+        if not osp.exists(transform_fp):
+            print('Generating transform matrices...')
+            mesh = Mesh(filename=template_fp)
+            ds_factors = [4, 4, 4, 4]
+            _, A, D, U, F = mesh_sampling.generate_transform_matrices(mesh, ds_factors)
+            tmp = {'face': F, 'adj': A, 'down_transform': D, 'up_transform': U}
+
+            with open(transform_fp, 'wb') as fp:
+                pickle.dump(tmp, fp)
+            print('Done!')
+            print('Transform matrices are saved in \'{}\''.format(transform_fp))
+        else:
+            with open(transform_fp, 'rb') as f:
+                tmp = pickle.load(f, encoding='latin1')
+
+        edge_index_list = [util.to_edge_index(adj).to(device) for adj in tmp['adj']]
+
+        down_transform_list = [
+            util.to_sparse(down_transform).to(device)
+            for down_transform in tmp['down_transform']
+        ]
+        up_transform_list = [
+            util.to_sparse(up_transform).to(device)
+            for up_transform in tmp['up_transform']
+        ]
+
+        self.generator = AE(3,
+                [16, 16, 16, 32],
+                8,
+                edge_index_list,
+                down_transform_list,
+                up_transform_list,
+                K=6).to(device)
+        # print(model)
+
+
+        # networks
+        # self.generator = MeshGenerator(opt.loadSize, not opt.no_linearity, 
+        #     input_nc, opt.code_n,opt.encoder_fc_n, opt.ngf, 
+        #     opt.n_downsample_global, opt.n_blocks_global,opt.norm)
+
+        self.l1loss = torch.nn.L1Loss()
+        self.l2loss = torch.nn.MSELoss()
+        if not opt.no_cls_loss:
+            self.CLSloss = lossNet.CLSLoss(opt)
+
+        self.visualizer = Visualizer(opt)
+        self.ckpt_path = os.path.join(opt.checkpoints_dir, opt.name)
+    
+
+    def forward(self, A_mesh):
+        
+        return self.generator(A_mesh)
+    
+    def training_step(self, batch, batch_idx):
+        # self.batch = batch
+        # train generator
+        # generate images
+        print (batch['Amesh'].shape)
+        rec_mesh_A = \
+        self(batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3))
         map_type = batch['map_type']
 
         loss_mesh = 0
