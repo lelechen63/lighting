@@ -447,14 +447,14 @@ class GraphConvMeshModule(pl.LightningModule):
             with open(transform_fp, 'rb') as f:
                 tmp = pickle.load(f, encoding='latin1')
 
-        edge_index_list = [util.to_edge_index(adj).to(device) for adj in tmp['adj']]
+        edge_index_list = [util.to_edge_index(adj) for adj in tmp['adj']]
 
         down_transform_list = [
-            util.to_sparse(down_transform).to(device)
+            util.to_sparse(down_transform)
             for down_transform in tmp['down_transform']
         ]
         up_transform_list = [
-            util.to_sparse(up_transform).to(device)
+            util.to_sparse(up_transform)
             for up_transform in tmp['up_transform']
         ]
 
@@ -464,7 +464,7 @@ class GraphConvMeshModule(pl.LightningModule):
                 edge_index_list,
                 down_transform_list,
                 up_transform_list,
-                K=6).to(device)
+                K=6)
         # print(model)
 
 
