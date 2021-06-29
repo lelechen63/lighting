@@ -293,6 +293,11 @@ def getmeshnorm():
     # plt.show()
     # plt.savefig('./gg.png')
 
+def get_canonical_mesh():
+    points = np.load('/data/home/us000042/lelechen/github/lighting/predef/meshmean.npy')
+    ommesh  = openmesh.read_trimesh('/raid/celong/FaceScape/textured_meshes/1/models_reg/1_neutral.obj')
+    vertex_indices = ommesh.face_vertex_indices()
+    openmesh.write_mesh('/data/home/us000042/lelechen/github/lighting/predef/meshmean.obj', openmesh.TriMesh(points, vertex_indices))
 
 def get_tex_total():
     dataroot = '/data/home/us000042/lelechen/data/Facescape/'
@@ -336,7 +341,7 @@ def get_texnorm():
 # get_meanmesh()
 # get_texnorm()
 # get_mesh_total()
-getmeshnorm()
+get_canonical_mesh()
 # tmp()
 # get_mean()
 # gettexmesh_pid_expid()
