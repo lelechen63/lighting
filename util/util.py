@@ -6,6 +6,24 @@ import numpy as np
 import os
 import cv2
 
+
+def makedirs(folder):
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+
+
+def to_sparse(spmat):
+    return torch.sparse.FloatTensor(
+        torch.LongTensor([spmat.tocoo().row,
+                          spmat.tocoo().col]),
+        torch.FloatTensor(spmat.tocoo().data), torch.Size(spmat.tocoo().shape))
+
+
+def to_edge_index(mat):
+    return torch.LongTensor(np.vstack(mat.nonzero()))
+
+
+
 # Converts a Tensor into a Numpy array
 # |imtype|: the desired type of the converted numpy array
 def tensor2im(image_tensor, imtype=np.uint8, normalize=True):
