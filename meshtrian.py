@@ -10,7 +10,7 @@ from psbody.mesh import Mesh
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
 
-from meshnetwork import AE
+from model.meshnetwork import AE
 # from datasets import MeshData
 from util import util, mesh_sampling #, writer, train_eval, DataLoader, 
 
