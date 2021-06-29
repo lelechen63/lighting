@@ -54,3 +54,5 @@ model = AE(3,
            up_transform_list,
            K=6).to(device)
 print(model)
+
+print('==========')
