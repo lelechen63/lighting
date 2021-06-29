@@ -294,7 +294,7 @@ def getmeshnorm():
     # plt.savefig('./gg.png')
 
 def get_canonical_mesh():
-    points = np.load('/data/home/us000042/lelechen/github/lighting/predef/meshmean.npy')
+    points = np.load('/data/home/us000042/lelechen/github/lighting/predef/meshmean.npy').reshape(-1,3)
     ommesh  = openmesh.read_trimesh('/data/home/us000042/lelechen/data/Facescape/textured_meshes/1/models_reg/1_neutral.obj')
     vertex_indices = ommesh.face_vertex_indices()
     openmesh.write_mesh('/data/home/us000042/lelechen/github/lighting/predef/meshmean.obj', openmesh.TriMesh(points, vertex_indices))
