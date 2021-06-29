@@ -5,7 +5,7 @@ import os.path as osp
 import numpy as np
 import torch
 import torch.backends.cudnn as cudnn
-import torch_geometric.transforms as T
+# import torch_geometric.transforms as T
 from psbody.mesh import Mesh
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
