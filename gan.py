@@ -203,10 +203,13 @@ else:
             print (batch['A_path'][0], loss.data)
             tmp = batch['A_path'][0].split('/')
             gt_mesh = batch['Amesh'].data[0]* totalstdmesh + totalmeanmesh
-            # gt_mesh = gt_mesh.cpu()
+            rec_Amesh = rec_mesh_A.data[0] * totalstdmesh + totalmeanmesh )
+            gt_mesh = gt_mesh.float()
+            rec_Amesh = rec_Amesh.float()
+
             print (gt_mesh.type())
             gt_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gt_mesh )
-            rec_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), (rec_mesh_A.data[0] * totalstdmesh + totalmeanmesh )  )
+            rec_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), rec_Amesh )
             # rec_id = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), idmesh.data[0] + totalmeanmesh)
 
             gt_Amesh = np.ascontiguousarray(gt_Amesh, dtype=np.uint8)
