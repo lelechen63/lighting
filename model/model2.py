@@ -500,7 +500,7 @@ class GraphConvMeshModule(pl.LightningModule):
         # id loss
         loss_id = 0 # self.l2loss(idmesh, batch['Aidmesh'] )
         # mesh loss
-        loss_land = self.l2loss(rec_mesh_A[:,self.land_inx], batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3)[:,self.land_inx].detach() ) 
+        loss_land = 0# self.l2loss(rec_mesh_A[:,self.land_inx], batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3)[:,self.land_inx].detach() ) 
         loss_mesh = self.l2loss(rec_mesh_A, batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).detach() )
 
         loss = loss_mesh + loss_land
