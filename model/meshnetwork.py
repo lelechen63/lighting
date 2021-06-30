@@ -115,7 +115,7 @@ class AE(nn.Module):
                 print (self.down_transform[i])
                 # self.down_transform[i] = self.down_transform[i].type_as(x)
                 # print (self.down_transform[i].get_device())
-                x = layer(x, self.edge_index[i].type_as(x), self.down_transform[i].type_as(x))
+                x = layer(x, self.edge_index[i], self.down_transform[i])
             else:
                 x = x.view(-1, layer.weight.size(1))
                 x = layer(x)
