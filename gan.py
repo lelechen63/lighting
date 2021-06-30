@@ -202,7 +202,10 @@ else:
             loss = l2loss(rec_mesh_A, batch[ 'Amesh' ].view(batch['Amesh'].shape[0], -1, 3).to(device))
             print (batch['A_path'][0], loss.data)
             tmp = batch['A_path'][0].split('/')
-            gt_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),( batch['Amesh'].data[0]* totalstdmesh + totalmeanmesh ) )
+            gt_mesh = batch['Amesh'].data[0]* totalstdmesh + totalmeanmesh
+            # gt_mesh = gt_mesh.cpu()
+            print (gt_mesh.type())
+            gt_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gt_mesh )
             rec_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), (rec_mesh_A.data[0] * totalstdmesh + totalmeanmesh )  )
             # rec_id = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), idmesh.data[0] + totalmeanmesh)
 
