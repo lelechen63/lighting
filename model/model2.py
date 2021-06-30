@@ -470,7 +470,7 @@ class GraphConvMeshModule(pl.LightningModule):
         land_tex = open(land_tex, 'r')
         Lines = land_tex.readlines()
         self.land_inx = []
-        for line in lins:
+        for line in Lines:
             self.land_inx.append(int(line))
         print(self.land_inx)
         self.l1loss = torch.nn.L1Loss()
