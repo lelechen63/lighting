@@ -105,22 +105,21 @@ class AE(nn.Module):
                 nn.init.xavier_uniform_(param)
 
     def encoder(self, x):
-        self.edge_index = self.edge_index.type_as(x)
-        self.down_transform = self.down_transform.type_as(x)
+        # self.edge_index = self.edge_index.type_as(x)
+        # self.down_transform = self.down_transform.type_as(x)
         for i, layer in enumerate(self.en_layers):
             if i != len(self.en_layers) - 1:
-                print (x.get_device())
-                print( self.edge_index[i].get_device()   )
-                print (self.down_transform[i].get_device())
-                x = layer(x, self.edge_index[i], self.down_transform[i])
+                # print (x.get_device())
+                # print( self.edge_index[i].get_device()   )
+                # print (self.down_transform[i].get_device())
+                x = layer(x, self.edge_index[i].type_as(x), self.down_transform[i].type_as(x))
             else:
                 x = x.view(-1, layer.weight.size(1))
                 x = layer(x)
         return x
 
     def decoder(self, x):
-        self.edge_index = self.edge_index.type_as(x)
-        self.up_transform = self.up_transform.type_as(x)
+        
 
         num_layers = len(self.de_layers)
         num_deblocks = num_layers - 2
@@ -129,8 +128,8 @@ class AE(nn.Module):
                 x = layer(x)
                 x = x.view(-1, self.num_vert, self.out_channels[-1])
             elif i != num_layers - 1:
-                x = layer(x, self.edge_index[num_deblocks - i],
-                          self.up_transform[num_deblocks - i])
+                x = layer(x, self.edge_index[num_deblocks - i].type_as(x),
+                          self.up_transform[num_deblocks - i].type_as(x))
             else:
                 # last layer
                 x = layer(x, self.edge_index[0])
