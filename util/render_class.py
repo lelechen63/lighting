@@ -61,8 +61,8 @@ def meshrender(id_idx, exp_idx, vertices, cam_idx=1):
     # cam_idx: 1
     # return: rendered image, [h,w,3]
     """
-    scale = Rt_scale_dict['%d'%id_idx]['%d'%exp_idx][0]
-    Rt_TU = np.array(Rt_scale_dict['%d'%id_idx]['%d'%exp_idx][1])
+    scale = Rt_scale_dict['1']['%d'%1][0]
+    Rt_TU = np.array(Rt_scale_dict['%d'%1]['%d'%1][1])
     # Rt_TU = torch.from_numpy(Rt_TU).type(torch.float32).to(pyredner.get_device())
     Rt_TU = torch.from_numpy(Rt_TU).type(torch.float32).to("cuda:0")
 
@@ -82,7 +82,7 @@ def meshrender(id_idx, exp_idx, vertices, cam_idx=1):
 
     # obj.normals = pyredner.compute_vertex_normal(obj.vertices.to(pyredner.get_device()), obj.indices.to(pyredner.get_device())).cpu()
 
-    img_dir = f"{image_data_root}/{id_idx}/{expressions[exp_idx]}"
+    img_dir = f"{image_data_root}/{1}/{expressions[1]}"
     with open(f"{img_dir}/params.json", 'r') as f:
         params = json.load(f)
 
