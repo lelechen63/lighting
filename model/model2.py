@@ -503,7 +503,7 @@ class GraphConvMeshModule(pl.LightningModule):
         loss_land = self.l2loss(rec_mesh_A[:,self.land_inx], batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3)[:,self.land_inx].detach() ) 
         loss_mesh = self.l2loss(rec_mesh_A, batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).detach() )
 
-        loss = loss_mesh + loss_land*100
+        loss = loss_mesh + loss_land
         # loss = loss_id + loss_final
         tqdm_dict = {'loss_mesh': loss_mesh, "loss_land" :loss_land }
 
