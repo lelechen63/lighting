@@ -85,6 +85,25 @@ else:
     elif opt.name =='gmesh':
         from model.meshnetwork import AE as module 
         checkpoint_path = '/data/home/us000042/lelechen/github/lighting/checkpoints/gmesh/latest.ckpt'
+        homepath = './predef'
+        device = torch.device('cuda', 0)
+
+        template_fp = osp.join(homepath, 'meshmean.obj')
+
+        transform_fp = osp.join(homepath, 'transform.pkl')
+        with open(transform_fp, 'rb') as f:
+            tmp = pickle.load(f, encoding='latin1')
+
+        edge_index_list = [util.to_edge_index(adj).to(device) for adj in tmp['adj']]
+
+        down_transform_list = [
+            util.to_sparse(down_transform).to(device)
+            for down_transform in tmp['down_transform']
+        ]
+        up_transform_list = [
+            util.to_sparse(up_transform).to(device)
+            for up_transform in tmp['up_transform']
+        ]
         module =  module(3,
                 [16, 16, 16, 32],
                 8,
