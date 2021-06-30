@@ -131,8 +131,8 @@ class AE(nn.Module):
                 x = layer(x)
                 x = x.view(-1, self.num_vert, self.out_channels[-1])
             elif i != num_layers - 1:
-                x = layer(x, self.edge_index[num_deblocks - i].type_as(x),
-                          self.up_transform[num_deblocks - i].type_as(x))
+                x = layer(x, self.edge_index[num_deblocks - i],
+                          self.up_transform[num_deblocks - i])
             else:
                 # last layer
                 x = layer(x, self.edge_index[0])
