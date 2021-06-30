@@ -254,7 +254,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
             tex = self.total_t[cc]
             self.total_tex[data] = [tex - self.totalmeantex ]
             A_vertices = self.total_m[cc] - self.totalmeanmesh
-            self.total_tex[data].append(( A_vertices - self.totalmeanmesh ) / self.totalstdmesh)
+            self.total_tex[data].append(A_vertices  / self.totalstdmesh)
             cc += 1
             if opt.debug:
                 if len(self.total_tex) == 13:
