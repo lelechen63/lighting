@@ -536,9 +536,9 @@ class GraphConvMeshModule(pl.LightningModule):
 
     def on_epoch_end(self):
         if self.current_epoch % 5 == 0:
-            print ('!!!!!save model')
-            self.trainer.save_checkpoint( os.path.join( self.ckpt_path, '%05d.ckpt'%self.current_epoch) )
-        self.trainer.save_checkpoint( os.path.join( self.ckpt_path, 'latest.ckpt') )
+            # print ('!!!!!save model')
+            # self.trainer.save_checkpoint( os.path.join( self.ckpt_path, '%05d.ckpt'%self.current_epoch) )
+            self.trainer.save_checkpoint( os.path.join( self.ckpt_path, 'latest.ckpt') )
 
 
 class  TexMeshDecoder(nn.Module):
