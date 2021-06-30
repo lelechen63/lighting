@@ -465,14 +465,14 @@ class GraphConvMeshModule(pl.LightningModule):
                 down_transform_list,
                 up_transform_list,
                 K=6)
-        # print(model)
-
-
-        # networks
-        # self.generator = MeshGenerator(opt.loadSize, not opt.no_linearity, 
-        #     input_nc, opt.code_n,opt.encoder_fc_n, opt.ngf, 
-        #     opt.n_downsample_global, opt.n_blocks_global,opt.norm)
-
+        
+        land_tex = './predef/landmark_indices.txt'
+        land_tex = open(land_tex, 'r')
+        Lines = land_tex.readlines()
+        self.land_inx = []
+        for line in lins:
+            self.land_inx.append(int(line))
+        print(self.land_inx)
         self.l1loss = torch.nn.L1Loss()
         self.l2loss = torch.nn.MSELoss()
         if not opt.no_cls_loss:
@@ -500,10 +500,12 @@ class GraphConvMeshModule(pl.LightningModule):
         # id loss
         loss_id = 0 # self.l2loss(idmesh, batch['Aidmesh'] )
         # mesh loss
-        loss_final = self.l2loss(rec_mesh_A, batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).detach() )
-        loss = loss_final
+        loss_land = self.l2loss(rec_mesh_A[:,self.land_inx], batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3)[:,self.land_inx].detach() ) 
+        loss_mesh = self.l2loss(rec_mesh_A, batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).detach() )
+
+        loss = loss_mesh + loss_land*100
         # loss = loss_id + loss_final
-        tqdm_dict = {'loss_final': loss_final }
+        tqdm_dict = {'loss_mesh': loss_mesh, "loss_land" :loss_land }
 
         # tqdm_dict = { 'loss_id': loss_id, 'loss_final': loss_final }
         output = OrderedDict({
