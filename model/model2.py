@@ -427,6 +427,7 @@ class GraphConvMeshModule(pl.LightningModule):
         self.opt = opt
         input_nc = 3
         homepath = './predef'
+        device = torch.device('cuda', 0)
 
         template_fp = osp.join(homepath, 'meshmean.obj')
 
@@ -446,14 +447,14 @@ class GraphConvMeshModule(pl.LightningModule):
             with open(transform_fp, 'rb') as f:
                 tmp = pickle.load(f, encoding='latin1')
 
-        edge_index_list = [util.to_edge_index(adj) for adj in tmp['adj']]
+        edge_index_list = [util.to_edge_index(adj).to(device) for adj in tmp['adj']]
 
         down_transform_list = [
-            util.to_sparse(down_transform)
+            util.to_sparse(down_transform).to(device)
             for down_transform in tmp['down_transform']
         ]
         up_transform_list = [
-            util.to_sparse(up_transform)
+            util.to_sparse(up_transform).to(device)
             for up_transform in tmp['up_transform']
         ]
 
