@@ -108,7 +108,7 @@ else:
         ]
         module =  module(3,
                 [16, 16, 16, 32],
-                8,
+                256,
                 edge_index_list,
                 down_transform_list,
                 up_transform_list,
