@@ -426,7 +426,6 @@ class GraphConvMeshModule(pl.LightningModule):
         self.save_hyperparameters()
         self.opt = opt
         input_nc = 3
-        device = 
         homepath = './predef'
 
         template_fp = osp.join(homepath, 'meshmean.obj')
