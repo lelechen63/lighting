@@ -38,7 +38,7 @@ elif opt.name == 'gmesh' :
 opt.datasetname = "fs_texmesh"
 
 totalmeanmesh = torch.FloatTensor( np.load( "./predef/meanmesh.npy" ) ) 
-
+totalstdmesh = np.load( "./predef/meshstd.npy" )
 
 dm = FacescapeDataModule(opt)
 
@@ -80,15 +80,23 @@ else:
     elif opt.name =='mesh':
         from model.model2 import MeshGenerator as module 
         checkpoint_path = '/data/home/us000042/lelechen/github/lighting/checkpoints/mesh/latest.ckpt'
+        module =  module(opt.loadSize, not opt.no_linearity, 3, opt.code_n,opt.encoder_fc_n, opt.ngf,opt.n_downsample_global, opt.n_blocks_global,opt.norm)
+
     elif opt.name =='gmesh':
-        from model.model2 import GraphConvMeshModule as module 
+        from model.meshnetwork import AE as module 
         checkpoint_path = '/data/home/us000042/lelechen/github/lighting/checkpoints/gmesh/latest.ckpt'
+        module =  module(3,
+                [16, 16, 16, 32],
+                8,
+                edge_index_list,
+                down_transform_list,
+                up_transform_list,
+                K=6)
 
     print(checkpoint_path)
     checkpoint = torch.load(checkpoint_path)
     print (checkpoint.keys())
 
-    module =  module(opt.loadSize, not opt.no_linearity, 3, opt.code_n,opt.encoder_fc_n, opt.ngf,opt.n_downsample_global, opt.n_blocks_global,opt.norm)
 
     def pl2normal(checkpoint):
         state_dict = checkpoint
@@ -155,6 +163,26 @@ else:
             tmp = batch['A_path'][0].split('/')
             gt_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),( batch['Amesh'].data[0] ) *110-50 + totalmeanmesh )
             rec_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), (rec_mesh_A.data[0] )*110-50 + totalmeanmesh  )
+            # rec_id = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), idmesh.data[0] + totalmeanmesh)
+
+            gt_Amesh = np.ascontiguousarray(gt_Amesh, dtype=np.uint8)
+            gt_Amesh = util.writeText(gt_Amesh, batch['A_path'][0], 10)
+
+            visuals = OrderedDict([
+                ('gt_Amesh', gt_Amesh),
+                # ('rec_id', rec_id),
+                ('rec_Amesh', rec_Amesh),
+            
+                ])
+
+        elif opt.name.split('_')[0] =='gmesh':
+
+            rec_mesh_A = module( batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3))
+            loss = l2loss(rec_mesh_A, batch[ 'Amesh' ].view(batch['Amesh'].shape[0], -1, 3))
+            print (batch['A_path'][0], loss.data)
+            tmp = batch['A_path'][0].split('/')
+            gt_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),( batch['Amesh'].data[0]* totalstdmesh + totalmeanmesh ) )
+            rec_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), (rec_mesh_A.data[0] * totalstdmesh + totalmeanmesh )  )
             # rec_id = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), idmesh.data[0] + totalmeanmesh)
 
             gt_Amesh = np.ascontiguousarray(gt_Amesh, dtype=np.uint8)
