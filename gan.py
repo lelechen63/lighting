@@ -199,7 +199,7 @@ else:
         elif opt.name.split('_')[0] =='gmesh':
             module = module.to(device)
             rec_mesh_A = module( batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).to(device))
-            loss = l2loss(rec_mesh_A, batch[ 'Amesh' ].view(batch['Amesh'].shape[0], -1, 3))
+            loss = l2loss(rec_mesh_A, batch[ 'Amesh' ].view(batch['Amesh'].shape[0], -1, 3).to(device))
             print (batch['A_path'][0], loss.data)
             tmp = batch['A_path'][0].split('/')
             gt_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),( batch['Amesh'].data[0]* totalstdmesh + totalmeanmesh ) )
