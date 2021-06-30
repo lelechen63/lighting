@@ -202,8 +202,8 @@ else:
             loss = l2loss(rec_mesh_A, batch[ 'Amesh' ].view(batch['Amesh'].shape[0], -1, 3).to(device))
             print (batch['A_path'][0], loss.data)
             tmp = batch['A_path'][0].split('/')
-            gt_mesh = batch['Amesh'].data[0]* totalstdmesh + totalmeanmesh
-            rec_Amesh = rec_mesh_A.data[0] * totalstdmesh + totalmeanmesh 
+            gt_mesh = batch['Amesh'].data[0].cpu()* totalstdmesh + totalmeanmesh
+            rec_Amesh = rec_mesh_A.data[0].cpu() * totalstdmesh + totalmeanmesh 
             gt_mesh = gt_mesh.float()
             rec_Amesh = rec_Amesh.float()
 
