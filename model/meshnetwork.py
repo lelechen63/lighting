@@ -107,6 +107,9 @@ class AE(nn.Module):
     def encoder(self, x):
         for i, layer in enumerate(self.en_layers):
             if i != len(self.en_layers) - 1:
+                print (x.device())
+                print( self.edge_index[i].device()   )
+                print (self.down_transform[i].device())
                 x = layer(x, self.edge_index[i], self.down_transform[i])
             else:
                 x = x.view(-1, layer.weight.size(1))
