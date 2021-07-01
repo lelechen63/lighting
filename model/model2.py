@@ -491,7 +491,7 @@ class GraphConvMeshModule(pl.LightningModule):
         # train generator
         # generate images
         print (batch['Amesh'].shape)
-        code, rec_mesh_A = \
+        rec_mesh_A, code = \
         self(batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3))
         map_type = batch['map_type']
 
