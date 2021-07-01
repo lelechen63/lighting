@@ -528,6 +528,8 @@ class GraphConvMeshModule(pl.LightningModule):
             #     lr_scale = 0.8 ** (10 - epoch)
             # else:
             lr_scale = 0.95 ** int(epoch/10)
+            if lr_scale < 0.08:
+                lr_scale = 0.08
             return lr_scale
         scheduler = torch.optim.lr_scheduler.LambdaLR(opt_g, lr_lambda=lr_foo )
                         
