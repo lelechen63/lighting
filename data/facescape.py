@@ -509,7 +509,7 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
         A_exp = int(tmp[-1].split('_')[0])
         # id_p , 'models_reg', motion_p
       
-        A_vertices = self.total_tex[self.data_list[index]][1]        
+        A_vertices = self.total_tex[self.data_list[index]][0]        
         toss = random.getrandbits(1)
 
         # toss 0-> same iden, diff exp
@@ -535,7 +535,7 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
                     continue 
                
              
-                B_vertices = self.total_tex[tex_index][1]
+                B_vertices = self.total_tex[tex_index][0]
                 if B_vertices.shape[0] != 78951:
                     print('!!!!',B_vertices.shape )
                     continue
