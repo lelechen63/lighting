@@ -491,21 +491,23 @@ class GraphConvMeshModule(pl.LightningModule):
         # train generator
         # generate images
         print (batch['Amesh'].shape)
-        rec_mesh_A = \
+        code, rec_mesh_A = \
         self(batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3))
         map_type = batch['map_type']
 
         loss_mesh = 0
 
+        # regularization
+        loss_code = ( code ** 2 ).mean()
         # id loss
         loss_id = 0 # self.l2loss(idmesh, batch['Aidmesh'] )
         # mesh loss
         loss_land = 0# self.l2loss(rec_mesh_A[:,self.land_inx], batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3)[:,self.land_inx].detach() ) 
         loss_mesh = self.l2loss(rec_mesh_A, batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).detach() )
 
-        loss = loss_mesh + loss_land
+        loss = loss_mesh + loss_code* 0.1
         # loss = loss_id + loss_final
-        tqdm_dict = {'loss_mesh': loss_mesh, "loss_land" :loss_land }
+        tqdm_dict = {'loss_mesh': loss_mesh, "loss_code" :loss_code }
 
         # tqdm_dict = { 'loss_id': loss_id, 'loss_final': loss_final }
         output = OrderedDict({
