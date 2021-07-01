@@ -482,7 +482,6 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
         for data in tqdm(self.data_list):
             
             tmp = data.split('/')
-            tex = self.total_t[cc]
             self.total_tex[data] = [ ]
             A_vertices = self.total_m[cc] - self.totalmeanmesh
             self.total_tex[data].append(A_vertices  / self.totalstdmesh)
