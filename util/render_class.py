@@ -81,10 +81,11 @@ def meshrender(id_idx, exp_idx, vertices, cam_idx=1):
     obj.normals = pyredner.compute_vertex_normal(obj.vertices, obj.indices)
 
     # obj.normals = pyredner.compute_vertex_normal(obj.vertices.to(pyredner.get_device()), obj.indices.to(pyredner.get_device())).cpu()
-
-    img_dir = f"{image_data_root}/{1}/{expressions[1]}"
-    with open(f"{img_dir}/params.json", 'r') as f:
+    with open('/data/home/us000042/lelechen/data/Facescape/jsons/1/1_neutral/params.json', 'r') as f:
         params = json.load(f)
+    # img_dir = f"{image_data_root}/{1}/{expressions[1]}"
+    # with open(f"{img_dir}/params.json", 'r') as f:
+    #     params = json.load(f)
 
     K = np.array(params['%d_K' % cam_idx])
     Rt = np.array(params['%d_Rt' % cam_idx])
