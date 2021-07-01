@@ -25,6 +25,9 @@ import os
 from util.visualizer import Visualizer
 from util.render_class import meshrender
 opt = TrainOptions().parse()
+
+opt.datasetname = "fs_texmesh"
+
 if opt.name == 'tex' :
     from model.model2 import TexModule as module 
 if opt.name == 'mesh' :
@@ -37,7 +40,8 @@ elif opt.name == 'texgan':
     from model.model2 import TexGANModule as module 
 elif opt.name == 'gmesh' :
     from model.model2 import GraphConvMeshModule as module 
-opt.datasetname = "fs_texmesh"
+    opt.datasetname = "fs_mesh"
+
 
 totalmeanmesh = torch.FloatTensor( np.load( "./predef/meanmesh.npy" ) ) 
 totalstdmesh = np.load( "./predef/meshstd.npy" )

@@ -428,3 +428,130 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
 
     def name(self):
         return 'FacescapeTexDataset'
+
+
+
+
+class FacescapeMeshDataset(torch.utils.data.Dataset):
+    def __init__(self, opt):
+        self.opt = opt
+        ### input A (texture and mesh)   
+        self.dir_A = os.path.join(opt.dataroot, "textured_meshes")
+
+        # self.dir_tex = '/raid/celong/FaceScape/texture_mapping/target/'
+        self.dir_tex = os.path.join(opt.dataroot, "texture_mapping", 'target')
+        # '/data/home/us000042/lelechen/data/Facescape/texture_mapping/target/'
+        ### input B (real images)
+        self.dir_B = os.path.join(opt.dataroot, "ffhq_aligned_img")
+
+        ### input C (eye parsing images)
+        self.dir_C = os.path.join(opt.dataroot, "fsmview_landmarks")
+
+        ### json 
+        self.dir_json = os.path.join(opt.dataroot, "fsmview_images")
+
+        if opt.isTrain:
+            _file = open(os.path.join(opt.dataroot, "lists/texmesh_train.pkl"), "rb")
+            total_m = '/data/home/us000042/lelechen/data/Facescape/bigmeshtrain.npy'
+        else:
+            _file = open(os.path.join(opt.dataroot, "lists/texmesh_test.pkl"), "rb")
+            total_m = '/data/home/us000042/lelechen/data/Facescape/bigmeshtest.npy'
+
+
+        self.data_list = pickle.load(_file)#[:1]
+        _file.close()
+        
+        ids = open(os.path.join(opt.dataroot, "lists/ids.pkl"), "rb")
+        self.id_set = set(pickle.load(ids))
+        self.exp_set = get_exp()
+
+        self.meanmesh = get_meanmesh()
+        print ('===========================')
+        print ('id_set:',self.id_set)
+        print('+++++++++++++++++++++++++++')
+        print ('exp_set:',self.exp_set)
+        print ('===========================')
+
+        self.totalmeanmesh = np.load( "./predef/meshmean.npy" )
+        self.totalstdmesh = np.load( "./predef/meshstd.npy" )
+       
+        self.total_m = np.load(total_m)
+        bk = get_blacklist()
+        cc = 0
+        self.total_tex = {}
+        for data in tqdm(self.data_list):
+            
+            tmp = data.split('/')
+            tex = self.total_t[cc]
+            self.total_tex[data] = [ ]
+            A_vertices = self.total_m[cc] - self.totalmeanmesh
+            self.total_tex[data].append(A_vertices  / self.totalstdmesh)
+            cc += 1
+            if opt.debug:
+                if len(self.total_tex) == 13:
+                    break
+
+        # remove blacklisted item
+        for element in bk:
+            try:
+                del self.total_tex[element]
+                self.data_list.remove(element)
+            except:
+                print(element)
+                
+        print ('******************', len(self.data_list), len(self.total_tex))
+        # free the memory
+        self.total_t = []
+        self.total_m = []
+    def __getitem__(self, index):
+        t = time.time()
+        tmp = self.data_list[index].split('/')
+        A_id = int(tmp[0])
+        A_exp = int(tmp[-1].split('_')[0])
+        # id_p , 'models_reg', motion_p
+      
+        A_vertices = self.total_tex[self.data_list[index]][1]        
+        toss = random.getrandbits(1)
+
+        # toss 0-> same iden, diff exp
+        while True:
+            # try:
+                if toss == 0:
+                    pool = self.exp_set - set(tmp[-1])
+                    B_exp = random.sample(pool, 1)[0]
+                    B_id = tmp[0]
+                # toss 1 -> same exp, diff iden
+                else:
+                    pool = self.id_set - set(tmp[0])
+                    B_id = random.sample(pool, 1)[0]
+                    B_exp = tmp[-1]
+                
+                # tex
+                tex_index = os.path.join( B_id , 'models_reg', B_exp  )
+                
+                if self.opt.debug:
+                    tex_index = self.data_list[index]
+
+                if tex_index not in self.total_tex.keys():
+                    continue 
+               
+             
+                B_vertices = self.total_tex[tex_index][1]
+                if B_vertices.shape[0] != 78951:
+                    print('!!!!',B_vertices.shape )
+                    continue
+                break
+            
+        input_dict = { 'Amesh': torch.FloatTensor(A_vertices),
+                'A_path': self.data_list[index], 
+                'Bmesh': torch.FloatTensor(B_vertices), 'B_path': os.path.join( B_id, 'models_reg' , B_exp),
+                'map_type':toss, 'Aid': int(A_id) - 1, 'Aexp': int(A_exp) -1,
+                'Bid':int(B_id) - 1, 'Bexp':int(B_exp.split('_')[0]) - 1 }
+
+        return input_dict
+
+    def __len__(self):
+        return len(self.total_tex) // self.opt.batchSize * self.opt.batchSize
+
+    def name(self):
+        return 'FacescapeMeshDataset'
