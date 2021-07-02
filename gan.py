@@ -38,6 +38,7 @@ elif opt.name == 'texmeshreal':
     from model.model import TexMeshModule as module 
 elif opt.name == 'texgan':
     from model.model2 import TexGANModule as module 
+    opt.datasetname = "fs_tex"
 elif opt.name == 'gmesh' :
     from model.model2 import GraphConvMeshModule as module 
     opt.datasetname = "fs_mesh"
@@ -197,7 +198,7 @@ else:
                 ('gt_Amesh', gt_Amesh),
                 # ('rec_id', rec_id),
                 ('rec_Amesh', rec_Amesh),
-            
+             
                 ])
 
         elif opt.name.split('_')[0] =='gmesh':

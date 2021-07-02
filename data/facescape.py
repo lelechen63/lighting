@@ -346,12 +346,12 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
 class FacescapeTexDataset(torch.utils.data.Dataset):
     def __init__(self, opt):
         self.opt = opt
-
         ### input A (texture and mesh)   
         self.dir_A = os.path.join(opt.dataroot, "textured_meshes")
 
-        self.dir_tex = '/raid/celong/FaceScape/texture_mapping/target/'
-
+        # self.dir_tex = '/raid/celong/FaceScape/texture_mapping/target/'
+        self.dir_tex = os.path.join(opt.dataroot, "texture_mapping", 'target')
+        # '/data/home/us000042/lelechen/data/Facescape/texture_mapping/target/'
         ### input B (real images)
         self.dir_B = os.path.join(opt.dataroot, "ffhq_aligned_img")
 
@@ -361,65 +361,87 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         ### json 
         self.dir_json = os.path.join(opt.dataroot, "fsmview_images")
 
-        self.exp_set =  get_exp()
-
         if opt.isTrain:
             _file = open(os.path.join(opt.dataroot, "lists/texmesh_train.pkl"), "rb")
-            
+            total_m = '/data/home/us000042/lelechen/data/Facescape/bigmeshtrain.npy'
+            total_t = '/data/home/us000042/lelechen/data/Facescape/bigtex256train.npy'
         else:
             _file = open(os.path.join(opt.dataroot, "lists/texmesh_test.pkl"), "rb")
-       
+            total_m = '/data/home/us000042/lelechen/data/Facescape/bigmeshtest.npy'
+            total_t = '/data/home/us000042/lelechen/data/Facescape/bigtex256test.npy'
+
+
         self.data_list = pickle.load(_file)#[:1]
+
+
         _file.close()
         
         ids = open(os.path.join(opt.dataroot, "lists/ids.pkl"), "rb")
         self.id_set = set(pickle.load(ids))
         self.exp_set = get_exp()
+
+        self.meanmesh = get_meanmesh()
+        print ('===========================')
+        print ('id_set:',self.id_set)
+        print('+++++++++++++++++++++++++++')
+        print ('exp_set:',self.exp_set)
+        print ('===========================')
+
+        self.totalmeanmesh = np.load( "./predef/meshmean.npy" )
+        self.totalstdmesh = np.load( "./predef/meshstd.npy" )
+        self.totalmeantex = np.load( "./predef/meantex.npy" )
         # self.facial_seg = cv2.imread("./predef/facial_mask_v10.png")[:,:,::-1]
         self.facial_seg = Image.open("./predef/facial_mask_v10.png")
         # self.facial_seg  = self.facial_seg.resize(self.img_size)
         self.facial_seg  = np.array(self.facial_seg ) / 255.0
         self.facial_seg = np.expand_dims(self.facial_seg, axis=2)
-        self.x = 1019
+        self.x = 1169-150
         self.y =500
         self.w =2000
         self.h = 1334
-        self.l = max(self.w,self.h)
-        self.total_tex = []
+        self.l = max(self.w ,self.h)
+        self.total_tex = {}
+        self.total_t = np.load(total_t)
+        self.total_m = np.load(total_m)
+        bk = get_blacklist()
+        cc = 0
         for data in tqdm(self.data_list):
+            
             tmp = data.split('/')
-            tex_path = os.path.join( self.dir_tex , tmp[0], tmp[-1] + '.png')
-            tex = Image.open(tex_path).convert('RGB')#.resize(self.img_size)
-            tex  = np.array(tex ) 
-            tex = tex * self.facial_seg
-            tex =  tex[self.y:self.y+self.l,self.x :self.x +self.l,:]
-            tex = cv2.resize(tex, (opt.loadSize,opt.loadSize), interpolation = cv2.INTER_AREA)
-            self.total_tex.append(tex)
-            # if len(self.total_tex) == 33:
-            #     break
+            tex = self.total_t[cc]
+            self.total_tex[data] = [tex ]
+            cc += 1
+            if opt.debug:
+                if len(self.total_tex) == 13:
+                    break
+
+        # remove blacklisted item
+        for element in bk:
+            try:
+                del self.total_tex[element]
+                self.data_list.remove(element)
+            except:
+                print(element)
+                
+        print ('******************', len(self.data_list), len(self.total_tex))
+        # free the memory
+        self.total_t = []
+        self.total_m = []
     def __getitem__(self, index):
         t = time.time()
         tmp = self.data_list[index].split('/')
         # id_p , 'models_reg', motion_p
         # tex 
         tex_path = os.path.join( self.dir_tex , tmp[0], tmp[-1] + '.png')
-        # tex_path = '/raid/celong/FaceScape/texture_mapping/target/1/9_mouth_right.png'
-        # mesh 
-        # tex = Image.open(tex_path).convert('RGB')#.resize(self.img_size)
-        # tex  = np.array(tex ) 
-        # # tex = cv2.resize(tex, self.img_size, interpolation = cv2.INTER_AREA)
-        # tex = tex * self.facial_seg
-        # tex = tex[self.y:self.y+self.l,self.x :self.x +self.l,:]
-        tex = self.total_tex[index]
+     
+        tex = self.total_tex[index][0]
         tex = Image.fromarray(np.uint8(tex))
         params = get_params(self.opt, tex.size)
         transform = get_transform(self.opt, params)      
         tex_tensor = transform(tex)
 
         input_dict = { 'tex':tex_tensor, 'id': int(tmp[0]) - 1, 'exp': int(tmp[-1].split('_')[0] )- 1, 'path': self.data_list[index]}
-        # if input_dict['id'] > 300 or input_dict['id']< 0 or input_dict['exp'] > 19  or input_dict['exp']< 0 :
-        #     print(input_dict['path'])
-        #     print('*************')
+       
        
         return input_dict
 
