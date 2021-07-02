@@ -492,7 +492,7 @@ class GraphConvMeshModule(pl.LightningModule):
         # generate images
         print (batch['Amesh'].shape)
         rec_mesh_A, code = \
-        self(batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3))
+        self(batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3)) 
         map_type = batch['map_type']
 
         loss_mesh = 0
