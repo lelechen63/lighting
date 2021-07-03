@@ -440,7 +440,7 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         transform = get_transform(self.opt, params)      
         tex_tensor = transform(tex)
 
-        input_dict = { 'tex':tex_tensor, 'id': int(tmp[0]) - 1, 'exp': int(tmp[-1].split('_')[0] )- 1, 'path': self.data_list[index]}
+        input_dict = { 'Atex':tex_tensor, 'Aid': int(tmp[0]) - 1, 'Aexp': int(tmp[-1].split('_')[0] )- 1, 'A_path': self.data_list[index]}
        
        
         return input_dict
