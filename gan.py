@@ -72,14 +72,62 @@ if opt.isTrain:
         trainer = pl.Trainer(callbacks=[checkpoint_callback], precision=16,gpus= len( opt.gpu_ids ), accelerator='ddp', max_epochs= 10000, progress_bar_refresh_rate=20)
     # trainer = pl.Trainer(gpus=4, accelerator='dp', max_epochs= 10000, progress_bar_refresh_rate=20)
 
-    
-
     trainer.fit(model, dm)
 
 else:
     print ('!!!!!!' + opt.name +'~!!!!!!!!')
-    if opt.name == 'tex' :
-        pass
+    if opt.name == 'texgan' :
+        checkpoint_path = '/data/home/us000042/lelechen/github/lighting/checkpoints/texgan_novgg_nocls/latest.ckpt'
+        
+        from model.model2 import TexGenerator as module
+
+        module = module(opt.loadSize, not opt.no_linearity, 
+            3, opt.code_n,opt.encoder_fc_n, o pt.ngf, 
+            opt.n_downsample_global, opt.n_blocks_global,opt.norm)
+    
+        checkpoint = torch.load(checkpoint_path)
+
+        def pl2normal(checkpoint):
+            state_dict = checkpoint
+            new_state_dict = OrderedDict()
+            for k, v in state_dict.items():
+                if 'discriminator' in k:
+                    continue
+                if 'vgg' in k :
+                    continue 
+                if 'cls' in k :
+                    continue 
+                name = k[10:]
+                new_state_dict[name] = v
+            return new_state_dict
+        
+        module.load_state_dict(pl2normal(checkpoint['state_dict']))
+
+        dm.setup()
+        testdata = dm.test_dataloader()
+        # testdata = random.shuffle(testdata)
+        opt.name = opt.name + '_test'
+        visualizer = Visualizer(opt)
+        l2loss = torch.nn.MSELoss()
+        for num,batch in enumerate(testdata):
+            
+            rec_tex_A= \
+            module(  batch['Atex'])
+            Atex = util.tensor2im(batch['Atex'][0])
+            Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
+            Atex = util.writeText(Atex, batch['A_path'][0])
+
+            tmp = batch['A_path'][0].split('/')
+            gt_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),batch['Amesh'].data[0] )
+            rec_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), rec_mesh_A.data[0])
+            visuals = OrderedDict([
+                ('Atex', Atex),
+                ('rec_tex_A', util.tensor2im(rec_tex_A.data[0]))
+                ])
+
+            visualizer.display_current_results(visuals, num, 1000000)
+
+
     elif opt.name =='texmesh':
         checkpoint_path = '/data/home/us000042/lelechen/github/lighting/lightning_logs/version_30/checkpoints/epoch=720-step=152851.ckpt'
         
