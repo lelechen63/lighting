@@ -118,8 +118,6 @@ else:
             Atex = util.writeText(Atex, batch['A_path'][0])
 
             tmp = batch['A_path'][0].split('/')
-            gt_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),batch['Amesh'].data[0] )
-            rec_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), rec_mesh_A.data[0])
             visuals = OrderedDict([
                 ('Atex', Atex),
                 ('rec_tex_A', util.tensor2im(rec_tex_A.data[0]))
