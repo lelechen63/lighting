@@ -81,8 +81,8 @@ else:
         
         from model.model2 import TexGenerator as module
 
-        module = module(opt.loadSize, not opt.no_linearity, 
-            3, opt.code_n,opt.encoder_fc_n, o pt.ngf, 
+        module = module(opt.loadSize, not opt.no_linearity,\
+            3, opt.code_n,opt.encoder_fc_n, o pt.ngf, \
             opt.n_downsample_global, opt.n_blocks_global,opt.norm)
     
         checkpoint = torch.load(checkpoint_path)
