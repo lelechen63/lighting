@@ -570,7 +570,7 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
                 'A_path': self.data_list[index], 
                 'Bmesh': torch.FloatTensor(B_vertices), 'B_path': os.path.join( B_id, 'models_reg' , B_exp),
                 'map_type':toss, 'Aid': int(A_id) - 1, 'Aexp': int(A_exp) -1,
-                'Bid':int(B_id) - 1, 'Bexp':int(B_exp.split('_')[0]) - 1, 'Aidmesh': Aidmesh, 'Bidmesh': Bidmesh }
+                'Bid':int(B_id) - 1, 'Bexp':int(B_exp.split('_')[0]) - 1, 'Aidmesh':  torch.FloatTensor(Aidmesh), 'Bidmesh': torch.FloatTensor(Bidmesh) }
 
         return input_dict
 
