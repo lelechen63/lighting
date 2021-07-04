@@ -546,6 +546,144 @@ class GraphConvMeshModule(pl.LightningModule):
             # self.trainer.save_checkpoint( os.path.join( self.ckpt_path, '%05d.ckpt'%self.current_epoch) )
             self.trainer.save_checkpoint( os.path.join( self.ckpt_path, 'latest.ckpt') )
 
+class DisGraphConvMeshModule(pl.LightningModule):
+    def __init__(self, opt ):
+        super().__init__()
+        self.save_hyperparameters()
+        self.opt = opt
+        input_nc = 3
+        homepath = './predef'
+        device = torch.device('cuda', 0)
+
+        template_fp = osp.join(homepath, 'meshmean.obj')
+
+        transform_fp = osp.join(homepath, 'transform.pkl')
+        if not osp.exists(transform_fp):
+            print('Generating transform matrices...')
+            mesh = Mesh(filename=template_fp)
+            ds_factors = [4, 4, 4, 4]
+            _, A, D, U, F = mesh_sampling.generate_transform_matrices(mesh, ds_factors)
+            tmp = {'face': F, 'adj': A, 'down_transform': D, 'up_transform': U}
+
+            with open(transform_fp, 'wb') as fp:
+                pickle.dump(tmp, fp)
+            print('Done!')
+            print('Transform matrices are saved in \'{}\''.format(transform_fp))
+        else:
+            with open(transform_fp, 'rb') as f:
+                tmp = pickle.load(f, encoding='latin1')
+
+        edge_index_list = [util.to_edge_index(adj).to(device) for adj in tmp['adj']]
+
+        down_transform_list = [
+            util.to_sparse(down_transform).to(device)
+            for down_transform in tmp['down_transform']
+        ]
+        up_transform_list = [
+            util.to_sparse(up_transform).to(device)
+            for up_transform in tmp['up_transform']
+        ]
+
+        self.generator = DisAE(3,
+                [16, 16, 16, 32],
+                256,
+                edge_index_list,
+                down_transform_list,
+                up_transform_list,
+                K=6)
+        
+        land_tex = './predef/landmark_indices.txt'
+        land_tex = open(land_tex, 'r')
+        Lines = land_tex.readlines()
+        self.land_inx = []
+        for line in Lines:
+            self.land_inx.append(int(line))
+        print(self.land_inx)
+        self.l1loss = torch.nn.L1Loss()
+        self.l2loss = torch.nn.MSELoss()
+        if not opt.no_cls_loss:
+            self.CLSloss = lossNet.CLSLoss(opt)
+
+        self.visualizer = Visualizer(opt)
+        self.ckpt_path = os.path.join(opt.checkpoints_dir, opt.name)
+    
+
+    def forward(self, A_mesh, B_mesh):
+        
+        return self.generator(A_mesh, B_mesh)
+    
+    def training_step(self, batch, batch_idx):
+        # self.batch = batch
+        # train generator
+        # generate images
+        print (batch['Amesh'].shape)
+        rec_mesh_A, rec_mesh_B, rec_mesh_AB, rec_mesh_BA, Aexp,Aid, Bexp, Bid = \
+        self(batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3), batch['Bmesh'].view(batch['Bmesh'].shape[0], -1, 3)) 
+        map_type = batch['map_type']
+
+        loss_code = 0
+
+        # regularization
+        loss_code += ( Aexp ** 2  ).mean() +(Aid ** 2).mean()
+        loss_code += ( Bexp ** 2  ).mean() +(Bid ** 2).mean()
+        
+        # mismatch loss
+        loss_mis = 0
+        if not self.opt.mismatch_loss:
+            for i in range(map_type.shape[0]):
+                if map_type[i] == 0: # same id, diff exp, mismatch is decided by exp
+                        loss_mis += self.l2loss(rec_mesh_AB[i].unsqueeze(0), batch['Bmesh'][i].unsqueeze(0).view(batch['Bmesh'].shape[0], -1, 3).detach()) * self.opt.lambda_feat * self.opt.lambda_mismatch
+                        loss_mis += self.l2loss(rec_mesh_BA[i].unsqueeze(0), batch['Amesh'][i].unsqueeze(0).view(batch['Amesh'].shape[0], -1, 3).detach()) * self.opt.lambda_feat* self.opt.lambda_mismatch
+                    else:
+                        loss_mis += self.l2loss(rec_mesh_AB[i].unsqueeze(0), batch['Amesh'][i].unsqueeze(0).view(batch['Amesh'].shape[0], -1, 3).detach()) * self.opt.lambda_feat* self.opt.lambda_mismatch
+                        loss_mis += self.l2loss(rec_mesh_BA[i].unsqueeze(0), batch['Bmesh'][i].unsqueeze(0).view(batch['Bmesh'].shape[0], -1, 3).detach()) * self.opt.lambda_feat* self.opt.lambda_mismatch
+            # reconstruction loss
+
+        # mesh loss
+        loss_mesh = 0
+        loss_mesh += self.l2loss(rec_mesh_A, batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).detach() )
+        loss_mesh += self.l2loss(rec_mesh_B, batch['Bmesh'].view(batch['Bmesh'].shape[0], -1, 3).detach() )
+
+        loss = loss_mesh + loss_code* 0.1 + loss_mis 
+        # loss = loss_id + loss_final
+        tqdm_dict = {'loss_mesh': loss_mesh, "loss_code" :loss_code, "loss_miss" :loss_mis }
+
+        # tqdm_dict = { 'loss_id': loss_id, 'loss_final': loss_final }
+        output = OrderedDict({
+            'loss': loss,
+            'progress_bar': tqdm_dict,
+            'log': tqdm_dict
+        })
+
+        errors = {k: v.data.item() if not isinstance(v, int) else v for k, v in tqdm_dict.items()}            
+        self.visualizer.print_current_errors(self.current_epoch, batch_idx, errors, 0)
+        self.visualizer.plot_current_errors(errors, batch_idx)
+        return output
+          
+    def configure_optimizers(self):
+        lr = self.opt.lr
+        opt_g = torch.optim.Adam(self.generator.parameters(), lr=lr, betas=(self.opt.beta1, 0.999))
+        # return [opt_g]
+        def lr_foo(epoch):
+            # if epoch < 10:
+            #     lr_scale = 0.8 ** (10 - epoch)
+            # else:
+            lr_scale = 0.95 ** int(epoch/10)
+            if lr_scale < 0.08:
+                lr_scale = 0.08
+            return lr_scale
+        scheduler = torch.optim.lr_scheduler.LambdaLR(opt_g, lr_lambda=lr_foo )
+                        
+
+        return [opt_g], [scheduler]
+    
+
+
+    def on_epoch_end(self):
+        if self.current_epoch % 5 == 0:
+            # print ('!!!!!save model')
+            # self.trainer.save_checkpoint( os.path.join( self.ckpt_path, '%05d.ckpt'%self.current_epoch) )
+            self.trainer.save_checkpoint( os.path.join( self.ckpt_path, 'latest.ckpt') )
 
 class  TexMeshDecoder(nn.Module):
     def __init__(self,  tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
@@ -626,37 +764,16 @@ class  TexMeshDecoder(nn.Module):
         model += [nn.ReflectionPad2d(3), nn.Conv2d(ngf, 3, kernel_size=7, padding=0), nn.Tanh()]    
         self.output_layer = nn.Sequential(*model)
 
-    # def forward(self, id_code, exp_code):
-    #     exp_fea = self.exp_dec(exp_code)
-    #     id_fea = self.identity_dec(id_code)
-    #     feature = torch.cat([exp_fea, id_fea], axis = 1)
-    #     rec_mesh = self.mesh_fc_dec(feature)
-
-    #     tex_dec = self.tex_fc_dec(feature)
-    #     # tex_dec = tex_dec.unsqueeze(2).unsqueeze(3).repeat(1, 1, int(self.tex_shape / 128),int(self.tex_shape / 128)) # not sure 
-        
-    #     tex_dec = tex_dec.view(tex_dec.shape[0], -1, 4,4) # not sure 
-
-    #     decoded = self.tex_decoder(tex_dec)
-    #     rec_tex = self.output_layer(decoded)
-    #     return rec_tex, rec_mesh
+   
 
     def forward(self, tex_code, mesh_code):
-        # exp_fea = self.exp_dec(exp_code)
-        # id_fea = self.identity_dec(id_code)
-        # feature = torch.cat([exp_fea, id_fea], axis = 1)
+       
         rec_mesh = self.mesh_fc_dec(mesh_code)
-
-        # tex_dec = self.tex_fc_dec(tex_code)
-        # tex_dec = tex_dec.unsqueeze(2).unsqueeze(3).repeat(1, 1, int(self.tex_shape / 128),int(self.tex_shape / 128)) # not sure 
-        
         tex_dec = tex_code.view(tex_code.shape[0], -1, 4,4) # not sure 
 
         decoded = self.tex_decoder(tex_dec)
         rec_tex = self.output_layer(decoded)
         return rec_tex, rec_mesh   
-
-
 
 class TexGenerator(nn.Module):
     def __init__(self, tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
@@ -795,6 +912,8 @@ class TexMeshModule(pl.LightningModule):
                 lr_scale = 0.8 ** (10 - epoch)
             else:
                 lr_scale = 0.95 ** int(epoch/10)
+            if lr_scale < 0.08:
+                lr_scale == 0.08
             return lr_scale
         scheduler = torch.optim.lr_scheduler.LambdaLR(
             opt_g,
@@ -803,12 +922,7 @@ class TexMeshModule(pl.LightningModule):
 
         return [opt_g], [scheduler]
     
-    # def optimizer_step(self, epoch_nb, batch_nb, optimizer, optimizer_i, opt_closure):
-    #     if self.trainer.global_step > 30:
-    #         for pg in optimizer.param_groups:
-    #             pg['lr'] = 0.8 * self.opt.lr
-    #     optimizer.step()
-    #     optimizer.zero_grad()
+   
 
     def on_epoch_end(self):
         if self.current_epoch % 10 == 0:
@@ -915,6 +1029,8 @@ class TexModule(pl.LightningModule):
                 lr_scale = 0.8 ** (10 - epoch)
             else:
                 lr_scale = 0.95 ** int(epoch/10)
+            if lr_scale < 0.08:
+                lr_scale = 0.08
             return lr_scale
         scheduler = torch.optim.lr_scheduler.LambdaLR(
             opt_g,
