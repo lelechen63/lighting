@@ -629,6 +629,7 @@ class DisGraphConvMeshModule(pl.LightningModule):
         
         # mismatch loss
         loss_mis = 0
+        print (rec_mesh_AB.shape, batch['Bmesh'].shape, )
         if not self.opt.no_mismatch_loss:
             for i in range(map_type.shape[0]):
                 if map_type[i] == 0: # same id, diff exp, mismatch is decided by exp
