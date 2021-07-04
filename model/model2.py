@@ -724,7 +724,7 @@ class DisGraphConvMeshModule2(pl.LightningModule):
             for up_transform in tmp['up_transform']
         ]
 
-        self.generator = DisAE(3,
+        self.generator = DisAE2(3,
                 [16, 16, 16, 32],
                 256,
                 edge_index_list,
