@@ -46,6 +46,9 @@ elif opt.name == 'disgmesh' :
     from model.model2 import DisGraphConvMeshModule as module 
     opt.datasetname = "fs_mesh"
 
+elif opt.name == 'disgmesh2' :
+    from model.model2 import DisGraphConvMeshModule2 as module 
+    opt.datasetname = "fs_mesh"
 totalmeanmesh = torch.FloatTensor( np.load( "./predef/meanmesh.npy" ) ) 
 totalstdmesh = np.load( "./predef/meshstd.npy" )
 
