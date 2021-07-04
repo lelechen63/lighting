@@ -163,8 +163,8 @@ class DisAE(nn.Module):
                             **kwargs))
         # self.en_layers.append(
         #     nn.Linear(self.num_vert * out_channels[-1], latent_channels))
-        self.idenc = nn.ModuleList(nn.Linear(self.num_vert * out_channels[-1], latent_channels))
-        self.expenc = nn.ModuleList(nn.Linear(self.num_vert * out_channels[-1], latent_channels))
+        self.idenc = nn.Sequential(nn.Linear(self.num_vert * out_channels[-1], latent_channels))
+        self.expenc = nn.Sequential(nn.Linear(self.num_vert * out_channels[-1], latent_channels))
 
         # decoder
         self.de_layers = nn.ModuleList()
