@@ -770,6 +770,8 @@ class DisGraphConvMeshModule2(pl.LightningModule):
         # mesh loss
         loss_mesh = 0
         loss_mesh += self.l2loss(rec_mesh_A, batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).detach() )
+        
+        print (idA.shape, batch['Aid'].shape)
         loss_mesh += self.l2loss(idA, batch['Aid'].view(batch['Aid'].shape[0], -1, 3).detach() )
 
         loss = loss_mesh + loss_code* 0.1 + loss_mis 
