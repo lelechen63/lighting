@@ -236,7 +236,7 @@ class DisAE(nn.Module):
 class DisAE2(nn.Module):
     def __init__(self, in_channels, out_channels, latent_channels, edge_index,
                  down_transform, up_transform, K, **kwargs):
-        super(DisAE, self).__init__()
+        super(DisAE2, self).__init__()
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.edge_index = edge_index
