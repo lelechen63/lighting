@@ -343,7 +343,7 @@ class DisAE2(nn.Module):
             else:
                 # last layer
                 exp = layer(exp, self.edge_index[0])
-        fianl = x + exp 
+        final = x + exp 
         return final, x
 
     def forward(self, A):
