@@ -633,11 +633,11 @@ class DisGraphConvMeshModule(pl.LightningModule):
         if not self.opt.no_mismatch_loss:
             for i in range(map_type.shape[0]):
                 if map_type[i] == 0: # same id, diff exp, mismatch is decided by exp
-                    loss_mis += self.l2loss(rec_mesh_AB[i].unsqueeze(0), batch['Bmesh'][i].unsqueeze(0).view(batch['Bmesh'].shape[0], -1, 3).detach()) * self.opt.lambda_feat * self.opt.lambda_mismatch
-                    loss_mis += self.l2loss(rec_mesh_BA[i].unsqueeze(0), batch['Amesh'][i].unsqueeze(0).view(batch['Amesh'].shape[0], -1, 3).detach()) * self.opt.lambda_feat* self.opt.lambda_mismatch
+                    loss_mis += self.l2loss(rec_mesh_AB[i].unsqueeze(0), batch['Bmesh'][i].unsqueeze(0).view(1, -1, 3).detach()) * self.opt.lambda_feat * self.opt.lambda_mismatch
+                    loss_mis += self.l2loss(rec_mesh_BA[i].unsqueeze(0), batch['Amesh'][i].unsqueeze(0).view(1, -1, 3).detach()) * self.opt.lambda_feat* self.opt.lambda_mismatch
                 else:
-                    loss_mis += self.l2loss(rec_mesh_AB[i].unsqueeze(0), batch['Amesh'][i].unsqueeze(0).view(batch['Amesh'].shape[0], -1, 3).detach()) * self.opt.lambda_feat* self.opt.lambda_mismatch
-                    loss_mis += self.l2loss(rec_mesh_BA[i].unsqueeze(0), batch['Bmesh'][i].unsqueeze(0).view(batch['Bmesh'].shape[0], -1, 3).detach()) * self.opt.lambda_feat* self.opt.lambda_mismatch
+                    loss_mis += self.l2loss(rec_mesh_AB[i].unsqueeze(0), batch['Amesh'][i].unsqueeze(0).view(1, -1, 3).detach()) * self.opt.lambda_feat* self.opt.lambda_mismatch
+                    loss_mis += self.l2loss(rec_mesh_BA[i].unsqueeze(0), batch['Bmesh'][i].unsqueeze(0).view(1, -1, 3).detach()) * self.opt.lambda_feat* self.opt.lambda_mismatch
             # reconstruction loss
 
         # mesh loss

@@ -202,7 +202,6 @@ class DisAE(nn.Module):
             # else:
         
         x = x.view(x.shape[0], -1)
-        print (x.shape)
         expcode = self.expenc(x)
         idcode = self.idenc(x)
         return expcode, idcode
