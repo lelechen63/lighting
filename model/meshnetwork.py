@@ -201,7 +201,8 @@ class DisAE(nn.Module):
                 x = layer(x, self.edge_index[i], self.down_transform[i])
             # else:
         
-        x = x.view(-1, layer.weight.size(1))
+        x = x.view(x.shape[0], -1)
+        print (x.shape)
         expcode = self.expenc(x)
         idcode = self.idenc(x)
         return expcode, idcode
