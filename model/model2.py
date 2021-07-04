@@ -774,7 +774,7 @@ class DisGraphConvMeshModule2(pl.LightningModule):
         print (idA.shape, batch['Aidmesh'].shape)
         loss_mesh += self.l2loss(idA, batch['Aidmesh'].view(batch['Aidmesh'].shape[0], -1, 3).detach() )
 
-        loss = loss_mesh + loss_code* 0.1 + loss_mis 
+        loss = loss_mesh + loss_code* 0.1 
         tqdm_dict = {'loss_mesh': loss_mesh, "loss_code" :loss_code }
 
         output = OrderedDict({
