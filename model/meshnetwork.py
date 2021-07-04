@@ -274,9 +274,9 @@ class DisAE2(nn.Module):
                     Deblock(out_channels[-idx], out_channels[-idx - 1], K,
                             **kwargs))
         # reconstruction
-        self.idde_layers.append(
+        self.de_layers.append(
             ChebConv(out_channels[0], in_channels, K, **kwargs))
-
+        # decoder
         self.idde_layers = nn.ModuleList()
         self.idde_layers.append(
             nn.Linear(latent_channels , self.num_vert * out_channels[-1]))
