@@ -354,4 +354,4 @@ class DisAE2(nn.Module):
         # outB, idB = self.decoder(Bexp,Bid)
         # outAB = self.decoder(Bexp,Aid)
         # outBA = self.decoder(Aexp,Bid)
-        return outA, idA # outB , outAB, outBA, Aexp, Aid, Bexp, Bid
+        return outA, idA, Aexp, Aid # outB , outAB, outBA, Aexp, Aid, Bexp, Bid

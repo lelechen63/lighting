@@ -757,14 +757,14 @@ class DisGraphConvMeshModule2(pl.LightningModule):
         # train generator
         # generate images
         print (batch['Amesh'].shape)
-        rec_mesh_A, idA = \
+        rec_mesh_A, idA, Aexpcode, Aidcode = \
         self(batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3)) 
         map_type = batch['map_type']
 
         loss_code = 0
 
         # regularization
-        loss_code += ( Aexp ** 2  ).mean() +(Aid ** 2).mean()
+        loss_code += ( Aexpcode ** 2  ).mean() +(Aidcode ** 2).mean()
         
    
         # mesh loss
