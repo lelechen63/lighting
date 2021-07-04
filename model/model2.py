@@ -748,9 +748,9 @@ class DisGraphConvMeshModule2(pl.LightningModule):
         self.ckpt_path = os.path.join(opt.checkpoints_dir, opt.name)
     
 
-    def forward(self, A_mesh, B_mesh):
+    def forward(self, A_mesh):
         
-        return self.generator(A_mesh, B_mesh)
+        return self.generator(A_mesh)
     
     def training_step(self, batch, batch_idx):
         # self.batch = batch
