@@ -795,6 +795,7 @@ class MeshTexGenerator(nn.Module):
         out_channels = [16, 16, 16, 32]
         in_channels = 3
         K = 6
+        self.latent_channels = 256
         self.in_channels = in_channels
         self.out_channels = out_channels 
         self.edge_index = edge_index_list
@@ -814,12 +815,12 @@ class MeshTexGenerator(nn.Module):
                     Enblock(out_channels[idx - 1], out_channels[idx], K
                             ))
         self.en_layers.append(
-            nn.Linear(self.num_vert * out_channels[-1], latent_channels))
+            nn.Linear(self.num_vert * out_channels[-1], self.latent_channels))
 
         # decoder
         self.de_layers = nn.ModuleList()
         self.de_layers.append(
-            nn.Linear(latent_channels, self.num_vert * out_channels[-1]))
+            nn.Linear(self.latent_channels, self.num_vert * out_channels[-1]))
         for idx in range(len(out_channels)):
             if idx == 0:
                 self.de_layers.append(
@@ -833,12 +834,12 @@ class MeshTexGenerator(nn.Module):
             ChebConv(out_channels[0], in_channels, K))
 
         self.codeEnc = nn.Sequential(
-            nn.Linear(latent_channels *2, latent_channels),   
-            nn.Linear(latent_channels *2, latent_channels)
+            nn.Linear(self.latent_channels *2, self.latent_channels),   
+            nn.Linear(self.latent_channels *2, self.latent_channels)
         )
         self.codeDec = nn.Sequential(
-            nn.Linear(latent_channels , latent_channels),   
-            nn.Linear(latent_channels , latent_channels * 2)
+            nn.Linear(self.latent_channels , self.latent_channels),   
+            nn.Linear(self.latent_channels , self.latent_channels * 2)
         )
 
         self.reset_parameters()
