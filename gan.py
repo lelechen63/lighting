@@ -44,14 +44,10 @@ opt = TrainOptions().parse()
 
 opt.datasetname = "fs_texmesh"
 
-if opt.name == 'tex' :
-    from model.model2 import TexModule as module 
-if opt.name == 'mesh' :
-    from model.model2 import MeshModule as module 
-elif opt.name == 'texmesh':
-    from model.model2 import TexMeshModule as module 
-elif opt.name == 'texmeshreal':
-    from model.model import TexMeshModule as module 
+if  opt.name == 'meshtexgan':
+    from model.model2 import MeshTexGANModule as module 
+    opt.datasetname = "fs_meshtex"
+    print('********')
 elif opt.name == 'texgan':
     from model.model2 import TexGANModule as module 
     opt.datasetname = "fs_tex"

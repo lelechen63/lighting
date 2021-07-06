@@ -18,6 +18,10 @@ from util.render_class import meshrender
 from model.meshnetwork import *
 from util import  mesh_sampling
 import pickle
+from model.conv import ChebConv
+from .inits import reset
+from torch_scatter import scatter_add
+
 # pickle.dump(some_object)
 
 def get_norm_layer(norm_type='instance'):
@@ -28,104 +32,6 @@ def get_norm_layer(norm_type='instance'):
     else:
         raise NotImplementedError('normalization layer [%s] is not found' % norm_type)
     return norm_layer
-
-class TexMeshEncoder(nn.Module):
-    def __init__(self,  tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
-                ngf=64, n_downsampling=5, n_blocks=4, norm_layer= nn.BatchNorm2d, \
-                padding_type='reflect'):
-        super().__init__()
-        self.tex_shape = tex_shape
-        activation = nn.ReLU(True)
-
-        # print (tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
-        #         ngf, n_downsampling, n_blocks, norm_layer, \
-        #         padding_type )
-        # print('!!!!!!!!!!!!!!!')
-        
-        self.CNNencoder = nn.Sequential(
-            nn.ReflectionPad2d(3), nn.Conv2d(input_nc, ngf, kernel_size=7, padding=0),
-            norm_layer(ngf), 
-            nn.ReLU(True),  
-            nn.Conv2d(ngf , ngf  * 2, kernel_size=3, stride=2, padding=1),
-            norm_layer(ngf  * 2),
-            nn.ReLU(True),  # 2
-
-            # nn.Conv2d( ngf * 2, ngf  * 2, kernel_size=3, stride=2, padding=1),
-            # norm_layer(ngf  * 2),
-            # nn.ReLU(True),  #4
-
-            nn.Conv2d(ngf*2 , ngf  * 4, kernel_size=3, stride=2, padding=1),
-            norm_layer(ngf  * 4),
-            nn.ReLU(True), # 8
-
-            nn.Conv2d(ngf*4 , ngf  * 4, kernel_size=3, stride=2, padding=1),
-            norm_layer(ngf  * 4),
-            nn.ReLU(True), # 16
-
-            nn.Conv2d(ngf*4 , ngf  * 8, kernel_size=3, stride=2, padding=1),
-            norm_layer(ngf  * 8),
-            nn.ReLU(True),  #32
-
-            nn.Conv2d(ngf*8 , ngf  * 8, kernel_size=3, stride=2, padding=1),
-            norm_layer(ngf  * 8),
-            nn.ReLU(True),  #64
-
-            nn.Conv2d(ngf*8 , ngf  * 16, kernel_size=3, stride=2, padding=1),
-            norm_layer(ngf  * 16),
-            nn.ReLU(True),  #128
-            # nn.Conv2d(ngf*16 , ngf  * 16, kernel_size=3, stride=2, padding=1),
-            # norm_layer(ngf  * 16),
-            # nn.ReLU(True),  #4
-        )
-        self.meshencoder = nn.Sequential(
-            nn.Linear( 78951, ngf*2),
-            nn.ReLU(True),
-            nn.Linear( ngf*2, ngf*2),
-            nn.ReLU(True),
-            nn.Linear( ngf*2, ngf*2),
-            nn.ReLU(True),
-            nn.Linear( ngf*2, ngf*2),
-            nn.ReLU(True),
-            nn.Linear( ngf*2, ngf*4),
-            nn.ReLU(True)
-            )
-
-        self.enc_input_size = int(ngf * 16 * self.tex_shape/128 * self.tex_shape/128  + ngf * 4)
-        # self.identity_enc = nn.Sequential(
-        #     nn.Linear( self.enc_input_size, ngf*4),
-        #     nn.ReLU(True),
-        #     nn.Linear( ngf*4, ngf*4),
-        #     nn.ReLU(True),
-        #     nn.Linear( ngf*4, ngf*4),
-        #     nn.ReLU(True),
-        #     nn.Linear( ngf*4,code_n),
-        #     nn.ReLU(True),
-        #     )
-
-        # self.expression_enc = nn.Sequential(
-        #     nn.Linear( self.enc_input_size, ngf*4),
-        #     nn.ReLU(True),
-        #     nn.Linear( ngf*4, ngf*4),
-        #     nn.ReLU(True),
-        #     nn.Linear( ngf*4, ngf*4),
-        #     nn.ReLU(True),
-        #     nn.Linear( ngf*4,code_n),
-        #     nn.ReLU(True),
-        #     )
-        model = []
-        for i in range(n_blocks):
-            model += [ResnetBlock(ngf * 16, padding_type=padding_type, activation=activation, norm_layer=norm_layer)]
-        self.resblocks = nn.Sequential(*model)
-    def forward(self, tex, mesh):
-        tex_encoded = self.CNNencoder(tex)
-        tex_encoded = self.resblocks(tex_encoded).view(tex_encoded.shape[0], -1)
-        mesh_encoded = self.meshencoder(mesh)
-        # encoded= torch.cat([mesh_encoded, tex_encoded], 1)
-        
-        # identity_code = self.identity_enc(encoded)
-        # expression_code = self.expression_enc(encoded)
-        # return identity_code, expression_code
-        return tex_encoded, mesh_encoded
 
 
 
@@ -250,7 +156,6 @@ class GraphConvMeshModule(pl.LightningModule):
         super().__init__()
         self.save_hyperparameters()
         self.opt = opt
-        input_nc = 3
         homepath = './predef'
         device = torch.device('cuda', 0)
 
@@ -282,30 +187,8 @@ class GraphConvMeshModule(pl.LightningModule):
             util.to_sparse(up_transform).to(device)
             for up_transform in tmp['up_transform']
         ]
-
-        self.generator = AE(3,
-                [16, 16, 16, 32],
-                256,
-                edge_index_list,
-                down_transform_list,
-                up_transform_list,
-                K=6)
         
-        land_tex = './predef/landmark_indices.txt'
-        land_tex = open(land_tex, 'r')
-        Lines = land_tex.readlines()
-        self.land_inx = []
-        for line in Lines:
-            self.land_inx.append(int(line))
-        print(self.land_inx)
-        self.l1loss = torch.nn.L1Loss()
-        self.l2loss = torch.nn.MSELoss()
-        if not opt.no_cls_loss:
-            self.CLSloss = lossNet.CLSLoss(opt)
 
-        self.visualizer = Visualizer(opt)
-        self.ckpt_path = os.path.join(opt.checkpoints_dir, opt.name)
-    
 
     def forward(self, A_mesh):
         
@@ -634,6 +517,117 @@ class DisGraphConvMeshModule2(pl.LightningModule):
         if self.current_epoch % 5 == 0:
             self.trainer.save_checkpoint( os.path.join( self.ckpt_path, 'latest.ckpt') )
 
+class  TexMeshDecoder(nn.Module):
+    def __init__(self,  tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+                ngf=64, n_downsampling=5, n_blocks=4, norm_layer = nn.BatchNorm2d, \
+                padding_type='reflect'):
+        super().__init__()
+
+        self.tex_shape = tex_shape
+        activation = nn.ReLU(True)   
+        # self.identity_dec = nn.Sequential(
+        #     nn.Linear( code_n, ngf*4),
+        #     nn.ReLU(True),
+        #     nn.Linear( ngf*4, ngf*4),
+        #     nn.ReLU(True),
+        #     # nn.Linear( ngf*4, ngf*4),
+        #     # nn.ReLU(True),
+        #     nn.Linear( ngf*4,ngf*4),
+        #     nn.ReLU(True),
+        #     )
+        # self.exp_dec = nn.Sequential(
+        #     nn.Linear( code_n, ngf*4),
+        #     nn.ReLU(True),
+        #     nn.Linear( ngf*4, ngf*4),
+        #     nn.ReLU(True),
+        #     # nn.Linear( ngf*4, ngf*4),
+        #     # nn.ReLU(True),
+        #     nn.Linear( ngf*4,ngf*4),
+        #     nn.ReLU(True),
+        #     )
+        self.tex_fc_dec = nn.Sequential(
+            nn.Linear( ngf*4 * 2, ngf*16 * 4 * 4),
+            nn.ReLU(True)
+            )
+        self.mesh_fc_dec = nn.Sequential(
+            nn.Linear( ngf*4, ngf*4),
+            nn.ReLU(True),
+            nn.Linear( ngf*4, ngf*4),
+            nn.ReLU(True),
+            nn.Linear( ngf*4, ngf*4),
+            nn.ReLU(True),
+            nn.Linear( ngf*4, 78951),
+            )
+        ### upsample
+
+        self.tex_decoder = nn.Sequential(
+            # nn.ConvTranspose2d(ngf * 16, ngf * 16, kernel_size=3, stride=2, padding=1, output_padding=1),
+            # norm_layer(ngf * 16), 
+            # nn.ReLU(True),
+            nn.ConvTranspose2d(ngf * 16, ngf * 8, kernel_size=3, stride=2, padding=1, output_padding=1),
+            norm_layer(ngf * 8), 
+            nn.ReLU(True), #2
+
+            # nn.ConvTranspose2d(ngf * 8, ngf * 8, kernel_size=3, stride=2, padding=1, output_padding=1),
+            # norm_layer(ngf * 8), 
+            # nn.ReLU(True), #4
+
+            nn.ConvTranspose2d(ngf * 8, ngf * 4, kernel_size=3, stride=2, padding=1, output_padding=1),
+            norm_layer(ngf * 4), 
+            nn.ReLU(True), #8
+
+            nn.ConvTranspose2d(ngf * 4, ngf * 4, kernel_size=3, stride=2, padding=1, output_padding=1),
+            norm_layer(ngf * 4), 
+            nn.ReLU(True), #16
+
+            nn.ConvTranspose2d(ngf * 4, ngf * 2, kernel_size=3, stride=2, padding=1, output_padding=1),
+            norm_layer(ngf * 2), 
+            nn.ReLU(True), #32
+
+            nn.ConvTranspose2d(ngf * 2, ngf * 2, kernel_size=3, stride=2, padding=1, output_padding=1),
+            norm_layer(ngf * 2), 
+            nn.ReLU(True), #64
+
+            nn.ConvTranspose2d(ngf * 2, ngf , kernel_size=3, stride=2, padding=1, output_padding=1),
+            norm_layer(ngf), 
+            nn.ReLU(True), #128
+        )
+        model = []
+        model += [nn.ReflectionPad2d(3), nn.Conv2d(ngf, 3, kernel_size=7, padding=0), nn.Tanh()]    
+        self.output_layer = nn.Sequential(*model)
+
+   
+
+    def forward(self, tex_code, mesh_code):
+       
+        rec_mesh = self.mesh_fc_dec(mesh_code)
+        tex_dec = tex_code.view(tex_code.shape[0], -1, 4,4) # not sure 
+
+        decoded = self.tex_decoder(tex_dec)
+        rec_tex = self.output_layer(decoded)
+        return rec_tex, rec_mesh   
+
+class TexGenerator(nn.Module):
+    def __init__(self, tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+                ngf=64, n_downsampling=5, n_blocks=4, norm_layer='batch', \
+                padding_type='reflect'):
+        super().__init__()
+        norm_layer = get_norm_layer(norm_type=norm_layer)  
+
+        self.texEnc = TexEncoder(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+                ngf, n_downsampling, n_blocks, norm_layer, padding_type)
+
+        self.texDec = TexDecoder(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+                ngf, n_downsampling, n_blocks, norm_layer, padding_type)
+    def forward(self, A_tex ):
+        
+        tex_code = self.texEnc(A_tex)
+
+        # reconstruction
+        rec_tex_A = self.texDec(tex_code)
+        return rec_tex_A
+
+
 class TexGANModule(pl.LightningModule):
     def __init__(self, opt ):
         super().__init__()
@@ -737,10 +731,266 @@ class TexGANModule(pl.LightningModule):
 
             Atex = util.tensor2im(batch['Atex'][0])
             
-            # print (Atex.shape)
-            # print (self.totalmeantex.shape)
+            Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
+            Atex = util.writeText(Atex, batch['A_path'][0])
+            rec_tex_A_vis = util.tensor2im(rec_tex_A.data[0])
+            # rec_tex_A_vis = rec_tex_A_vis + self.totalmeantex
+            # rec_tex_A_vis = np.ascontiguousarray(rec_tex_A_vis, dtype=np.uint8)
+            # rec_tex_A_vis = np.clip(rec_tex_A_vis, 0, 255)
+            visuals = OrderedDict([
+            ('Atex', Atex),
+            ('rec_tex_A', rec_tex_A_vis ),
+        
+            ])
+       
+            self.visualizer.display_current_results(visuals, self.current_epoch, 1000000) 
 
-            # Atex = Atex + self.totalmeantex
+            self.trainer.save_checkpoint( os.path.join( self.ckpt_path, 'latest.ckpt') )
+
+class MeshTexGenerator(nn.Module):
+    def __init__(self, tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+                ngf=64, n_downsampling=5, n_blocks=4, norm_layer='batch', \
+                padding_type='reflect'):
+        super().__init__()
+        norm_layer = get_norm_layer(norm_type=norm_layer)  
+
+        self.texEnc = TexEncoder(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+                ngf, n_downsampling, n_blocks, norm_layer, padding_type)
+
+        self.texDec = TexDecoder(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+                ngf, n_downsampling, n_blocks, norm_layer, padding_type)
+
+        # define the mesh part
+        homepath = './predef'
+        device = torch.device('cuda', 0)
+
+        template_fp = osp.join(homepath, 'meshmean.obj')
+
+        transform_fp = osp.join(homepath, 'transform.pkl')
+        if not osp.exists(transform_fp):
+            print('Generating transform matrices...')
+            mesh = Mesh(filename=template_fp)
+            ds_factors = [4, 4, 4, 4]
+            _, A, D, U, F = mesh_sampling.generate_transform_matrices(mesh, ds_factors)
+            tmp = {'face': F, 'adj': A, 'down_transform': D, 'up_transform': U}
+
+            with open(transform_fp, 'wb') as fp:
+                pickle.dump(tmp, fp)
+            print('Done!')
+            print('Transform matrices are saved in \'{}\''.format(transform_fp))
+        else:
+            with open(transform_fp, 'rb') as f:
+                tmp = pickle.load(f, encoding='latin1')
+
+        edge_index_list = [util.to_edge_index(adj).to(device) for adj in tmp['adj']]
+
+        down_transform_list = [
+            util.to_sparse(down_transform).to(device)
+            for down_transform in tmp['down_transform']
+        ]
+        up_transform_list = [
+            util.to_sparse(up_transform).to(device)
+            for up_transform in tmp['up_transform']
+        ]
+
+        self.in_channels = 3
+        self.out_channels = [16, 16, 16, 32]
+        self.edge_index = edge_index_list
+        self.down_transform = down_transform_list
+        self.up_transform = up_transform_list
+        # self.num_vert used in the last and the first layer of encoder and decoder
+        self.num_vert = self.down_transform[-1].size(0)
+
+        # encoder
+        self.en_layers = nn.ModuleList()
+        for idx in range(len(out_channels)):
+            if idx == 0:
+                self.en_layers.append(
+                    Enblock(in_channels, out_channels[idx], K, **kwargs))
+            else:
+                self.en_layers.append(
+                    Enblock(out_channels[idx - 1], out_channels[idx], K,
+                            **kwargs))
+        self.en_layers.append(
+            nn.Linear(self.num_vert * out_channels[-1], latent_channels))
+
+        # decoder
+        self.de_layers = nn.ModuleList()
+        self.de_layers.append(
+            nn.Linear(latent_channels, self.num_vert * out_channels[-1]))
+        for idx in range(len(out_channels)):
+            if idx == 0:
+                self.de_layers.append(
+                    Deblock(out_channels[-idx - 1], out_channels[-idx - 1], K,
+                            **kwargs))
+            else:
+                self.de_layers.append(
+                    Deblock(out_channels[-idx], out_channels[-idx - 1], K,
+                            **kwargs))
+        # reconstruction
+        self.de_layers.append(
+            ChebConv(out_channels[0], in_channels, K, **kwargs))
+
+        self.codeEnc = nn.Sequential(
+            nn.Linear(latent_channels *2, latent_channels),   
+            nn.Linear(latent_channels *2, latent_channels)
+        )
+        self.codeDec = nn.Sequential(
+            nn.Linear(latent_channels , latent_channels),   
+            nn.Linear(latent_channels , latent_channels * 2)
+        )
+
+        self.reset_parameters()
+
+    def reset_parameters(self):
+        for name, param in self.named_parameters():
+            if 'bias' in name:
+                nn.init.constant_(param, 0)
+            else:
+
+
+        
+    def meshencoder(self, x):
+        # self.edge_index = self.edge_index.type_as(x)
+        # self.down_transform = self.down_transform.type_as(x)
+        for i, layer in enumerate(self.en_layers):
+            if i != len(self.en_layers) - 1:
+                x = layer(x, self.edge_index[i], self.down_transform[i])
+            else:
+                x = x.view(-1, layer.weight.size(1))
+                x = layer(x)
+        return x
+
+    def meshdecoder(self, x):
+        
+
+        num_layers = len(self.de_layers)
+        num_deblocks = num_layers - 2
+        for i, layer in enumerate(self.de_layers):
+            if i == 0:
+                x = layer(x)
+                x = x.view(-1, self.num_vert, self.out_channels[-1])
+            elif i != num_layers - 1:
+                x = layer(x, self.edge_index[num_deblocks - i],
+                          self.up_transform[num_deblocks - i])
+            else:
+                # last layer
+                x = layer(x, self.edge_index[0])
+        return x
+    def forward(self, A_tex, A_mesh ):
+        
+        # encode
+        tex_code = self.texEnc(A_tex)
+        mesh_code = self.meshencoder(A_mesh)
+
+        # code transfer
+        code = self.codeEnc(torch.cat([tex_code, mesh_code], 1))
+        reccode = self.codeDec(code)
+        rectex_code = reccode[:, :self.latent_channels]
+        recmesh_code = reccode[:,self.latent_channels:]
+
+        # reconstruction
+        rec_tex_A = self.texDec(rectex_code)
+        rec_mesh_A = self.meshdecoder(recmesh_code)
+
+        return rec_tex_A, rec_mesh_A, code
+
+class MeshTexGANModule(pl.LightningModule):
+    def __init__(self, opt ):
+        super().__init__()
+        self.opt = opt
+        input_nc = 3
+        # networks
+        self.generator = MeshTexGenerator(opt.loadSize, not opt.no_linearity, 
+            input_nc, opt.code_n,opt.encoder_fc_n, opt.ngf, 
+            opt.n_downsample_global, opt.n_blocks_global,opt.norm)
+
+        self.discriminator = MultiscaleDiscriminator(input_nc = 6)   
+
+        self.l1loss = torch.nn.L1Loss()
+        self.l2loss = torch.nn.MSELoss()
+        self.GANloss = lossNet.GANLoss()
+        self.visualizer = Visualizer(opt)
+        self.totalmeantex = np.load( "./predef/meantex.npy" )
+        self.ckpt_path = os.path.join(opt.checkpoints_dir, opt.name)
+        
+        
+    def forward(self, A_tex, A_mesh):
+        return self.generator(A_tex, A_mesh)
+    
+    def training_step(self, batch, batch_idx, optimizer_idx):
+        self.batch = batch
+        # train generator
+        # generate images
+        rec_tex_A, rec_mesh_A, code = \
+        self(batch['Atex'], batch['Amesh'] )
+        map_type = batch['map_type']
+
+        if optimizer_idx ==0:       
+            
+            # pix loss
+            loss_G_pix = 0
+            # reconstruction loss
+            if not self.opt.no_pix_loss:
+                loss_G_pix += self.l1loss(rec_tex_A, batch['Atex']) * self.opt.lambda_pix
+
+            loss_code = 0
+
+            # regularization
+            loss_code = ( code ** 2 ).mean()
+            
+            loss_mesh = self.l2loss(rec_mesh_A, batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).detach() )
+            # gan loss
+            g_loss = self.GANloss(self.discriminator(  torch.cat((batch['Atex'], rec_tex_A), dim=1) ), True)
+
+            loss = loss_G_pix   + loss_mesh + g_loss + loss_code * 0.1
+            tqdm_dict = {'loss_pix': loss_G_pix, , 'loss_mesh': loss_mesh, 'loss_GAN': g_loss, 'loss_code': loss_code }
+            output = OrderedDict({
+                'loss': loss,
+                'progress_bar': tqdm_dict,
+                'log': tqdm_dict
+            })
+
+            errors = {k: v.data.item() if not isinstance(v, int) else v for k, v in tqdm_dict.items()}            
+            self.visualizer.print_current_errors(self.current_epoch, batch_idx, errors, 0)
+            self.visualizer.plot_current_errors(errors, batch_idx)
+            return output
+        if optimizer_idx == 1:
+
+            real_loss = self.GANloss(self.discriminator( torch.cat((batch['Atex'], batch['Atex']), dim=1)), True)
+            fake_loss = self.GANloss( self.discriminator( torch.cat((batch['Atex'], rec_tex_A.detach() ), dim = 1) ), False)
+
+            # discriminator loss is the average of these
+            d_loss = (real_loss + fake_loss) / 2
+            tqdm_dict = {'d_loss': d_loss}
+            output = OrderedDict({
+                'loss': d_loss,
+                'progress_bar': tqdm_dict,
+                'log': tqdm_dict
+            })
+
+            errors = {k: v.data.item() if not isinstance(v, int) else v for k, v in tqdm_dict.items()}            
+            self.visualizer.print_current_errors(self.current_epoch, batch_idx, errors, 0)
+            self.visualizer.plot_current_errors(errors, batch_idx)
+            return output
+
+        
+    def configure_optimizers(self):
+        lr = self.opt.lr
+        opt_g = torch.optim.Adam(self.generator.parameters(), lr=lr, betas=(self.opt.beta1, 0.999))
+        
+        opt_d = torch.optim.Adam(self.discriminator.parameters(), lr=lr, betas=(self.opt.beta1, 0.999))
+
+        return [opt_g, opt_d], []
+
+    def on_epoch_end(self):
+        if self.current_epoch % 10 == 0:
+            batch = self.batch
+            rec_tex_A, _, _ = \
+            self(batch['Atex'], batch['Amesh'] )
+
+            Atex = util.tensor2im(batch['Atex'][0])
+            
             Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
 
             Atex = util.writeText(Atex, batch['A_path'][0])
@@ -758,8 +1008,6 @@ class TexGANModule(pl.LightningModule):
             self.visualizer.display_current_results(visuals, self.current_epoch, 1000000) 
 
             self.trainer.save_checkpoint( os.path.join( self.ckpt_path, 'latest.ckpt') )
-
-
 
 
 class MultiscaleDiscriminator(nn.Module):
