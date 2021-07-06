@@ -85,6 +85,15 @@ class TexEncoder(nn.Module):
         for i in range(n_blocks):
             model += [ResnetBlock(ngf * 16, padding_type=padding_type, activation=activation, norm_layer=norm_layer)]
         self.resblocks = nn.Sequential(*model)
+
+        self.codefc = nn.Sequential(
+            nn.Linear( ngf * 16, ngf * 4),
+            nn.ReLU(True),
+            nn.Linear( ngf*4 , ngf * 4 ),
+            nn.ReLU(True),
+            nn.Linear( ngf*4 , 256),
+            nn.ReLU(True)
+        )
     def forward(self, tex):
         tex_encoded = self.CNNencoder(tex)
         tex_encoded = self.resblocks(tex_encoded).view(tex_encoded.shape[0], -1)
@@ -101,6 +110,12 @@ class TexDecoder(nn.Module):
         activation = nn.ReLU(True)   
       
         self.tex_fc_dec = nn.Sequential(
+            nn.Linear( 256, ngf * 4),
+            nn.ReLU(True),
+            nn.Linear( ngf*4 , ngf*2),
+            nn.ReLU(True),
+            nn.Linear( ngf*4 * 2, ngf*16 * 4 * 4),
+            nn.ReLU(True),
             nn.Linear( ngf*4 * 2, ngf*16 * 4 * 4),
             nn.ReLU(True)
             )
@@ -142,7 +157,7 @@ class TexDecoder(nn.Module):
         self.output_layer = nn.Sequential(*model)
 
     def forward(self, tex_code):
-       
+        tex_code = self.tex_fc_dec(tex_code)
         tex_dec = tex_code.view(tex_code.shape[0], -1, 4,4) # not sure 
 
         decoded = self.tex_decoder(tex_dec)
