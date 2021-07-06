@@ -188,7 +188,13 @@ class GraphConvMeshModule(pl.LightningModule):
             for up_transform in tmp['up_transform']
         ]
         
-
+        self.generator = AE(3,
+                [16, 16, 16, 32],
+                256,
+                edge_index_list,
+                down_transform_list,
+                up_transform_list,
+                K=6)
 
     def forward(self, A_mesh):
         
@@ -940,7 +946,7 @@ class MeshTexGANModule(pl.LightningModule):
             # regularization
             loss_code = ( code ** 2 ).mean()
             
-            loss_mesh = self.l2loss(rec_mesh_A, batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).detach() )
+            loss_mesh = self.l2loss(rec_mesh_A, batch['Amesh'] )
             # gan loss
             g_loss = self.GANloss(self.discriminator(  torch.cat((batch['Atex'], rec_tex_A), dim=1) ), True)
 
