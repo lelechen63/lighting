@@ -847,9 +847,8 @@ class MeshTexGenerator(nn.Module):
             if 'bias' in name:
                 nn.init.constant_(param, 0)
             else:
+                nn.init.xavier_uniform_(param)
 
-
-        
     def meshencoder(self, x):
         # self.edge_index = self.edge_index.type_as(x)
         # self.down_transform = self.down_transform.type_as(x)
