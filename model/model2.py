@@ -792,9 +792,9 @@ class MeshTexGenerator(nn.Module):
             util.to_sparse(up_transform).to(device)
             for up_transform in tmp['up_transform']
         ]
-
+        out_channels = [16, 16, 16, 32]
         self.in_channels = 3
-        self.out_channels = [16, 16, 16, 32]
+        self.out_channels = out_channels 
         self.edge_index = edge_index_list
         self.down_transform = down_transform_list
         self.up_transform = up_transform_list
