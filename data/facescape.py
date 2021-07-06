@@ -439,9 +439,10 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         transform = get_transform(self.opt, params)      
         A_tex_tensor = transform(tex)
         A_vertices = self.total_tex[self.data_list[index]][1]
-        A_vertices = A_vertices.view(-1,3)
+        print (type(A_vertices))
+        A_vertices = A_vertices.reshape(-1,3)
         Aidmesh = ( self.meanmesh[tmp[0]]- self.totalmeanmesh ) / self.totalstdmesh
-        Aidmesh = Aidmesh.view(-1,3)
+        Aidmesh = Aidmesh.reshape(-1,3)
             
         input_dict = { 'Atex': A_tex_tensor, 'Amesh': torch.FloatTensor(A_vertices),
                 'A_path': self.data_list[index],
