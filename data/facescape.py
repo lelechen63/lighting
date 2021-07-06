@@ -439,7 +439,6 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         transform = get_transform(self.opt, params)      
         A_tex_tensor = transform(tex)
         A_vertices = self.total_tex[self.data_list[index]][1]
-        print (type(A_vertices))
         A_vertices = A_vertices.reshape(-1,3)
         Aidmesh = ( self.meanmesh[tmp[0]]- self.totalmeanmesh ) / self.totalstdmesh
         Aidmesh = Aidmesh.reshape(-1,3)

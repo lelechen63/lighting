@@ -891,6 +891,7 @@ class MeshTexGenerator(nn.Module):
         mesh_code = self.meshencoder(A_mesh)
 
         # code transfer
+        print (tex_code.shape, mesh_code.shape)
         code = self.codeEnc(torch.cat([tex_code, mesh_code], 1))
         reccode = self.codeDec(code)
         rectex_code = reccode[:, :self.latent_channels]
