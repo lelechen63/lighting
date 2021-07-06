@@ -794,6 +794,7 @@ class MeshTexGenerator(nn.Module):
         ]
         out_channels = [16, 16, 16, 32]
         in_channels = 3
+        K = 6
         self.in_channels = in_channels
         self.out_channels = out_channels 
         self.edge_index = edge_index_list
