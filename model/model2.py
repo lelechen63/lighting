@@ -97,7 +97,6 @@ class TexEncoder(nn.Module):
     def forward(self, tex):
         tex_encoded = self.CNNencoder(tex)
         tex_encoded = self.resblocks(tex_encoded).view(tex_encoded.shape[0], -1)
-        print (tex_encoded.shape)
         tex_encoded  = self.codefc(tex_encoded)
         return tex_encoded
 
@@ -159,7 +158,6 @@ class TexDecoder(nn.Module):
         self.output_layer = nn.Sequential(*model)
 
     def forward(self, tex_code):
-        print (tex_code.shape)
         tex_code = self.tex_fc_dec(tex_code)
         tex_dec = tex_code.view(tex_code.shape[0], -1, 4,4) # not sure 
 
@@ -222,7 +220,6 @@ class GraphConvMeshModule(pl.LightningModule):
         # self.batch = batch
         # train generator
         # generate images
-        print (batch['Amesh'].shape)
         rec_mesh_A, code = \
         self(batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3)) 
         map_type = batch['map_type']
@@ -330,7 +327,7 @@ class DisGraphConvMeshModule(pl.LightningModule):
         self.land_inx = []
         for line in Lines:
             self.land_inx.append(int(line))
-        print(self.land_inx)
+
         self.l1loss = torch.nn.L1Loss()
         self.l2loss = torch.nn.MSELoss()
         if not opt.no_cls_loss:
@@ -348,7 +345,6 @@ class DisGraphConvMeshModule(pl.LightningModule):
         # self.batch = batch
         # train generator
         # generate images
-        print (batch['Amesh'].shape)
         rec_mesh_A, rec_mesh_B, rec_mesh_AB, rec_mesh_BA, Aexp,Aid, Bexp, Bid = \
         self(batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3), batch['Bmesh'].view(batch['Bmesh'].shape[0], -1, 3)) 
         map_type = batch['map_type']
@@ -488,7 +484,6 @@ class DisGraphConvMeshModule2(pl.LightningModule):
         # self.batch = batch
         # train generator
         # generate images
-        print (batch['Amesh'].shape)
         rec_mesh_A, idA, Aexpcode, Aidcode = \
         self(batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3)) 
         map_type = batch['map_type']
@@ -503,7 +498,6 @@ class DisGraphConvMeshModule2(pl.LightningModule):
         loss_mesh = 0
         loss_mesh += self.l2loss(rec_mesh_A, batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).detach() )
         
-        print (idA.shape, batch['Aidmesh'].shape)
         loss_mesh += self.l2loss(idA, batch['Aidmesh'].view(batch['Aidmesh'].shape[0], -1, 3).detach() )
 
         loss = loss_mesh + loss_code* 0.1 
@@ -884,13 +878,11 @@ class MeshTexGenerator(nn.Module):
                 x = layer(x, self.edge_index[0])
         return x
     def forward(self, A_tex, A_mesh ):
-        print (A_tex.shape, A_mesh.shape)
         # encode
         tex_code = self.texEnc(A_tex)
         mesh_code = self.meshencoder(A_mesh)
 
         # code transfer
-        print (tex_code.shape, mesh_code.shape)
         code = self.codeEnc(torch.cat([tex_code, mesh_code], 1))
         reccode = self.codeDec(code)
         rectex_code = reccode[:, :self.latent_channels]
