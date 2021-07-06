@@ -808,7 +808,7 @@ class MeshTexGenerator(nn.Module):
         for idx in range(len(out_channels)):
             if idx == 0:
                 self.en_layers.append(
-                    Enblock(in_channels, out_channels[idx], K, **kwargs))
+                    Enblock(in_channels, out_channels[idx], K))
             else:
                 self.en_layers.append(
                     Enblock(out_channels[idx - 1], out_channels[idx], K,
@@ -823,15 +823,14 @@ class MeshTexGenerator(nn.Module):
         for idx in range(len(out_channels)):
             if idx == 0:
                 self.de_layers.append(
-                    Deblock(out_channels[-idx - 1], out_channels[-idx - 1], K,
-                            **kwargs))
+                    Deblock(out_channels[-idx - 1], out_channels[-idx - 1], K))
             else:
                 self.de_layers.append(
-                    Deblock(out_channels[-idx], out_channels[-idx - 1], K,
-                            **kwargs))
+                    Deblock(out_channels[-idx], out_channels[-idx - 1], K
+                            ))
         # reconstruction
         self.de_layers.append(
-            ChebConv(out_channels[0], in_channels, K, **kwargs))
+            ChebConv(out_channels[0], in_channels, K))
 
         self.codeEnc = nn.Sequential(
             nn.Linear(latent_channels *2, latent_channels),   
