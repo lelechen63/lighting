@@ -839,7 +839,7 @@ class MeshTexGenerator(nn.Module):
 
         self.codeEnc = nn.Sequential(
             nn.Linear(self.latent_channels *2, self.latent_channels),   
-            nn.Linear(self.latent_channels *2, self.latent_channels)
+            nn.Linear(self.latent_channels , self.latent_channels)
         )
         self.codeDec = nn.Sequential(
             nn.Linear(self.latent_channels , self.latent_channels),   
