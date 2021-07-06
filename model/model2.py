@@ -811,8 +811,8 @@ class MeshTexGenerator(nn.Module):
                     Enblock(in_channels, out_channels[idx], K))
             else:
                 self.en_layers.append(
-                    Enblock(out_channels[idx - 1], out_channels[idx], K,
-                            **kwargs))
+                    Enblock(out_channels[idx - 1], out_channels[idx], K
+                            ))
         self.en_layers.append(
             nn.Linear(self.num_vert * out_channels[-1], latent_channels))
 
