@@ -97,6 +97,7 @@ class TexEncoder(nn.Module):
     def forward(self, tex):
         tex_encoded = self.CNNencoder(tex)
         tex_encoded = self.resblocks(tex_encoded).view(tex_encoded.shape[0], -1)
+        tex_encoded  = self.codefc(tex_encoded)
         return tex_encoded
 
 
@@ -546,26 +547,7 @@ class  TexMeshDecoder(nn.Module):
 
         self.tex_shape = tex_shape
         activation = nn.ReLU(True)   
-        # self.identity_dec = nn.Sequential(
-        #     nn.Linear( code_n, ngf*4),
-        #     nn.ReLU(True),
-        #     nn.Linear( ngf*4, ngf*4),
-        #     nn.ReLU(True),
-        #     # nn.Linear( ngf*4, ngf*4),
-        #     # nn.ReLU(True),
-        #     nn.Linear( ngf*4,ngf*4),
-        #     nn.ReLU(True),
-        #     )
-        # self.exp_dec = nn.Sequential(
-        #     nn.Linear( code_n, ngf*4),
-        #     nn.ReLU(True),
-        #     nn.Linear( ngf*4, ngf*4),
-        #     nn.ReLU(True),
-        #     # nn.Linear( ngf*4, ngf*4),
-        #     # nn.ReLU(True),
-        #     nn.Linear( ngf*4,ngf*4),
-        #     nn.ReLU(True),
-        #     )
+        
         self.tex_fc_dec = nn.Sequential(
             nn.Linear( ngf*4 * 2, ngf*16 * 4 * 4),
             nn.ReLU(True)
