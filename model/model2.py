@@ -879,7 +879,7 @@ class MeshTexGenerator(nn.Module):
                 x = layer(x, self.edge_index[0])
         return x
     def forward(self, A_tex, A_mesh ):
-        
+        print (A_tex.shape, A_mesh.shape)
         # encode
         tex_code = self.texEnc(A_tex)
         mesh_code = self.meshencoder(A_mesh)

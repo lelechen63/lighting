@@ -509,7 +509,7 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         # self.facial_seg  = self.facial_seg.resize(self.img_size)
         self.facial_seg  = np.array(self.facial_seg ) / 255.0
         self.facial_seg = np.expand_dims(self.facial_seg, axis=2)
-        self.x = 1169-150
+        self.x = 1019
         self.y =500
         self.w =2000
         self.h = 1334
