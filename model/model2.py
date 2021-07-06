@@ -793,7 +793,8 @@ class MeshTexGenerator(nn.Module):
             for up_transform in tmp['up_transform']
         ]
         out_channels = [16, 16, 16, 32]
-        self.in_channels = 3
+        in_channels = 3
+        self.in_channels = in_channels
         self.out_channels = out_channels 
         self.edge_index = edge_index_list
         self.down_transform = down_transform_list
