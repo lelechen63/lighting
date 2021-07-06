@@ -97,6 +97,7 @@ class TexEncoder(nn.Module):
     def forward(self, tex):
         tex_encoded = self.CNNencoder(tex)
         tex_encoded = self.resblocks(tex_encoded).view(tex_encoded.shape[0], -1)
+        print (tex_encoded.shape)
         tex_encoded  = self.codefc(tex_encoded)
         return tex_encoded
 
