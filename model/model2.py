@@ -114,11 +114,11 @@ class TexDecoder(nn.Module):
         self.tex_fc_dec = nn.Sequential(
             nn.Linear( 256, ngf * 4),
             nn.ReLU(True),
-            nn.Linear( ngf*4 , ngf*2),
+            nn.Linear( ngf*4 , ngf * 4*2),
             nn.ReLU(True),
-            nn.Linear( ngf*4 * 2, ngf*16 * 4 * 4),
+            nn.Linear( ngf*4 * 2, ngf*16 ),
             nn.ReLU(True),
-            nn.Linear( ngf*4 * 2, ngf*16 * 4 * 4),
+            nn.Linear( ngf*16, ngf*16 * 4 * 4),
             nn.ReLU(True)
             )
      
@@ -159,6 +159,7 @@ class TexDecoder(nn.Module):
         self.output_layer = nn.Sequential(*model)
 
     def forward(self, tex_code):
+        print (tex_code.shape)
         tex_code = self.tex_fc_dec(tex_code)
         tex_dec = tex_code.view(tex_code.shape[0], -1, 4,4) # not sure 
 
