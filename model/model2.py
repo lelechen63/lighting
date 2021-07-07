@@ -194,7 +194,7 @@ class GraphConvMeshModule(pl.LightningModule):
             util.to_sparse(up_transform).to(device)
             for up_transform in tmp['up_transform']
         ]
-        
+        self.l2loss = torch.nn.MSELoss()
         self.generator = AE(3,
                 [16, 16, 16, 32],
                 256,
