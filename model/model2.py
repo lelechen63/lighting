@@ -202,7 +202,8 @@ class GraphConvMeshModule(pl.LightningModule):
                 down_transform_list,
                 up_transform_list,
                 K=6)
-
+        self.visualizer = Visualizer(opt)
+        self.ckpt_path = os.path.join(opt.checkpoints_dir, opt.name)
     def forward(self, A_mesh):
         
         return self.generator(A_mesh)
