@@ -659,7 +659,7 @@ class TexGANModule(pl.LightningModule):
             g_loss = self.GANloss(self.discriminator(  torch.cat((batch['Atex'], rec_tex_A), dim=1) ), True)
 
             loss = loss_G_pix    + loss_mesh + g_loss
-            tqdm_dict = {'loss_pix': loss_G_pix, 'loss_G_VGG': loss_G_VGG, 'loss_G_CLS': loss_G_CLS, 'loss_mesh': loss_mesh, 'loss_GAN': g_loss }
+            tqdm_dict = {'loss_pix': loss_G_pix, 'loss_mesh': loss_mesh, 'loss_GAN': g_loss }
             output = OrderedDict({
                 'loss': loss,
                 'progress_bar': tqdm_dict,
