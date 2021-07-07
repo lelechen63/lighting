@@ -42,11 +42,6 @@ class TexEncoder(nn.Module):
         super().__init__()
         self.tex_shape = tex_shape
         activation = nn.ReLU(True)
-
-        # print (tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
-        #         ngf, n_downsampling, n_blocks, norm_layer, \
-        #         padding_type )
-        # print('!!!!!!!!!!!!!!!')
         
         self.CNNencoder = nn.Sequential(
             nn.ReflectionPad2d(3), nn.Conv2d(input_nc, ngf, kernel_size=7, padding=0),
@@ -55,10 +50,6 @@ class TexEncoder(nn.Module):
             nn.Conv2d(ngf , ngf  * 2, kernel_size=3, stride=2, padding=1),
             norm_layer(ngf  * 2),
             nn.ReLU(True),  # 2
-
-            # nn.Conv2d( ngf * 2, ngf  * 2, kernel_size=3, stride=2, padding=1),
-            # norm_layer(ngf  * 2),
-            # nn.ReLU(True),  #4
 
             nn.Conv2d(ngf*2 , ngf  * 4, kernel_size=3, stride=2, padding=1),
             norm_layer(ngf  * 4),
@@ -641,11 +632,7 @@ class TexGANModule(pl.LightningModule):
 
         self.l1loss = torch.nn.L1Loss()
         self.l2loss = torch.nn.MSELoss()
-        if not opt.no_vgg_loss:             
-            self.VGGloss = lossNet.VGGLoss()
-        if not opt.no_cls_loss:
-            self.CLSloss = lossNet.CLSLoss(opt)
-
+       
         self.GANloss = lossNet.GANLoss()
         self.visualizer = Visualizer(opt)
         self.totalmeantex = np.load( "./predef/meantex.npy" )
@@ -659,20 +646,9 @@ class TexGANModule(pl.LightningModule):
         # generate images
         rec_tex_A = \
         self(batch['Atex'])
-        map_type = batch['map_type']
 
-        if optimizer_idx ==0:       
-            # VGG loss
-            loss_G_VGG = 0
-            if not self.opt.no_vgg_loss:
-                loss_G_VGG += self.VGGloss(rec_tex_A, batch['Atex']) * self.opt.lambda_feat
-            
-            # CLS loss
-            loss_G_CLS = 0
-            if not self.opt.no_cls_loss:
-                loss_G_CLS += self.CLSloss(rec_tex_A,  batch['Aid'] , 'id') * self.opt.lambda_cls
-                loss_G_CLS += self.CLSloss(rec_tex_A,  batch['Aexp'] , 'exp') * self.opt.lambda_cls
-
+        if optimizer_idx ==0:                  
+          
             # pix loss
             loss_G_pix = 0
             # reconstruction loss
@@ -682,7 +658,7 @@ class TexGANModule(pl.LightningModule):
             loss_mesh = 0 
             g_loss = self.GANloss(self.discriminator(  torch.cat((batch['Atex'], rec_tex_A), dim=1) ), True)
 
-            loss = loss_G_pix + loss_G_VGG + loss_G_CLS + loss_mesh + g_loss
+            loss = loss_G_pix    + loss_mesh + g_loss
             tqdm_dict = {'loss_pix': loss_G_pix, 'loss_G_VGG': loss_G_VGG, 'loss_G_CLS': loss_G_CLS, 'loss_mesh': loss_mesh, 'loss_GAN': g_loss }
             output = OrderedDict({
                 'loss': loss,
