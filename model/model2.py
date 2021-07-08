@@ -104,25 +104,17 @@ class TexDecoder(nn.Module):
         self.tex_fc_dec = nn.Sequential(
             nn.Linear( 256, ngf * 4),
             nn.ReLU(True),
-            nn.Linear( ngf*4 , ngf * 4*2),
-            nn.ReLU(True),
-            nn.Linear( ngf*4 * 2, ngf*16 ),
+            nn.Linear( ngf*4 , ngf * 16),
             nn.ReLU(True),
             nn.Linear( ngf*16, ngf*16 * 4 * 4),
             nn.ReLU(True)
             )
      
         self.tex_decoder = nn.Sequential(
-            # nn.ConvTranspose2d(ngf * 16, ngf * 16, kernel_size=3, stride=2, padding=1, output_padding=1),
-            # norm_layer(ngf * 16), 
-            # nn.ReLU(True),
+        
             nn.ConvTranspose2d(ngf * 16, ngf * 8, kernel_size=3, stride=2, padding=1, output_padding=1),
             norm_layer(ngf * 8), 
             nn.ReLU(True), #2
-
-            # nn.ConvTranspose2d(ngf * 8, ngf * 8, kernel_size=3, stride=2, padding=1, output_padding=1),
-            # norm_layer(ngf * 8), 
-            # nn.ReLU(True), #4
 
             nn.ConvTranspose2d(ngf * 8, ngf * 4, kernel_size=3, stride=2, padding=1, output_padding=1),
             norm_layer(ngf * 4), 
@@ -552,16 +544,10 @@ class  TexMeshDecoder(nn.Module):
         ### upsample
 
         self.tex_decoder = nn.Sequential(
-            # nn.ConvTranspose2d(ngf * 16, ngf * 16, kernel_size=3, stride=2, padding=1, output_padding=1),
-            # norm_layer(ngf * 16), 
-            # nn.ReLU(True),
+           
             nn.ConvTranspose2d(ngf * 16, ngf * 8, kernel_size=3, stride=2, padding=1, output_padding=1),
             norm_layer(ngf * 8), 
             nn.ReLU(True), #2
-
-            # nn.ConvTranspose2d(ngf * 8, ngf * 8, kernel_size=3, stride=2, padding=1, output_padding=1),
-            # norm_layer(ngf * 8), 
-            # nn.ReLU(True), #4
 
             nn.ConvTranspose2d(ngf * 8, ngf * 4, kernel_size=3, stride=2, padding=1, output_padding=1),
             norm_layer(ngf * 4), 
