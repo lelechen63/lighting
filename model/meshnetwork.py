@@ -117,7 +117,6 @@ class AE(nn.Module):
 
     def decoder(self, x):
         
-
         num_layers = len(self.de_layers)
         num_deblocks = num_layers - 2
         for i, layer in enumerate(self.de_layers):
