@@ -16,11 +16,11 @@ from os import path as osp
 from util.visualizer import Visualizer
 from util.render_class import meshrender
 # from model.meshnetwork import *
-from util import  mesh_sampling
+# from util import  mesh_sampling
 import pickle
-from model.conv import ChebConv
-from .inits import reset
-from torch_scatter import scatter_add
+# from model.conv import ChebConv
+# from .inits import reset
+# from torch_scatter import scatter_add
 
 # pickle.dump(some_object)
 
