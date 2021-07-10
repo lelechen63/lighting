@@ -494,16 +494,12 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         self.id_set = set(pickle.load(ids))
         self.exp_set = get_exp()
 
-        self.meanmesh = get_meanmesh()
         print ('===========================')
         print ('id_set:',self.id_set)
         print('+++++++++++++++++++++++++++')
         print ('exp_set:',self.exp_set)
         print ('===========================')
 
-        self.totalmeanmesh = np.load( "./predef/meshmean.npy" )
-        self.totalstdmesh = np.load( "./predef/meshstd.npy" )
-        self.totalmeantex = np.load( "./predef/meantex.npy" )
         # self.facial_seg = cv2.imread("./predef/facial_mask_v10.png")[:,:,::-1]
         self.facial_seg = Image.open("./predef/facial_mask_v10.png")
         # self.facial_seg  = self.facial_seg.resize(self.img_size)
