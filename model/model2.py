@@ -78,10 +78,10 @@ class TexEncoder(nn.Module):
         self.resblocks = nn.Sequential(*model)
 
         self.codefc = nn.Sequential(
-            nn.Linear( ngf * 16 * 4 * 4, ngf * 16),
-            nn.ReLU(True),
-            nn.Linear( ngf*16 , ngf * 4 ),
-            nn.ReLU(True),
+            nn.Linear( ngf * 16 * 4 * 4, ngf * 4),
+            # nn.ReLU(True),
+            # nn.Linear( ngf*16 , ngf * 4 ),
+            # nn.ReLU(True),
             nn.Linear( ngf*4 , 256),
             nn.ReLU(True)
         )
@@ -104,9 +104,9 @@ class TexDecoder(nn.Module):
         self.tex_fc_dec = nn.Sequential(
             nn.Linear( 256, ngf * 4),
             nn.ReLU(True),
-            nn.Linear( ngf*4 , ngf * 16),
-            nn.ReLU(True),
-            nn.Linear( ngf*16, ngf*16 * 4 * 4),
+            # nn.Linear( ngf*4 , ngf * 16),
+            # nn.ReLU(True),
+            nn.Linear( ngf*4, ngf*16 * 4 * 4),
             nn.ReLU(True)
             )
      
