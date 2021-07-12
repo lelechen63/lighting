@@ -239,7 +239,8 @@ class TexDecoder(nn.Module):
             nn.ReLU(True), #128
         )
         model = []
-        model += [nn.ReflectionPad2d(3), nn.Conv2d(ngf, 3, kernel_size=7, padding=0), nn.Tanh()]    
+        model += [nn.ReflectionPad2d(3), nn.Conv2d(ngf, 3, kernel_size=7, padding=0)]   
+        # model += [nn.ReflectionPad2d(3), nn.Conv2d(ngf, 3, kernel_size=7, padding=0), nn.Tanh()]    
         self.output_layer = nn.Sequential(*model)
 
     def forward(self, tex_code):
