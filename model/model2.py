@@ -727,8 +727,8 @@ class TexGANModule(pl.LightningModule):
         self.visualizer = Visualizer(opt)
         self.meantex = np.load('/data/home/us000042/lelechen/github/lighting/predef/meantex.npy')
         self.stdtex = np.load('/data/home/us000042/lelechen/github/lighting/predef/stdtex.npy')
-        self.meantex = torch.Tensor(self.meantex)
-        self.stdtex = torch.Tensor(self.stdtex)
+        self.meantex = torch.Tensor(self.meantex).permute(1,2,0)
+        self.stdtex = torch.Tensor(self.stdtex).permute(1,2,0)
         self.ckpt_path = os.path.join(opt.checkpoints_dir, opt.name)
     def forward(self, A_tex):
         return self.generator(A_tex)
