@@ -724,7 +724,9 @@ class TexGANModule(pl.LightningModule):
        
         self.GANloss = lossNet.GANLoss()
         self.visualizer = Visualizer(opt)
-        # self.totalmeantex = np.load( "./predef/meantex.npy" )
+        self.meantex = np.load('/data/home/us000042/lelechen/github/lighting/predef/meantex.npy')
+        self.stdtex = np.load('/data/home/us000042/lelechen/github/lighting/predef/stdtex.npy')
+
         self.ckpt_path = os.path.join(opt.checkpoints_dir, opt.name)
     def forward(self, A_tex):
         return self.generator(A_tex)

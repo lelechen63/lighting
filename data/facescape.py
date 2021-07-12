@@ -505,7 +505,7 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
             tmp = data.split('/')
             tex = self.total_t[cc]
             print (tex.shape, meantex.shape, stdtex.shape)
-            self.total_tex[data] = [ (tex - meantex)/stdtex ]
+            self.total_tex[data] = [ (tex - self.meantex)/self.stdtex ]
             cc += 1
             if opt.debug:
                 if len(self.total_tex) == 13:
