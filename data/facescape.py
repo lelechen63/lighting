@@ -487,6 +487,8 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
 
         self.data_list = pickle.load(_file)#[:1]
 
+        self.meantex = np.load('/data/home/us000042/lelechen/github/lighting/predef/meantex.npy')
+        self.stdtex = np.load('/data/home/us000042/lelechen/github/lighting/predef/stdtex.npy')
 
         _file.close()
         
@@ -502,8 +504,8 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
             
             tmp = data.split('/')
             tex = self.total_t[cc]
-            print (tex.shape, texmean.shape, texstd.shape)
-            self.total_tex[data] = [ (tex - texmean)/texstd ]
+            print (tex.shape, meantex.shape, stdtex.shape)
+            self.total_tex[data] = [ (tex - meantex)/stdtex ]
             cc += 1
             if opt.debug:
                 if len(self.total_tex) == 13:
