@@ -3,6 +3,110 @@ import torch.nn.functional as F
 from torch import nn
 
 
+class LinearWN( torch.nn.Linear ):
+    def __init__( self, in_features, out_features, bias = True ):
+        super().__init__( in_features, out_features, bias )
+        self.g = torch.nn.Parameter( torch.ones( out_features ) )
+        self.is_fused = False
+
+    def forward( self, input ):
+        if self.is_fused:
+            return F.linear( input, self.weight, self.bias )
+        else:
+            wnorm = torch.sqrt( torch.sum( self.weight ** 2 ) )
+            return F.linear( input, self.weight * self.g[ :, None ] / wnorm, self.bias )
+
+    def fuse( self ):
+        wnorm = torch.sqrt( (self.weight ** 2).sum() )
+        self.weight.data = self.weight.data * self.g.data[ :, None ] / wnorm
+        del self._parameters[ "g" ]
+        self.is_fused = True
+
+    def unfuse( self ):
+        self.g = torch.nn.Parameter( torch.ones( out_features ) )
+        self.is_fused = False
+
+class Conv2dWNUB( torch.nn.Conv2d ):
+    def __init__( self, in_channels, out_channels, height, width, kernel_size,
+                  stride = 1, padding = 0, dilation = 1, groups = 1, bias = False ):
+        super().__init__( in_channels, out_channels, kernel_size, stride,
+                          padding, dilation, groups, False )
+        self.g = torch.nn.Parameter( torch.ones( out_channels // groups ) )
+        self.bias = torch.nn.Parameter( torch.zeros( out_channels, height, width ) )
+        self.is_fused = False
+
+    def forward( self, x ):
+        if self.is_fused:
+            return F.conv2d( x, self.weight,
+                               bias = None, stride = self.stride, padding = self.padding,
+                               dilation = self.dilation, groups = self.groups ) + self.bias[ None, ... ]
+        else:
+            wnorm = torch.sqrt( torch.sum( self.weight ** 2 ) )
+            return F.conv2d( x, self.weight * self.g[ :, None, None, None ] / wnorm,
+                               bias = None, stride = self.stride, padding = self.padding,
+                               dilation = self.dilation, groups = self.groups ) + self.bias[ None, ... ]
+
+    def fuse( self ):
+        wnorm = torch.sqrt( (self.weight ** 2).sum() )
+        self.weight.data = self.weight.data * self.g.data[ :, None, None, None ] / wnorm
+        del self._parameters[ "g" ]
+        self.is_fused = True
+
+    def unfuse( self ):
+        self.g = torch.nn.Parameter( torch.ones( self.out_channels // self.groups ) )
+        self.is_fused = False
+
+
+def glorot( m, alpha ):
+    gain = np.sqrt( 2. / (1. + alpha ** 2) )
+
+    if isinstance( m, torch.nn.Conv2d ):
+        ksize = m.kernel_size[ 0 ] * m.kernel_size[ 1 ]
+        n1 = m.in_channels
+        n2 = m.out_channels
+
+        std = gain * np.sqrt( 2.0 / ((n1 + n2) * ksize) )
+    elif isinstance( m, torch.nn.ConvTranspose2d ):
+        ksize = m.kernel_size[ 0 ] * m.kernel_size[ 1 ] // 4
+        n1 = m.in_channels
+        n2 = m.out_channels
+
+        std = gain * np.sqrt( 2.0 / ((n1 + n2) * ksize) )
+    elif isinstance( m, torch.nn.ConvTranspose3d ):
+        ksize = m.kernel_size[ 0 ] * m.kernel_size[ 1 ] * m.kernel_size[ 2 ] // 8
+        n1 = m.in_channels
+        n2 = m.out_channels
+
+        std = gain * matorch.sqrt( 2.0 / ((n1 + n2) * ksize) )
+    elif isinstance( m, torch.nn.Linear ):
+        n1 = m.in_features
+        n2 = m.out_features
+
+        std = gain * np.sqrt( 2.0 / (n1 + n2) )
+    else:
+        return
+
+    # m.weight.data.normal_(0, std)
+    m.weight.data.uniform_( -std * np.sqrt( 3.0 ), std * np.sqrt( 3.0 ) )
+    m.bias.data.zero_()
+
+    if isinstance( m, torch.nn.ConvTranspose2d ):
+        # hardcoded for stride=2 for now
+        m.weight.data[ :, :, 0::2, 1::2 ] = m.weight.data[ :, :, 0::2, 0::2 ]
+        m.weight.data[ :, :, 1::2, 0::2 ] = m.weight.data[ :, :, 0::2, 0::2 ]
+        m.weight.data[ :, :, 1::2, 1::2 ] = m.weight.data[ :, :, 0::2, 0::2 ]
+
+    if isinstance( m, Conv2dWNUB ) or isinstance( m, Conv2dWN ) or isinstance( m, ConvTranspose2dWN ) or \
+            isinstance( m, ConvTranspose2dWNUB ) or isinstance( m, LinearWN ):
+        norm = np.sqrt( torch.sum( m.weight.data[ : ] ** 2 ) )
+        m.g.data[ : ] = norm
+
+
+def fuse( m ):
+    if hasattr( m, "fuse" ) and isinstance( m, torch.nn.Module ):
+        m.fuse()
+
+
 # Define a resnet block
 class ResnetBlock(nn.Module):
     def __init__(self, dim, padding_type, norm_layer, activation=nn.ReLU(True), use_dropout=False):

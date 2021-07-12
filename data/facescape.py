@@ -493,23 +493,6 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         ids = open(os.path.join(opt.dataroot, "lists/ids.pkl"), "rb")
         self.id_set = set(pickle.load(ids))
         self.exp_set = get_exp()
-
-        print ('===========================')
-        print ('id_set:',self.id_set)
-        print('+++++++++++++++++++++++++++')
-        print ('exp_set:',self.exp_set)
-        print ('===========================')
-
-        # self.facial_seg = cv2.imread("./predef/facial_mask_v10.png")[:,:,::-1]
-        self.facial_seg = Image.open("./predef/facial_mask_v10.png")
-        # self.facial_seg  = self.facial_seg.resize(self.img_size)
-        self.facial_seg  = np.array(self.facial_seg ) / 255.0
-        self.facial_seg = np.expand_dims(self.facial_seg, axis=2)
-        self.x = 1019
-        self.y =500
-        self.w =2000
-        self.h = 1334
-        self.l = max(self.w ,self.h)
         self.total_tex = {}
         self.total_t = np.load(total_t)
         self.total_m = np.load(total_m)
@@ -519,7 +502,8 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
             
             tmp = data.split('/')
             tex = self.total_t[cc]
-            self.total_tex[data] = [tex ]
+            print (tex.shape, texmean.shape, texstd.shape)
+            self.total_tex[data] = [ (tex - texmean)/texstd ]
             cc += 1
             if opt.debug:
                 if len(self.total_tex) == 13:
@@ -546,8 +530,9 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
      
         tex = self.total_tex[self.data_list[index]][0]
         tex = Image.fromarray(np.uint8(tex))
+        
         params = get_params(self.opt, tex.size)
-        transform = get_transform(self.opt, params)      
+        transform = get_transform(self.opt, params, normalize = False)      
         tex_tensor = transform(tex)
 
         input_dict = { 'Atex':tex_tensor, 'Aid': int(tmp[0]) - 1, 'Aexp': int(tmp[-1].split('_')[0] )- 1, 'A_path': self.data_list[index]}
