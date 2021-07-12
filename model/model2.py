@@ -796,7 +796,7 @@ class TexGANModule(pl.LightningModule):
             rec_tex_A = \
             self(batch['Atex'])
 
-            Atex = batch['Atex'][0] * self.stdtex + self.meantex 
+            Atex = batch['Atex'].data[0] * self.stdtex + self.meantex 
             # Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
             Atex = util.tensor2im(Atex , normalize = False)
             
