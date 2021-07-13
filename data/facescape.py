@@ -530,12 +530,12 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         tex_path = os.path.join( self.dir_tex , tmp[0], tmp[-1] + '.png')
      
         tex = self.total_tex[self.data_list[index]][0]
-        tex = Image.fromarray(np.uint8(tex))
+        # tex = Image.fromarray(np.uint8(tex))
         
-        params = get_params(self.opt, tex.size)
-        transform = get_transform(self.opt, params, normalize = False)      
-        tex_tensor = transform(tex)
-
+        # params = get_params(self.opt, tex.size)
+        # transform = get_transform(self.opt, params, normalize = False)      
+        # tex_tensor = transform(tex)
+        tex_tensor = torch.FloatTensor(tex)
         input_dict = { 'Atex':tex_tensor, 'Aid': int(tmp[0]) - 1, 'Aexp': int(tmp[-1].split('_')[0] )- 1, 'A_path': self.data_list[index]}
        
        
