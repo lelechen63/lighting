@@ -508,7 +508,11 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
             print (tex.shape, tex.max(), tex.min())
             print (self.meantex.shape, self.meantex.max(), self.meantex.min())
             print (self.stdtex.shape, self.stdtex.max(), self.stdtex.min())
-            self.total_tex[data] = [ (tex - self.meantex)/self.stdtex ]
+            tmp = (tex - self.meantex)/self.stdtex
+            print (tmp.max(), tmp.min())
+            print (tmp)
+            
+            self.total_tex[data] = [ tmp ]
             cc += 1
             if opt.debug:
                 if len(self.total_tex) == 13:
