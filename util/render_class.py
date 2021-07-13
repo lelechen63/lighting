@@ -5,8 +5,7 @@ import imageio
 import openmesh
 import cv2
 
-import pyredner
-import redner
+import render
 import math
 import pickle
 import os
@@ -41,10 +40,10 @@ expressions = {
 }
 with open("./predef/Rt_scale_dict.json", 'r') as f:
     Rt_scale_dict = json.load(f)
-pyredner.set_use_gpu(torch.cuda.is_available())
-pyredner.set_print_timing(False)
+pyrender.set_use_gpu(torch.cuda.is_available())
+pyrender.set_print_timing(False)
 om_indices = np.load("./predef/om_indices.npy")
-om_indices = torch.from_numpy(om_indices).type(torch.int32).to(pyredner.get_device())
+om_indices = torch.from_numpy(om_indices).type(torch.int32).to(pyrender.get_device())
 image_data_root = "/data/home/us000042/lelechen/data/Facescape/jsons"
 
 def shift(image, vector):
@@ -63,24 +62,24 @@ def meshrender(id_idx, exp_idx, vertices, cam_idx=1):
     """
     scale = Rt_scale_dict['1']['%d'%1][0]
     Rt_TU = np.array(Rt_scale_dict['%d'%1]['%d'%1][1])
-    # Rt_TU = torch.from_numpy(Rt_TU).type(torch.float32).to(pyredner.get_device())
+    # Rt_TU = torch.from_numpy(Rt_TU).type(torch.float32).to(pyrender.get_device())
     Rt_TU = torch.from_numpy(Rt_TU).type(torch.float32).to("cuda:0")
 
  
     input_vertices = vertices.reshape(-1,3).to("cuda:0")
 
-    # input_vertices = vertices.reshape(-1,3).to(pyredner.get_device())
+    # input_vertices = vertices.reshape(-1,3).to(pyrender.get_device())
     input_vertices = (Rt_TU[:3,:3].T @ (input_vertices - Rt_TU[:3,3]).T).T
     input_vertices = input_vertices / scale
     input_vertices = input_vertices.contiguous()
 
-    m = pyredner.Material(diffuse_reflectance = torch.tensor((0.5, 0.5, 0.5), device = pyredner.get_device()))
+    m = pyrender.Material(diffuse_reflectance = torch.tensor((0.5, 0.5, 0.5), device = pyrender.get_device()))
     # print ('m', m.device)
 
-    obj = pyredner.Object(vertices=input_vertices, indices=om_indices, material=m)
-    obj.normals = pyredner.compute_vertex_normal(obj.vertices, obj.indices)
+    obj = pyrender.Object(vertices=input_vertices, indices=om_indices, material=m)
+    obj.normals = pyrender.compute_vertex_normal(obj.vertices, obj.indices)
 
-    # obj.normals = pyredner.compute_vertex_normal(obj.vertices.to(pyredner.get_device()), obj.indices.to(pyredner.get_device())).cpu()
+    # obj.normals = pyrender.compute_vertex_normal(obj.vertices.to(pyrender.get_device()), obj.indices.to(pyrender.get_device())).cpu()
     with open('/data/home/us000042/lelechen/data/Facescape/jsons/1/1_neutral/params.json', 'r') as f:
         params = json.load(f)
     # img_dir = f"{image_data_root}/{1}/{expressions[1]}"
@@ -112,26 +111,26 @@ def meshrender(id_idx, exp_idx, vertices, cam_idx=1):
     K[1,1] = -K[1,1] * 2.0 / w_src
 
     # Setup camera
-    cam = pyredner.Camera(
+    cam = pyrender.Camera(
         cam_to_world= c2w,
         intrinsic_mat=K,
         clip_near = 1e-2, # needs to > 0
         resolution = (h_src, w_src),
         # distortion_params=distortion,
-        camera_type=pyredner.camera_type.perspective,
+        camera_type=pyrender.camera_type.perspective,
         fisheye = False
     )
     
     light_dir = torch.tensor([[0.0, 0.0, 1.0]])
     light_dir = (c2w[:3,:3]@light_dir.T).T
     light_dir = light_dir.to("cuda:0")
-    # light_dir = light_dir.to(pyredner.get_device())
+    # light_dir = light_dir.to(pyrender.get_device())
     lights = [
-        pyredner.DirectionalLight(light_dir, torch.tensor([5.0, 5.0, 5.0], device = pyredner.get_device()))
+        pyrender.DirectionalLight(light_dir, torch.tensor([5.0, 5.0, 5.0], device = pyrender.get_device()))
     ]
     
-    scene = pyredner.Scene(camera=cam, objects=[obj])
-    img = pyredner.render_deferred(scene, lights=lights)
+    scene = pyrender.Scene(camera=cam, objects=[obj])
+    img = pyrender.render_deferred(scene, lights=lights)
 
     img = torch.pow(img, 1.0/2.2).cpu().numpy()
     img = shift(img, [-dx, -dy])
@@ -147,7 +146,7 @@ def meshrender(id_idx, exp_idx, vertices, cam_idx=1):
 # import openmesh
 # import cv2
 
-# import pyredner
+# import pyrender
 # import redner
 # import math
 # import pickle
@@ -183,13 +182,13 @@ def meshrender(id_idx, exp_idx, vertices, cam_idx=1):
 #             19: "19_brow_raiser",
 #             20: "20_brow_lower"
 #         }
-#         # pyredner = pyredner
+#         # pyrender = pyrender
 #         with open("./predef/Rt_scale_dict.json", 'r') as f:
 #             self.Rt_scale_dict = json.load(f)
-#         pyredner.set_use_gpu(torch.cuda.is_available())
-#         pyredner.set_print_timing(False)
+#         pyrender.set_use_gpu(torch.cuda.is_available())
+#         pyrender.set_print_timing(False)
 #         om_indices = np.load("./predef/om_indices.npy")
-#         self.om_indices = torch.from_numpy(om_indices).type(torch.int32).to(pyredner.get_device())
+#         self.om_indices = torch.from_numpy(om_indices).type(torch.int32).to(pyrender.get_device())
 #         self.image_data_root = "/data/home/us000042/lelechen/data/Facescape/jsons"
 
 #     def shift(self, image, vector):
@@ -208,7 +207,7 @@ def meshrender(id_idx, exp_idx, vertices, cam_idx=1):
 #         """
 #         scale = self.Rt_scale_dict['%d'%id_idx]['%d'%exp_idx][0]
 #         Rt_TU = np.array(self.Rt_scale_dict['%d'%id_idx]['%d'%exp_idx][1])
-#         # Rt_TU = torch.from_numpy(Rt_TU).type(torch.float32).to(pyredner.get_device())
+#         # Rt_TU = torch.from_numpy(Rt_TU).type(torch.float32).to(pyrender.get_device())
 #         Rt_TU = torch.from_numpy(Rt_TU).type(torch.float32).to("cuda:0")
 
 #         print ('Rt_TU', Rt_TU.device)
@@ -217,22 +216,22 @@ def meshrender(id_idx, exp_idx, vertices, cam_idx=1):
 #         print('+++++++')
 #         input_vertices = vertices.reshape(-1,3).to("cuda:0")
 
-#         # input_vertices = vertices.reshape(-1,3).to(pyredner.get_device())
+#         # input_vertices = vertices.reshape(-1,3).to(pyrender.get_device())
 #         input_vertices = (Rt_TU[:3,:3].T @ (input_vertices - Rt_TU[:3,3]).T).T
 #         input_vertices = input_vertices / scale
 #         input_vertices = input_vertices.contiguous()
 
 #         print ('input_vertices', input_vertices.device)
-#         m = pyredner.Material(diffuse_reflectance = torch.tensor((0.5, 0.5, 0.5), device = pyredner.get_device()))
+#         m = pyrender.Material(diffuse_reflectance = torch.tensor((0.5, 0.5, 0.5), device = pyrender.get_device()))
 #         # print ('m', m.device)
 
-#         obj = pyredner.Object(vertices=input_vertices, indices=self.om_indices, material=m)
+#         obj = pyrender.Object(vertices=input_vertices, indices=self.om_indices, material=m)
 #         print ('obj.vertices', obj.vertices.device)
 #         print ('obj.indices', obj.indices.device)
-#         obj.normals = pyredner.compute_vertex_normal(obj.vertices, obj.indices)
+#         obj.normals = pyrender.compute_vertex_normal(obj.vertices, obj.indices)
 #         print ('obj.normals', obj.normals.device)
 
-#         # obj.normals = pyredner.compute_vertex_normal(obj.vertices.to(pyredner.get_device()), obj.indices.to(pyredner.get_device())).cpu()
+#         # obj.normals = pyrender.compute_vertex_normal(obj.vertices.to(pyrender.get_device()), obj.indices.to(pyrender.get_device())).cpu()
 
 #         img_dir = f"{self.image_data_root}/{id_idx}/{self.expressions[exp_idx]}"
 #         with open(f"{img_dir}/params.json", 'r') as f:
@@ -263,27 +262,27 @@ def meshrender(id_idx, exp_idx, vertices, cam_idx=1):
 #         K[1,1] = -K[1,1] * 2.0 / w_src
 
 #         # Setup camera
-#         cam = pyredner.Camera(
+#         cam = pyrender.Camera(
 #             cam_to_world= c2w,
 #             intrinsic_mat=K,
 #             clip_near = 1e-2, # needs to > 0
 #             resolution = (h_src, w_src),
 #             # distortion_params=distortion,
-#             camera_type=pyredner.camera_type.perspective,
+#             camera_type=pyrender.camera_type.perspective,
 #             fisheye = False
 #         )
         
 #         light_dir = torch.tensor([[0.0, 0.0, 1.0]])
 #         light_dir = (c2w[:3,:3]@light_dir.T).T
 #         light_dir = light_dir.to("cuda:0")
-#         # light_dir = light_dir.to(pyredner.get_device())
+#         # light_dir = light_dir.to(pyrender.get_device())
 #         print ('light_dir:', light_dir.device)
 #         lights = [
-#             pyredner.DirectionalLight(light_dir, torch.tensor([5.0, 5.0, 5.0], device = pyredner.get_device()))
+#             pyrender.DirectionalLight(light_dir, torch.tensor([5.0, 5.0, 5.0], device = pyrender.get_device()))
 #         ]
         
-#         scene = pyredner.Scene(camera=cam, objects=[obj])
-#         img = pyredner.render_deferred(scene, lights=lights)
+#         scene = pyrender.Scene(camera=cam, objects=[obj])
+#         img = pyrender.render_deferred(scene, lights=lights)
 
 #         img = torch.pow(img, 1.0/2.2).cpu().numpy()
 #         img = self.shift(img, [-dx, -dy])
