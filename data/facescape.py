@@ -488,7 +488,7 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         self.data_list = pickle.load(_file)#[:1]
 
         self.meantex = np.load('/data/home/us000042/lelechen/github/lighting/predef/meantex.npy')
-        self.stdtex = np.load('/data/home/us000042/lelechen/github/lighting/predef/stdtex.npy')
+        self.stdtex = np.load('/data/home/us000042/lelechen/github/lighting/predef/stdtex.npy') + 0.00000001
 
         _file.close()
         
