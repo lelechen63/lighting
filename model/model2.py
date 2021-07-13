@@ -749,7 +749,7 @@ class TexGANModule(pl.LightningModule):
                 loss_G_pix += self.l1loss(rec_tex_A, batch['Atex']) * self.opt.lambda_pix
 
             loss_mesh = 0 
-            g_loss = self.GANloss(self.discriminator(   rec_tex_A, True))
+            g_loss = self.GANloss(self.discriminator(   rec_tex_A), True)
 
             loss = loss_G_pix    + loss_mesh + g_loss
             tqdm_dict = {'loss_pix': loss_G_pix, 'loss_mesh': loss_mesh, 'loss_GAN': g_loss }
@@ -765,8 +765,8 @@ class TexGANModule(pl.LightningModule):
             return output
         if optimizer_idx == 1:
 
-            real_loss = self.GANloss(self.discriminator(  batch['Atex'], True))
-            fake_loss = self.GANloss( self.discriminator( rec_tex_A.detach() , False))
+            real_loss = self.GANloss(self.discriminator(  batch['Atex']), True)
+            fake_loss = self.GANloss( self.discriminator( rec_tex_A.detach()) , False)
 
             # discriminator loss is the average of these
             d_loss = (real_loss + fake_loss) / 2
