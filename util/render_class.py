@@ -4,9 +4,9 @@ import trimesh
 import imageio
 import openmesh
 import cv2
+import redner
 
-import pyrender
-# import redner
+import pyredner
 import math
 import pickle
 import os
