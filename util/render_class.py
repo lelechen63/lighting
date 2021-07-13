@@ -5,7 +5,7 @@ import imageio
 import openmesh
 import cv2
 
-import render
+import pyrender
 import math
 import pickle
 import os
