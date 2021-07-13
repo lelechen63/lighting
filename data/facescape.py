@@ -534,6 +534,7 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         tex_path = os.path.join( self.dir_tex , tmp[0], tmp[-1] + '.png')
      
         tex = self.total_tex[self.data_list[index]][0]
+        print (tex)
         print ('+++', tex.max(), tex.min())
 
         # tex = Image.fromarray(np.uint8(tex))
