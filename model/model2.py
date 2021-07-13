@@ -727,8 +727,8 @@ class TexGANModule(pl.LightningModule):
         self.visualizer = Visualizer(opt)
         self.meantex = np.load('/data/home/us000042/lelechen/github/lighting/predef/meantex.npy')
         self.stdtex = np.load('/data/home/us000042/lelechen/github/lighting/predef/stdtex.npy')
-        self.meantex = torch.Tensor(self.meantex).permute(2, 0,1)
-        self.stdtex = torch.Tensor(self.stdtex).permute(2,0,1)
+        self.meantex = torch.FloatTensor(self.meantex).permute(2, 0,1)
+        self.stdtex = torch.FloatTensor(self.stdtex).permute(2,0,1)
         self.ckpt_path = os.path.join(opt.checkpoints_dir, opt.name)
     def forward(self, A_tex):
         return self.generator(A_tex)
@@ -799,9 +799,8 @@ class TexGANModule(pl.LightningModule):
 
             
             # Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
-            print (batch['Atex'].data[0].cpu().shape)
-            print (self.stdtex.shape, self.meantex.shape)
-            Atex = batch['Atex'].data[0].cpu()  * self.stdtex + self.meantex 
+           
+            Atex = batch['Atex'].data[0].cpu().float()  * self.stdtex + self.meantex 
             Atex = util.tensor2im(Atex  , normalize = False)
             
             Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
