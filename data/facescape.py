@@ -504,6 +504,10 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
             
             tmp = data.split('/')
             tex = self.total_t[cc]
+            print ('88888')
+            print (tex.shape, tex.max(), tex.min())
+            print (self.meantex.shape, self.meantex.max(), self.meantex.min())
+            print (self.stdtex.shape, self.stdtex.max(), self.stdtex.min())
             self.total_tex[data] = [ (tex - self.meantex)/self.stdtex ]
             cc += 1
             if opt.debug:
