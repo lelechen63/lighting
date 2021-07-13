@@ -504,13 +504,7 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
             
             tmp = data.split('/')
             tex = self.total_t[cc]
-            print ('88888')
-            print (tex.shape, tex.max(), tex.min())
-            print (self.meantex.shape, self.meantex.max(), self.meantex.min())
-            print (self.stdtex.shape, self.stdtex.max(), self.stdtex.min())
             tmp = (tex - self.meantex)/self.stdtex
-            print (tmp.max(), tmp.min())
-            print (tmp)
             
             self.total_tex[data] = [ tmp ]
             cc += 1
@@ -538,8 +532,6 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         tex_path = os.path.join( self.dir_tex , tmp[0], tmp[-1] + '.png')
      
         tex = self.total_tex[self.data_list[index]][0]
-        print (tex)
-        print ('+++', tex.max(), tex.min())
 
         # tex = Image.fromarray(np.uint8(tex))
         
@@ -547,7 +539,6 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         # transform = get_transform(self.opt, params, normalize = False)      
         # tex_tensor = transform(tex)
         tex_tensor = torch.FloatTensor(tex).permute(2,0,1)
-        print (tex_tensor.max(), tex_tensor.min())
         input_dict = { 'Atex':tex_tensor, 'Aid': int(tmp[0]) - 1, 'Aexp': int(tmp[-1].split('_')[0] )- 1, 'A_path': self.data_list[index]}
        
        
