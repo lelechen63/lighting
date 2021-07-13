@@ -800,7 +800,7 @@ class TexGANModule(pl.LightningModule):
             
             # Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
            
-            Atex = batch['Atex'].data[0].cpu().float()  * self.stdtex + self.meantex 
+            Atex = batch['Atex'].data[0].cpu()  * self.stdtex + self.meantex 
             Atex = util.tensor2im(Atex  , normalize = False)
             
             Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
