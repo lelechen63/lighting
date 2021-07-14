@@ -334,7 +334,7 @@ class TexMeshDeccoder(nn.Module):
         self.num_vert = self.down_transform[-1].size(0)
         self.meshfc = nn.Sequential(
             nn.Linear(256, self.num_vert * 32))
-        )
+
         self.meshconv = nn.Sequential(
             Deblock(32,32,K),
             Deblock(32,16,K),
