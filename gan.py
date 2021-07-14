@@ -73,7 +73,7 @@ if opt.isTrain:
         opt.name += '_nocls'
 
     model = module(opt)
-    
+    print (model)
     
     checkpoint_callback = ModelCheckpoint(
         monitor='train_loss',

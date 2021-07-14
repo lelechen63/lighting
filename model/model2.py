@@ -145,6 +145,7 @@ class TexEncoder(nn.Module):
         return tex_encoded
 
 
+
 class TexDecoder(nn.Module):
     def __init__(self,  tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
                 ngf=64, n_downsampling=5, n_blocks=4, norm_layer = nn.BatchNorm2d, \
@@ -203,6 +204,152 @@ class TexDecoder(nn.Module):
         return rec_tex   
 
 
+
+class TexMeshEncoder(nn.Module):
+    def __init__(self,  tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+                ngf=64, n_downsampling=5, n_blocks=4, norm_layer= nn.BatchNorm2d, \
+                padding_type='reflect', edge_index_list = None, down_transform_list = None,\
+                up_transform_list= None, K = 6 ):
+        super().__init__()
+        
+        self.CNNencoder = nn.Sequential(
+            nn.ReflectionPad2d(3), nn.Conv2d(input_nc, ngf, kernel_size=7, padding=0),
+            norm_layer(ngf), 
+            nn.ReLU(True),  
+            nn.Conv2d(ngf , ngf  * 2, kernel_size=3, stride=2, padding=1),
+            norm_layer(ngf  * 2),
+            nn.ReLU(True),  # 2
+
+            nn.Conv2d(ngf*2 , ngf  * 4, kernel_size=3, stride=2, padding=1),
+            norm_layer(ngf  * 4),
+            nn.ReLU(True), # 8
+
+            nn.Conv2d(ngf*4 , ngf  * 4, kernel_size=3, stride=2, padding=1),
+            norm_layer(ngf  * 4),
+            nn.ReLU(True), # 16
+
+            nn.Conv2d(ngf*4 , ngf  * 8, kernel_size=3, stride=2, padding=1),
+            norm_layer(ngf  * 8),
+            nn.ReLU(True),  #32
+
+            nn.Conv2d(ngf*8 , ngf  * 8, kernel_size=3, stride=2, padding=1),
+            norm_layer(ngf  * 8),
+            nn.ReLU(True),  #64
+
+            nn.Conv2d(ngf*8 , ngf  * 16, kernel_size=3, stride=2, padding=1),
+            norm_layer(ngf  * 16),
+            nn.ReLU(True),  #128
+        )
+     
+        model = []
+        for i in range(n_blocks):
+            model += [ResnetBlock(ngf * 16, padding_type=padding_type, activation=activation, norm_layer=norm_layer)]
+        self.resblocks = nn.Sequential(*model)
+
+        self.codefc = nn.Sequential(
+            nn.Linear( ngf * 16 * 4 * 4, ngf * 4),
+            nn.Linear( ngf*4 , 256),
+            nn.ReLU(True)
+        )
+        ## for mesh encoder        
+        self.generator = AE(3,
+                [16, 16, 16, 32],
+                256,
+                edge_index_list,
+                down_transform_list,
+                up_transform_list,
+                K=6)
+
+        self.meshconv = nn.Sequential(
+            Enblock(3,16,K),
+            Enblock(16,16,K),
+            Enblock(16,16,K),
+            Enblock(16,32,K)
+        )
+        num_vert = down_transform[-1].size(0)
+        self.meshfc = nn.Sequential(
+            nn.Linear(num_vert * 32, 256),
+            nn.ReLU(True)
+        )
+        self.fusefc =nn.Sequential(
+            nn.Linear(512, 256)
+        )
+    def forward(self, tex, mesh):
+        tex_encoded = self.CNNencoder(tex)
+        tex_encoded = self.resblocks(tex_encoded).view(tex_encoded.shape[0], -1)
+        tex_encoded  = self.codefc(tex_encoded)
+
+        mesh_encoded = self.meshconv(mesh).view(mesh.shape[0], -1)
+        mesh_encoded = self.meshfc(mesh_encoded)
+        code = self.fusefc( torch.cat( [ tex_encoded, mesh_encoded], 1))
+        
+        return code
+
+
+class TexMeshDeccoder(nn.Module):
+    def __init__(self,  tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+                ngf=64, n_downsampling=5, n_blocks=4, norm_layer= nn.BatchNorm2d, \
+                padding_type='reflect', edge_index_list = None, down_transform_list = None,\
+                up_transform_list= None, K = 6 ):
+        super().__init__()
+        
+        self.tex_fc_dec = nn.Sequential(
+            nn.Linear( 256, ngf * 4),
+            nn.ReLU(True),
+            nn.Linear( ngf*4, ngf*16 * 4 * 4),
+            nn.ReLU(True)
+            )
+     
+        self.tex_decoder = nn.Sequential(
+        
+            nn.ConvTranspose2d(ngf * 16, ngf * 8, kernel_size=3, stride=2, padding=1, output_padding=1),
+            norm_layer(ngf * 8), 
+            nn.ReLU(True), #2
+
+            nn.ConvTranspose2d(ngf * 8, ngf * 4, kernel_size=3, stride=2, padding=1, output_padding=1),
+            norm_layer(ngf * 4), 
+            nn.ReLU(True), #8
+
+            nn.ConvTranspose2d(ngf * 4, ngf * 4, kernel_size=3, stride=2, padding=1, output_padding=1),
+            norm_layer(ngf * 4), 
+            nn.ReLU(True), #16
+
+            nn.ConvTranspose2d(ngf * 4, ngf * 2, kernel_size=3, stride=2, padding=1, output_padding=1),
+            norm_layer(ngf * 2), 
+            nn.ReLU(True), #32
+
+            nn.ConvTranspose2d(ngf * 2, ngf * 2, kernel_size=3, stride=2, padding=1, output_padding=1),
+            norm_layer(ngf * 2), 
+            nn.ReLU(True), #64
+
+            nn.ConvTranspose2d(ngf * 2, ngf , kernel_size=3, stride=2, padding=1, output_padding=1),
+            norm_layer(ngf), 
+            nn.ReLU(True), #128
+        )
+        model = []
+        model += [nn.ReflectionPad2d(3), nn.Conv2d(ngf, 3, kernel_size=7, padding=0)]   
+        self.output_layer = nn.Sequential(*model)
+
+        # mesh decoder 
+        self.num_vert = self.down_transform[-1].size(0)
+        self.meshfc = nn.Sequential(
+            nn.Linear(256, self.num_vert * 32))
+        )
+        self.meshconv = nn.Sequential(
+            Deblock(32,32,K),
+            Deblock(32,16,K),
+            Deblock(16,16,K),
+            Deblock(16,32,K)
+        )
+
+    def forward(self, code ):
+        tex_code = self.tex_fc_dec(code)
+        tex_dec = tex_code.view(tex_code.shape[0], -1, 4,4)
+        decoded = self.tex_decoder(tex_dec)
+        rec_tex = self.output_layer(decoded)
+
+
+        return code
 
 class GraphConvMeshModule(pl.LightningModule):
     def __init__(self, opt ):
@@ -432,19 +579,12 @@ class DisGraphConvMeshModule(pl.LightningModule):
         opt_g = torch.optim.Adam(self.generator.parameters(), lr=lr, betas=(self.opt.beta1, 0.999))
         # return [opt_g]
         def lr_foo(epoch):
-            # if epoch < 10:
-            #     lr_scale = 0.8 ** (10 - epoch)
-            # else:
             lr_scale = 0.95 ** int(epoch/10)
             if lr_scale < 0.08:
                 lr_scale = 0.08
             return lr_scale
         scheduler = torch.optim.lr_scheduler.LambdaLR(opt_g, lr_lambda=lr_foo )
-                        
-
         return [opt_g], [scheduler]
-    
-
 
     def on_epoch_end(self):
         if self.current_epoch % 5 == 0:
