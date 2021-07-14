@@ -58,7 +58,7 @@ class TexEncoder2(nn.Module):
         self.apply( lambda x: glorot( x, 0.2 ) )
         glorot( self.codelast, 1.0 )
     def forward(self, tex):
-        tex_encoded = self.CNNencoder(tex).view(tex_encoded.shape[0], -1)
+        tex_encoded = self.CNNencoder(tex).view(tex.shape[0], -1)
         tex_encoded  = self.codefc(tex_encoded)
         tex_encoded = slef.codelast(tex_encoded)
         return tex_encoded
