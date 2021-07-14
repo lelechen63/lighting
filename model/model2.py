@@ -60,7 +60,7 @@ class TexEncoder2(nn.Module):
     def forward(self, tex):
         tex_encoded = self.CNNencoder(tex).view(tex.shape[0], -1)
         tex_encoded  = self.codefc(tex_encoded)
-        tex_encoded = slef.codelast(tex_encoded)
+        tex_encoded = self.codelast(tex_encoded)
         return tex_encoded
 
 
