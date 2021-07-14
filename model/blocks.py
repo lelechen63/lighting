@@ -1,7 +1,7 @@
 import torch
 import torch.nn.functional as F
 from torch import nn
-
+import numpy as np
 
 class LinearWN( torch.nn.Linear ):
     def __init__( self, in_features, out_features, bias = True ):
