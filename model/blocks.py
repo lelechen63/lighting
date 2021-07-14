@@ -67,12 +67,12 @@ class Conv2dWN( torch.nn.Conv2d ):
 
     def forward( self, x ):
         if self.is_fused:
-            return thf.conv2d( x, self.weight, bias = self.bias,
+            return F.conv2d( x, self.weight, bias = self.bias,
                                stride = self.stride, padding = self.padding,
                                dilation = self.dilation, groups = self.groups )
         else:
             wnorm = torch.sqrt( torch.sum( self.weight ** 2 ) )
-            return thf.conv2d( x, self.weight * self.g[ :, None, None, None ] / wnorm,
+            return F.conv2d( x, self.weight * self.g[ :, None, None, None ] / wnorm,
                                bias = self.bias, stride = self.stride, padding = self.padding,
                                dilation = self.dilation, groups = self.groups )
 
@@ -97,12 +97,12 @@ class ConvTranspose2dWNUB( torch.nn.ConvTranspose2d ):
 
     def forward( self, x ):
         if self.is_fused:
-            return thf.conv_transpose2d( x, self.weight,
+            return F.conv_transpose2d( x, self.weight,
                                          bias = None, stride = self.stride, padding = self.padding,
                                          dilation = self.dilation, groups = self.groups ) + self.bias[ None, ... ]
         else:
             wnorm = torch.sqrt( torch.sum( self.weight ** 2 ) )
-            return thf.conv_transpose2d( x, self.weight * self.g[ None, :, None, None ] / wnorm,
+            return F.conv_transpose2d( x, self.weight * self.g[ None, :, None, None ] / wnorm,
                                          bias = None, stride = self.stride, padding = self.padding,
                                          dilation = self.dilation, groups = self.groups ) + self.bias[ None, ... ]
 
@@ -127,12 +127,12 @@ class ConvTranspose2dWN( torch.nn.ConvTranspose2d ):
 
     def forward( self, x ):
         if self.is_fused:
-            return thf.conv_transpose2d( x, self.weight, bias = self.bias,
+            return F.conv_transpose2d( x, self.weight, bias = self.bias,
                                          stride = self.stride, padding = self.padding,
                                          dilation = self.dilation, groups = self.groups )
         else:
             wnorm = torch.sqrt( torch.sum( self.weight ** 2 ) )
-            return thf.conv_transpose2d( x, self.weight * self.g[ None, :, None, None ] / wnorm,
+            return F.conv_transpose2d( x, self.weight * self.g[ None, :, None, None ] / wnorm,
                                          bias = self.bias, stride = self.stride, padding = self.padding,
                                          dilation = self.dilation, groups = self.groups )
 
