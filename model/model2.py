@@ -137,6 +137,60 @@ class Net_dec( nn.Module ):
         self.fused = True
 
 
+
+
+class TexEncoder2(nn.Module):
+    def __init__(self,  tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+                ngf=64, n_downsampling=5, n_blocks=4, norm_layer= nn.BatchNorm2d, \
+                padding_type='reflect'):
+        super().__init__()
+        self.tex_shape = tex_shape
+        
+        self.CNNencoder = nn.Sequential(
+            Conv2dWNUB( 3, 32, 128, 128, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ), #2
+            Conv2dWNUB( 32, 32, 64, 64, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),#4
+            Conv2dWNUB( 32, 64, 32, 32, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),#8
+            Conv2dWNUB( 64, 64, 16, 16, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),#16
+            Conv2dWNUB( 64, 128, 8, 8, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),#32
+            Conv2dWNUB( 128, 256, 4, 4, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),#64
+        )
+
+        self.codefc = nn.Sequential(
+            LinearWN(256 * 4 * 4, 512 ), nn.LeakyReLU( 0.2, inplace = True )
+            )
+        self.codelast = LinearWN( 512, 256 )
+        self.apply( lambda x: glorot( x, 0.2 ) )
+        glorot( self.codelast, 1.0 )
+    def forward(self, tex):
+        tex_encoded = self.CNNencoder(tex).view(tex_encoded.shape[0], -1)
+        tex_encoded  = self.codefc(tex_encoded)
+        tex_encoded = slef.codelast(tex_encoded)
+        return tex_encoded
+
+
+class TexDecoder2(nn.Module):
+    def __init__(self,  tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+                ngf=64, n_downsampling=5, n_blocks=4, norm_layer = nn.BatchNorm2d, \
+                padding_type='reflect'):
+        super().__init__()
+
+        self.tex_shape = tex_shape
+        self.tex_fc_dec = nn.Sequential(
+            LinearWN( 256 , 256 * 4 * 4 ), nn.LeakyReLU( 0.2, inplace = True ) )
+        self.tex_decoder = nn.Sequential(
+            ConvTranspose2dWNUB( 256, 256, 8, 8, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),
+            ConvTranspose2dWNUB( 256, 128, 16, 16, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),
+            ConvTranspose2dWNUB( 128, 64, 32, 32, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),
+            ConvTranspose2dWNUB( 64, 32, 64, 64, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),
+            ConvTranspose2dWNUB( 32, 8, 128, 128, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),
+            ConvTranspose2dWNUB( 8, 3, 256, 256, 4, 2, 1 ) )
+
+    def forward(self, tex_code):
+        tex_code = self.tex_fc_dec(tex_code)
+        tex_dec = tex_code.view(tex_code.shape[0], 256, 4,4) # not sure 
+        decoded = self.tex_decoder(tex_dec)
+        return decoded   
+
 class TexEncoder(nn.Module):
     def __init__(self,  tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
                 ngf=64, n_downsampling=5, n_blocks=4, norm_layer= nn.BatchNorm2d, \
@@ -694,10 +748,10 @@ class TexGenerator(nn.Module):
         super().__init__()
         norm_layer = get_norm_layer(norm_type=norm_layer)  
 
-        self.texEnc = TexEncoder(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+        self.texEnc = TexEncoder2(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
                 ngf, n_downsampling, n_blocks, norm_layer, padding_type)
 
-        self.texDec = TexDecoder(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+        self.texDec = TexDecoder2(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
                 ngf, n_downsampling, n_blocks, norm_layer, padding_type)
     def forward(self, A_tex ):
         
