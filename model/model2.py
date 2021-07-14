@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 import functools
 from torch.autograd import Variable
-from .blocks import LinearBlock, Conv2dBlock, ResBlocks, ActFirstResBlock, ResnetBlock
+from .blocks import *
 from model import lossNet
 import torchvision
 from collections import OrderedDict
@@ -32,111 +32,6 @@ def get_norm_layer(norm_type='instance'):
     else:
         raise NotImplementedError('normalization layer [%s] is not found' % norm_type)
     return norm_layer
-
-
-# -------------------- Encoder --------------------
-class Net_enc( nn.Module ):
-    def __init__( self ):
-        super( Net_enc, self ).__init__()
-        self.geommod = nn.Sequential(
-            LinearWN( 21918, 256 ), nn.LeakyReLU( 0.2, inplace = True ) )  # ,
-      
-        self.texmod = nn.Sequential(
-            Conv2dWNUB( 3, 32, 512, 512, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),
-            Conv2dWNUB( 32, 32, 256, 256, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),
-            Conv2dWNUB( 32, 64, 128, 128, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),
-            Conv2dWNUB( 64, 64, 64, 64, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),
-            Conv2dWNUB( 64, 128, 32, 32, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),
-            Conv2dWNUB( 128, 128, 16, 16, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),
-            Conv2dWNUB( 128, 256, 8, 8, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),
-            Conv2dWNUB( 256, 256, 4, 4, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ) )
-    
-        self.jointmod = nn.Sequential(
-            LinearWN( 256 + 256 * 4 * 4, 512 ), nn.LeakyReLU( 0.2, inplace = True ) )
-
-        self.mu = LinearWN( 512, 256 )
-        self.std = LinearWN( 512, 256 )
-
-        self.apply( lambda x: glorot( x, 0.2 ) )
-        glorot( self.mu, 1.0 )
-        glorot( self.std, 1.0 )
-
-    def forward( self, geom, tex ):
-        geomout = self.geommod( geom )
-        texout = self.texmod( tex ).view( -1, 256 * 4 * 4 )
-        encout = self.jointmod( th.cat( [ geomout, texout ], dim = 1 ) )
-        mu = self.mu( encout )
-        std = self.std( encout )
-        return mu * 0.1, std * 0.01
-
-
-# -------------------- Decoder --------------------
-class Net_dec( nn.Module ):
-    def __init__( self ):
-        super( Net_dec, self ).__init__()
-        self.encmod = nn.Sequential(
-            LinearWN( 256, 256 ), nn.LeakyReLU( 0.2, inplace = True ) )
-        self.viewmod = nn.Sequential(
-            LinearWN( 3, 8 ), nn.LeakyReLU( 0.2, inplace = True ) )
-        self.geommod = nn.Sequential(
-            LinearWN( 256, 21918 ) )
-        self.texmod2 = nn.Sequential(
-            LinearWN( 256 + 8, 256 * 4 * 4 ), nn.LeakyReLU( 0.2, inplace = True ) )
-        self.texmod = nn.Sequential(
-            ConvTranspose2dWNUB( 256, 256, 8, 8, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),
-            ConvTranspose2dWNUB( 256, 128, 16, 16, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),
-            ConvTranspose2dWNUB( 128, 128, 32, 32, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),
-            ConvTranspose2dWNUB( 128, 64, 64, 64, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),
-            ConvTranspose2dWNUB( 64, 64, 128, 128, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),
-            ConvTranspose2dWNUB( 64, 32, 256, 256, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),
-            ConvTranspose2dWNUB( 32, 8, 512, 512, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),
-            ConvTranspose2dWNUB( 8, 3, 1024, 1024, 4, 2, 1 ) )
-        self.warpmod2 = nn.Sequential(
-            LinearWN( 256 + 8, 256 * 4 * 4 ), nn.LeakyReLU( 0.2, inplace = True ) )
-        self.warpmod = nn.Sequential(
-            ConvTranspose2dWN( 256, 256, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),
-            ConvTranspose2dWN( 256, 128, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),
-            ConvTranspose2dWN( 128, 128, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),
-            ConvTranspose2dWN( 128, 64, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),
-            ConvTranspose2dWN( 64, 64, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),
-            ConvTranspose2dWN( 64, 2, 4, 2, 1 ),
-            nn.Upsample( scale_factor = 4, mode = 'bilinear' ) )
-
-        #  add parameter here for bias
-        self.bias = nn.Parameter( th.zeros( 3, 1024, 1024 ) )
-        self.bias.data.zero_()
-
-        xgrid, ygrid = np.meshgrid( np.linspace( -1.0, 1.0, 1024 ), np.linspace( -1.0, 1.0, 1024 ) )
-        grid = np.concatenate( (xgrid[ None, :, : ], ygrid[ None, :, : ]), axis = 0 )[ None, ... ].astype( np.float32 )
-        self.register_buffer( "warpbias", th.from_numpy( grid ) )
-
-        self.apply( lambda x: glorot( x, 0.2 ) )
-        glorot( self.texmod[ -1 ], 1.0 )
-        glorot( self.warpmod[ -2 ], 1.0 )
-
-        self.fused = False
-
-    def forward( self, enc, view ):
-        encout = self.encmod( enc )
-        viewout = self.viewmod( view )
-        geomout = self.geommod( encout )
-        encout = th.cat( [ encout, viewout ], dim = 1 )
-        texout = self.texmod( self.texmod2( encout ).view( -1, 256, 4, 4 ) )
-        warpout = self.warpmod( self.warpmod2( encout ).view( -1, 256, 4, 4 ) )
-        if not self.fused:
-            warpout = warpout * (1. / 1024) + self.warpbias
-        else:
-            warpout += self.warpbias
-        warpout = warpout.permute( 0, 2, 3, 1 )
-        texout = thf.grid_sample( texout, warpout ) + self.bias[ None, :, :, : ]
-        return geomout, texout
-
-    def fuse( self ):
-        self.warpmod[ -2 ].weight.data /= 1024.
-        self.warpmod[ -2 ].bias.data /= 1024.
-        self.fused = True
-
-
 
 
 class TexEncoder2(nn.Module):
@@ -184,7 +79,8 @@ class TexDecoder2(nn.Module):
             ConvTranspose2dWNUB( 64, 32, 64, 64, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),
             ConvTranspose2dWNUB( 32, 8, 128, 128, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),
             ConvTranspose2dWNUB( 8, 3, 256, 256, 4, 2, 1 ) )
-
+        self.apply( lambda x: glorot( x, 0.2 ) )
+        glorot( self.tex_fc_dec[ -1 ], 1.0 )
     def forward(self, tex_code):
         tex_code = self.tex_fc_dec(tex_code)
         tex_dec = tex_code.view(tex_code.shape[0], 256, 4,4) # not sure 
