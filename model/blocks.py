@@ -57,12 +57,12 @@ class Conv2dWNUB( torch.nn.Conv2d ):
         self.is_fused = False
 
 
-class Conv2dWN( th.nn.Conv2d ):
+class Conv2dWN( torch.nn.Conv2d ):
     def __init__( self, in_channels, out_channels, kernel_size,
                   stride = 1, padding = 0, dilation = 1, groups = 1, bias = True ):
         super().__init__( in_channels, out_channels, kernel_size, stride,
                           padding, dilation, groups, True )
-        self.g = th.nn.Parameter( th.ones( out_channels // groups ) )
+        self.g = torch.nn.Parameter( torch.ones( out_channels // groups ) )
         self.is_fused = False
 
     def forward( self, x ):
@@ -71,28 +71,28 @@ class Conv2dWN( th.nn.Conv2d ):
                                stride = self.stride, padding = self.padding,
                                dilation = self.dilation, groups = self.groups )
         else:
-            wnorm = th.sqrt( th.sum( self.weight ** 2 ) )
+            wnorm = torch.sqrt( torch.sum( self.weight ** 2 ) )
             return thf.conv2d( x, self.weight * self.g[ :, None, None, None ] / wnorm,
                                bias = self.bias, stride = self.stride, padding = self.padding,
                                dilation = self.dilation, groups = self.groups )
 
     def fuse( self ):
-        wnorm = th.sqrt( (self.weight ** 2).sum() )
+        wnorm = torch.sqrt( (self.weight ** 2).sum() )
         self.weight.data = self.weight.data * self.g.data[ :, None, None, None ] / wnorm
         del self._parameters[ "g" ]
         self.is_fused = True
 
     def unfuse( self ):
-        self.g = th.nn.Parameter( th.ones( self.out_channels // self.groups ) )
+        self.g = torch.nn.Parameter( torch.ones( self.out_channels // self.groups ) )
         self.is_fused = False
 
-class ConvTranspose2dWNUB( th.nn.ConvTranspose2d ):
+class ConvTranspose2dWNUB( torch.nn.ConvTranspose2d ):
     def __init__( self, in_channels, out_channels, height, width, kernel_size,
                   stride = 1, padding = 0, dilation = 1, groups = 1, bias = False ):
         super().__init__( in_channels, out_channels, kernel_size, stride,
                           padding, dilation, groups, False )
-        self.g = th.nn.Parameter( th.ones( out_channels // groups ) )
-        self.bias = th.nn.Parameter( th.zeros( out_channels, height, width ) )
+        self.g = torch.nn.Parameter( torch.ones( out_channels // groups ) )
+        self.bias = torch.nn.Parameter( torch.zeros( out_channels, height, width ) )
         self.is_fused = False
 
     def forward( self, x ):
@@ -101,28 +101,28 @@ class ConvTranspose2dWNUB( th.nn.ConvTranspose2d ):
                                          bias = None, stride = self.stride, padding = self.padding,
                                          dilation = self.dilation, groups = self.groups ) + self.bias[ None, ... ]
         else:
-            wnorm = th.sqrt( th.sum( self.weight ** 2 ) )
+            wnorm = torch.sqrt( torch.sum( self.weight ** 2 ) )
             return thf.conv_transpose2d( x, self.weight * self.g[ None, :, None, None ] / wnorm,
                                          bias = None, stride = self.stride, padding = self.padding,
                                          dilation = self.dilation, groups = self.groups ) + self.bias[ None, ... ]
 
     def fuse( self ):
-        wnorm = th.sqrt( (self.weight ** 2).sum() )
+        wnorm = torch.sqrt( (self.weight ** 2).sum() )
         self.weight.data = self.weight.data * self.g.data[ None, :, None, None ] / wnorm
         del self._parameters[ "g" ]
         self.is_fused = True
 
     def unfuse( self ):
-        self.g = th.nn.Parameter( th.ones( self.out_channels // self.groups ) )
+        self.g = torch.nn.Parameter( torch.ones( self.out_channels // self.groups ) )
         self.is_fused = False
 
 
-class ConvTranspose2dWN( th.nn.ConvTranspose2d ):
+class ConvTranspose2dWN( torch.nn.ConvTranspose2d ):
     def __init__( self, in_channels, out_channels, kernel_size,
                   stride = 1, padding = 0, dilation = 1, groups = 1, bias = True ):
         super().__init__( in_channels, out_channels, kernel_size, stride,
                           padding, dilation, groups, True )
-        self.g = th.nn.Parameter( th.ones( out_channels // groups ) )
+        self.g = torch.nn.Parameter( torch.ones( out_channels // groups ) )
         self.is_fused = False
 
     def forward( self, x ):
@@ -131,19 +131,19 @@ class ConvTranspose2dWN( th.nn.ConvTranspose2d ):
                                          stride = self.stride, padding = self.padding,
                                          dilation = self.dilation, groups = self.groups )
         else:
-            wnorm = th.sqrt( th.sum( self.weight ** 2 ) )
+            wnorm = torch.sqrt( torch.sum( self.weight ** 2 ) )
             return thf.conv_transpose2d( x, self.weight * self.g[ None, :, None, None ] / wnorm,
                                          bias = self.bias, stride = self.stride, padding = self.padding,
                                          dilation = self.dilation, groups = self.groups )
 
     def fuse( self ):
-        wnorm = th.sqrt( (self.weight ** 2).sum() )
+        wnorm = torch.sqrt( (self.weight ** 2).sum() )
         self.weight.data = self.weight.data * self.g.data[ None, :, None, None ] / wnorm
         del self._parameters[ "g" ]
         self.is_fused = True
 
     def unfuse( self ):
-        self.g = th.nn.Parameter( th.ones( self.out_channels // self.groups ) )
+        self.g = torch.nn.Parameter( torch.ones( self.out_channels // self.groups ) )
         self.is_fused = False
 
 
