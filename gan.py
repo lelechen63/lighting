@@ -127,11 +127,48 @@ else:
             visualizer.display_current_results(visuals, num, 1000000)
 
 
-    elif opt.name =='texmesh':
-        checkpoint_path = '/data/home/us000042/lelechen/github/lighting/lightning_logs/version_30/checkpoints/epoch=720-step=152851.ckpt'
+    elif opt.name =='meshtexgan':
+        checkpoint_path = '/data/home/us000042/lelechen/github/lighting/checkpoints/meshtexgan/latest.ckpt'
         
-        from model.model2 import TexMeshGenerator as module 
-        pass
+        from model.model2 import MeshTexGenerator as module 
+        module = module(opt.loadSize, not opt.no_linearity, 
+            3, opt.code_n,opt.encoder_fc_n, opt.ngf, 
+            opt.n_downsample_global, opt.n_blocks_global,opt.norm)
+        checkpoint = troch.load(checkpoint_path)
+        module.load_state_dict(pl2normal(checkpoint['state_dict']))
+
+        dm.setup()
+        testdata = dm.test_dataloader()
+        # testdata = random.shuffle(testdata)
+        opt.name = opt.name + '_test'
+        visualizer = Visualizer(opt)
+        l2loss = torch.nn.MSELoss()
+        for num,batch in enumerate(testdata):
+            rec_tex_A, rec_mesh_A, code = \
+            module(batch['Atex'], batch['Amesh'] )
+
+            gt_mesh = batch['Amesh'].data[0].cpu()* totalstdmesh + totalmeanmesh
+            rec_Amesh = rec_mesh_A.data[0].cpu().view(-1) * totalstdmesh + totalmeanmesh 
+            gt_mesh = gt_mesh.float()
+            rec_Amesh = rec_Amesh.float()
+
+            gt_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gt_mesh )
+            rec_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), rec_Amesh )
+
+            gt_Amesh = np.ascontiguousarray(gt_Amesh, dtype=np.uint8)
+            gt_Amesh = util.writeText(gt_Amesh, batch['A_path'][0], 100)
+            Atex = util.tensor2im(batch['Atex'][0])
+            Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
+            Atex = util.writeText(Atex, batch['A_path'][0])
+
+            tmp = batch['A_path'][0].split('/')
+            visuals = OrderedDict([
+                ('Atex', Atex),
+                ('rec_tex_A', util.tensor2im(rec_tex_A.data[0])),
+                ('gt_Amesh', gt_Amesh),
+                ('rec_Amesh', rec_Amesh),
+                ])
+            visualizer.display_current_results(visuals, num, 1000000)
     elif opt.name =='mesh':
         from model.model2 import MeshGenerator as module 
         checkpoint_path = '/data/home/us000042/lelechen/github/lighting/checkpoints/mesh/latest.ckpt'
