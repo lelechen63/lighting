@@ -339,8 +339,10 @@ class TexMeshDeccoder(nn.Module):
             Deblock(32,32,K),
             Deblock(32,16,K),
             Deblock(16,16,K),
-            Deblock(16,32,K)
+            Deblock(16,16,K)
         )
+        self.meshlast = nn.Sequential(
+            ChebConv(16, 3, K))
 
     def forward(self, code ):
         tex_code = self.tex_fc_dec(code)
@@ -348,8 +350,11 @@ class TexMeshDeccoder(nn.Module):
         decoded = self.tex_decoder(tex_dec)
         rec_tex = self.output_layer(decoded)
 
+        mesh_code = self.meshfc(code).view(-1, self.num_vert, 32)
+        mesh_code = self.meshconv(mesh_code)
+        rec_mesh = self.meshlast(mesh_code)
 
-        return code
+        return rec_tex, rec_mesh
 
 class GraphConvMeshModule(pl.LightningModule):
     def __init__(self, opt ):
@@ -924,12 +929,6 @@ class MeshTexGenerator(nn.Module):
         super().__init__()
         norm_layer = get_norm_layer(norm_type=norm_layer)  
 
-        self.texEnc = TexEncoder(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
-                ngf, n_downsampling, n_blocks, norm_layer, padding_type)
-
-        self.texDec = TexDecoder(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
-                ngf, n_downsampling, n_blocks, norm_layer, padding_type)
-
         # define the mesh part
         homepath = './predef'
         device = torch.device('cuda', 0)
@@ -962,58 +961,21 @@ class MeshTexGenerator(nn.Module):
             util.to_sparse(up_transform).to(device)
             for up_transform in tmp['up_transform']
         ]
-        out_channels = [16, 16, 16, 32]
-        in_channels = 3
-        K = 6
-        self.latent_channels = 256
-        self.in_channels = in_channels
-        self.out_channels = out_channels 
-        self.edge_index = edge_index_list
-        self.down_transform = down_transform_list
-        self.up_transform = up_transform_list
-        # self.num_vert used in the last and the first layer of encoder and decoder
-        self.num_vert = self.down_transform[-1].size(0)
 
-        # encoder
-        self.en_layers = nn.ModuleList()
-        for idx in range(len(out_channels)):
-            if idx == 0:
-                self.en_layers.append(
-                    Enblock(in_channels, out_channels[idx], K))
-            else:
-                self.en_layers.append(
-                    Enblock(out_channels[idx - 1], out_channels[idx], K
-                            ))
-        self.en_layers.append(
-            nn.Linear(self.num_vert * out_channels[-1], self.latent_channels))
+        self.texmeshEnc = TexMeshEncoder( tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+                ngf=64, n_downsampling=5, n_blocks=4, norm_layer='batch', \
+                padding_type='reflect', edge_index_list = edge_index, \
+                 down_transform_list = down_transform_list,\
+                up_transform_list= up_transform_list, K = K)
 
-        # decoder
-        self.de_layers = nn.ModuleList()
-        self.de_layers.append(
-            nn.Linear(self.latent_channels, self.num_vert * out_channels[-1]))
-        for idx in range(len(out_channels)):
-            if idx == 0:
-                self.de_layers.append(
-                    Deblock(out_channels[-idx - 1], out_channels[-idx - 1], K))
-            else:
-                self.de_layers.append(
-                    Deblock(out_channels[-idx], out_channels[-idx - 1], K
-                            ))
-        # reconstruction
-        self.de_layers.append(
-            ChebConv(out_channels[0], in_channels, K))
+        self.texmeshDec = TexMeshEncoder( tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+                ngf=64, n_downsampling=5, n_blocks=4, norm_layer='batch', \
+                padding_type='reflect', edge_index_list = edge_index, \
+                 down_transform_list = down_transform_list,\
+                up_transform_list= up_transform_list, K = K)
 
-        self.codeEnc = nn.Sequential(
-            nn.Linear(self.latent_channels *2, self.latent_channels),   
-            nn.Linear(self.latent_channels , self.latent_channels)
-        )
-        self.codeDec = nn.Sequential(
-            nn.Linear(self.latent_channels , self.latent_channels),   
-            nn.Linear(self.latent_channels , self.latent_channels * 2)
-        )
-
-        self.reset_parameters()
-
+        self.texmeshEnc.reset_parameters()
+        self.texmeshDec.reset_parameters()
     def reset_parameters(self):
         for name, param in self.named_parameters():
             if 'bias' in name:
@@ -1021,47 +983,13 @@ class MeshTexGenerator(nn.Module):
             else:
                 nn.init.xavier_uniform_(param)
 
-    def meshencoder(self, x):
-        # self.edge_index = self.edge_index.type_as(x)
-        # self.down_transform = self.down_transform.type_as(x)
-        for i, layer in enumerate(self.en_layers):
-            if i != len(self.en_layers) - 1:
-                x = layer(x, self.edge_index[i], self.down_transform[i])
-            else:
-                x = x.view(-1, layer.weight.size(1))
-                x = layer(x)
-        return x
-
-    def meshdecoder(self, x):
-        
-
-        num_layers = len(self.de_layers)
-        num_deblocks = num_layers - 2
-        for i, layer in enumerate(self.de_layers):
-            if i == 0:
-                x = layer(x)
-                x = x.view(-1, self.num_vert, self.out_channels[-1])
-            elif i != num_layers - 1:
-                x = layer(x, self.edge_index[num_deblocks - i],
-                          self.up_transform[num_deblocks - i])
-            else:
-                # last layer
-                x = layer(x, self.edge_index[0])
-        return x
+   
     def forward(self, A_tex, A_mesh ):
         # encode
-        tex_code = self.texEnc(A_tex)
-        mesh_code = self.meshencoder(A_mesh)
-
-        # code transfer
-        code = self.codeEnc(torch.cat([tex_code, mesh_code], 1))
-        reccode = self.codeDec(code)
-        rectex_code = reccode[:, :self.latent_channels]
-        recmesh_code = reccode[:,self.latent_channels:]
+        code = self.texmeshEnc(A_tex, A_mesh)
 
         # reconstruction
-        rec_tex_A = self.texDec(rectex_code)
-        rec_mesh_A = self.meshdecoder(recmesh_code)
+        rec_tex_A,rec_mesh_A  = self.texmeshDec(code)
 
         return rec_tex_A, rec_mesh_A, code
 
