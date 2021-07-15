@@ -129,7 +129,7 @@ else:
 
     elif opt.name =='meshtexgan':
         checkpoint_path = '/data/home/us000042/lelechen/github/lighting/checkpoints/meshtexgan/latest.ckpt'
-        
+        device = torch.device('cuda', 0)
         from model.model2 import MeshTexGenerator as module 
         module = module(opt.loadSize, not opt.no_linearity, 
             3, opt.code_n,opt.encoder_fc_n, opt.ngf, 
@@ -143,6 +143,7 @@ else:
         opt.name = opt.name + '_test'
         visualizer = Visualizer(opt)
         l2loss = torch.nn.MSELoss()
+        module = module.to(device)
         for num,batch in enumerate(testdata):
             rec_tex_A, rec_mesh_A, code = \
             module(batch['Atex'], batch['Amesh'] )
