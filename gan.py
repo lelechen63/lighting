@@ -60,8 +60,8 @@ elif opt.name == 'disgmesh' :
 elif opt.name == 'disgmesh2' :
     from model.model2 import DisGraphConvMeshModule2 as module 
     opt.datasetname = "fs_mesh"
-# totalmeanmesh = torch.FloatTensor( np.load( "./predef/meanmesh.npy" ) ) 
-# totalstdmesh = np.load( "./predef/meshstd.npy" )
+totalmeanmesh = torch.FloatTensor( np.load( "./predef/meanmesh.npy" ) ) 
+totalstdmesh = np.load( "./predef/meshstd.npy" )
 
 dm = FacescapeDataModule(opt)
 
