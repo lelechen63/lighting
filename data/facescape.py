@@ -222,7 +222,7 @@ class FacescapeDisMeshTexDataset(torch.utils.data.Dataset):
         self.id_set = set(pickle.load(ids))
         self.exp_set = get_exp()
 
-        self.meanmesh = get_meanmesh()
+        # self.meanmesh = get_meanmesh()
         print ('===========================')
         print ('id_set:',self.id_set)
         print('+++++++++++++++++++++++++++')
@@ -375,7 +375,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         self.id_set = set(pickle.load(ids))
         self.exp_set = get_exp()
 
-        self.meanmesh = get_meanmesh()
+        # self.meanmesh = get_meanmesh()
         print ('===========================')
         print ('id_set:',self.id_set)
         print('+++++++++++++++++++++++++++')
@@ -586,7 +586,7 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
         self.id_set = set(pickle.load(ids))
         self.exp_set = get_exp()
 
-        self.meanmesh = get_meanmesh()
+        # self.meanmesh = get_meanmesh()
         print ('===========================')
         print ('id_set:',self.id_set)
         print('+++++++++++++++++++++++++++')
