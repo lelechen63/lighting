@@ -274,7 +274,6 @@ class TexMeshEncoder(nn.Module):
         tex_encoded = self.resblocks(tex_encoded).view(tex_encoded.shape[0], -1)
         tex_encoded  = self.codefc(tex_encoded)
 
-        print(mesh.shape)
         for i, layer in enumerate( self.meshconv):
             mesh = layer( mesh, self.edge_index[i], self.down_transform[i])
         mesh_encoded = mesh.view(mesh.shape[0], -1)
