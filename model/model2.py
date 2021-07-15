@@ -972,7 +972,7 @@ class MeshTexGenerator(nn.Module):
                 ngf=64, n_downsampling=5, n_blocks=4, norm_layer='batch', \
                 padding_type='reflect', edge_index_list = edge_index_list, \
                  down_transform_list = down_transform_list,\
-                up_transform_list= up_transform_list, K = K)
+                up_transform_list= up_transform_list, K = 6)
 
         self.texmeshEnc.reset_parameters()
         self.texmeshDec.reset_parameters()
