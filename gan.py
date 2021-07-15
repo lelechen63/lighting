@@ -146,7 +146,7 @@ else:
         module = module.to(device)
         for num,batch in enumerate(testdata):
             rec_tex_A, rec_mesh_A, code = \
-            module(batch['Atex'], batch['Amesh'] )
+            module(batch['Atex'].to(device), batch['Amesh'].to(device) )
 
             gt_mesh = batch['Amesh'].data[0].cpu()* totalstdmesh + totalmeanmesh
             rec_Amesh = rec_mesh_A.data[0].cpu().view(-1) * totalstdmesh + totalmeanmesh 
