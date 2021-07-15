@@ -211,7 +211,7 @@ class TexMeshEncoder(nn.Module):
                 padding_type='reflect', edge_index_list = None, down_transform_list = None,\
                 up_transform_list= None, K = 6 ):
         super().__init__()
-        
+        norm_layer = get_norm_layer(norm_type=norm_layer)  
         self.CNNencoder = nn.Sequential(
             nn.ReflectionPad2d(3), nn.Conv2d(input_nc, ngf, kernel_size=7, padding=0),
             norm_layer(ngf), 
@@ -292,7 +292,7 @@ class TexMeshDeccoder(nn.Module):
                 padding_type='reflect', edge_index_list = None, down_transform_list = None,\
                 up_transform_list= None, K = 6 ):
         super().__init__()
-        
+        norm_layer = get_norm_layer(norm_type=norm_layer)  
         self.tex_fc_dec = nn.Sequential(
             nn.Linear( 256, ngf * 4),
             nn.ReLU(True),
