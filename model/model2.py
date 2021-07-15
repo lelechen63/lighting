@@ -284,7 +284,7 @@ class TexMeshEncoder(nn.Module):
         return code
 
 
-class TexMeshDeccoder(nn.Module):
+class TexMeshDecoder(nn.Module):
     def __init__(self,  tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
                 ngf=64, n_downsampling=5, n_blocks=4, norm_layer= nn.BatchNorm2d, \
                 padding_type='reflect', edge_index_list = None, down_transform_list = None,\
@@ -329,19 +329,21 @@ class TexMeshDeccoder(nn.Module):
         self.output_layer = nn.Sequential(*model)
 
         # mesh decoder 
+        self.edge_index = edge_index_list
+        self.up_transform = up_transform_list
         self.num_vert = self.down_transform[-1].size(0)
         self.meshfc = nn.Sequential(
             nn.Linear(256, self.num_vert * 32))
 
-        self.meshconv = nn.Sequential(
+        self.meshconv = nn.ModuleList([
             Deblock(32,32,K),
             Deblock(32,16,K),
             Deblock(16,16,K),
-            Deblock(16,16,K)
+            Deblock(16,16,K)]
         )
         self.meshlast = nn.Sequential(
             ChebConv(16, 3, K))
-
+        self.num_deblocks = len(self.de_layers) - 1
     def forward(self, code ):
         tex_code = self.tex_fc_dec(code)
         tex_dec = tex_code.view(tex_code.shape[0], -1, 4,4)
@@ -349,8 +351,11 @@ class TexMeshDeccoder(nn.Module):
         rec_tex = self.output_layer(decoded)
 
         mesh_code = self.meshfc(code).view(-1, self.num_vert, 32)
-        mesh_code = self.meshconv(mesh_code)
-        rec_mesh = self.meshlast(mesh_code)
+
+        for i,layer in enumerate(self.meshconv):
+            mesh_code = self.layer(mesh_code, self.edge_index[self.num_deblocks - i],
+                          self.up_transform[num_deblocks - i])
+        rec_mesh = self.meshlast(mesh_code, self.edge_index_list[0])
 
         return rec_tex, rec_mesh
 
@@ -715,71 +720,7 @@ class DisGraphConvMeshModule2(pl.LightningModule):
     def on_epoch_end(self):
         if self.current_epoch % 5 == 0:
             self.trainer.save_checkpoint( os.path.join( self.ckpt_path, 'latest.ckpt') )
-
-class  TexMeshDecoder(nn.Module):
-    def __init__(self,  tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
-                ngf=64, n_downsampling=5, n_blocks=4, norm_layer = nn.BatchNorm2d, \
-                padding_type='reflect'):
-        super().__init__()
-
-        self.tex_shape = tex_shape
-        activation = nn.ReLU(True)   
-        
-        self.tex_fc_dec = nn.Sequential(
-            nn.Linear( ngf*4 * 2, ngf*16 * 4 * 4),
-            nn.ReLU(True)
-            )
-        self.mesh_fc_dec = nn.Sequential(
-            nn.Linear( ngf*4, ngf*4),
-            nn.ReLU(True),
-            nn.Linear( ngf*4, ngf*4),
-            nn.ReLU(True),
-            nn.Linear( ngf*4, ngf*4),
-            nn.ReLU(True),
-            nn.Linear( ngf*4, 78951),
-            )
-        ### upsample
-
-        self.tex_decoder = nn.Sequential(
-           
-            nn.ConvTranspose2d(ngf * 16, ngf * 8, kernel_size=3, stride=2, padding=1, output_padding=1),
-            norm_layer(ngf * 8), 
-            nn.ReLU(True), #2
-
-            nn.ConvTranspose2d(ngf * 8, ngf * 4, kernel_size=3, stride=2, padding=1, output_padding=1),
-            norm_layer(ngf * 4), 
-            nn.ReLU(True), #8
-
-            nn.ConvTranspose2d(ngf * 4, ngf * 4, kernel_size=3, stride=2, padding=1, output_padding=1),
-            norm_layer(ngf * 4), 
-            nn.ReLU(True), #16
-
-            nn.ConvTranspose2d(ngf * 4, ngf * 2, kernel_size=3, stride=2, padding=1, output_padding=1),
-            norm_layer(ngf * 2), 
-            nn.ReLU(True), #32
-
-            nn.ConvTranspose2d(ngf * 2, ngf * 2, kernel_size=3, stride=2, padding=1, output_padding=1),
-            norm_layer(ngf * 2), 
-            nn.ReLU(True), #64
-
-            nn.ConvTranspose2d(ngf * 2, ngf , kernel_size=3, stride=2, padding=1, output_padding=1),
-            norm_layer(ngf), 
-            nn.ReLU(True), #128
-        )
-        model = []
-        model += [nn.ReflectionPad2d(3), nn.Conv2d(ngf, 3, kernel_size=7, padding=0), nn.Tanh()]    
-        self.output_layer = nn.Sequential(*model)
-
-   
-
-    def forward(self, tex_code, mesh_code):
-       
-        rec_mesh = self.mesh_fc_dec(mesh_code)
-        tex_dec = tex_code.view(tex_code.shape[0], -1, 4,4) # not sure 
-
-        decoded = self.tex_decoder(tex_dec)
-        rec_tex = self.output_layer(decoded)
-        return rec_tex, rec_mesh   
+  
 
 class TexGenerator(nn.Module):
     def __init__(self, tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
@@ -966,7 +907,7 @@ class MeshTexGenerator(nn.Module):
                  down_transform_list = down_transform_list,\
                 up_transform_list= up_transform_list, K = 6)
 
-        self.texmeshDec = TexMeshEncoder( tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+        self.texmeshDec = TexMeshDecoder( tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
                 ngf=64, n_downsampling=5, n_blocks=4, norm_layer='batch', \
                 padding_type='reflect', edge_index_list = edge_index_list, \
                  down_transform_list = down_transform_list,\
