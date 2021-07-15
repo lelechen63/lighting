@@ -60,8 +60,8 @@ elif opt.name == 'disgmesh' :
 elif opt.name == 'disgmesh2' :
     from model.model2 import DisGraphConvMeshModule2 as module 
     opt.datasetname = "fs_mesh"
-totalmeanmesh = torch.FloatTensor( np.load( "./predef/meanmesh.npy" ) ) 
-totalstdmesh = np.load( "./predef/meshstd.npy" )
+totalmeanmesh = torch.FloatTensor( np.load( "./predef/meanmesh.npy" ) ).view(-1,3) 
+totalstdmesh = torch.FloatTensor(np.load( "./predef/meshstd.npy" )).view(-1,3)
 
 dm = FacescapeDataModule(opt)
 
@@ -147,9 +147,10 @@ else:
         for num,batch in enumerate(testdata):
             rec_tex_A, rec_mesh_A, code = \
             module(batch['Atex'].to(device), batch['Amesh'].to(device) )
-
+            print (batch['Amesh'].data[0].cpu().shape)
+            print(totalstdmesh.shape)
             gt_mesh = batch['Amesh'].data[0].cpu()* totalstdmesh + totalmeanmesh
-            rec_Amesh = rec_mesh_A.data[0].cpu().view(-1) * totalstdmesh + totalmeanmesh 
+            rec_Amesh = rec_mesh_A.data[0].cpu() * totalstdmesh + totalmeanmesh 
             gt_mesh = gt_mesh.float()
             rec_Amesh = rec_Amesh.float()
 
