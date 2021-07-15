@@ -974,10 +974,10 @@ class MeshTexGenerator(nn.Module):
                  down_transform_list = down_transform_list,\
                 up_transform_list= up_transform_list, K = 6)
 
-        self.reset_parameters()
+        # self.reset_parameters()
     def reset_parameters(self):
         for name, param in self.named_parameters():
-            print (name)
+            # print (name)
             if 'bias' in name:
                 nn.init.constant_(param, 0)
             else:
