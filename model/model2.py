@@ -279,6 +279,7 @@ class TexMeshEncoder(nn.Module):
         tex_encoded = self.resblocks(tex_encoded).view(tex_encoded.shape[0], -1)
         tex_encoded  = self.codefc(tex_encoded)
 
+        print(mesh.shape)
         mesh_encoded = self.meshconv(mesh).view(mesh.shape[0], -1)
         mesh_encoded = self.meshfc(mesh_encoded)
         code = self.fusefc( torch.cat( [ tex_encoded, mesh_encoded], 1))
