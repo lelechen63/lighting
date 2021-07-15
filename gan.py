@@ -149,6 +149,7 @@ else:
             module(batch['Atex'].to(device), batch['Amesh'].to(device) )
             print (batch['Amesh'].data[0].cpu().shape)
             print(totalstdmesh.shape)
+            tmp = batch['A_path'][0].split('/')
             gt_mesh = batch['Amesh'].data[0].cpu()* totalstdmesh + totalmeanmesh
             rec_Amesh = rec_mesh_A.data[0].cpu() * totalstdmesh + totalmeanmesh 
             gt_mesh = gt_mesh.float()
