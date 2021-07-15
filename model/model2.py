@@ -966,7 +966,7 @@ class MeshTexGenerator(nn.Module):
                 ngf=64, n_downsampling=5, n_blocks=4, norm_layer='batch', \
                 padding_type='reflect', edge_index_list = edge_index_list, \
                  down_transform_list = down_transform_list,\
-                up_transform_list= up_transform_list, K = K)
+                up_transform_list= up_transform_list, K = 6)
 
         self.texmeshDec = TexMeshEncoder( tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
                 ngf=64, n_downsampling=5, n_blocks=4, norm_layer='batch', \
