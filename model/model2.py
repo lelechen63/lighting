@@ -341,8 +341,7 @@ class TexMeshDecoder(nn.Module):
             Deblock(16,16,K),
             Deblock(16,16,K)]
         )
-        self.meshlast = nn.Sequential(
-            ChebConv(16, 3, K))
+        self.meshlast =   ChebConv(16, 3, K)
         self.num_deblocks = len(self.meshconv) - 1
     def forward(self, code ):
         tex_code = self.tex_fc_dec(code)
