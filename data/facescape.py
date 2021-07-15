@@ -631,7 +631,7 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
         # id_p , 'models_reg', motion_p
       
         A_vertices = self.total_tex[self.data_list[index]][0] 
-        Aidmesh = ( self.meanmesh[tmp[0]]- self.totalmeanmesh ) / self.totalstdmesh
+        # Aidmesh = ( self.meanmesh[tmp[0]]- self.totalmeanmesh ) / self.totalstdmesh
 
         toss = random.getrandbits(1)
 
@@ -650,8 +650,8 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
                 
                 # tex
                 tex_index = os.path.join( B_id , 'models_reg', B_exp  )
-                Bidmesh = ( self.meanmesh[B_id]- self.totalmeanmesh ) / self.totalstdmesh
-
+                # Bidmesh = ( self.meanmesh[B_id]- self.totalmeanmesh ) / self.totalstdmesh
+                
                 if self.opt.debug:
                     tex_index = self.data_list[index]
 
@@ -669,7 +669,7 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
                 'A_path': self.data_list[index], 
                 'Bmesh': torch.FloatTensor(B_vertices), 'B_path': os.path.join( B_id, 'models_reg' , B_exp),
                 'map_type':toss, 'Aid': int(A_id) - 1, 'Aexp': int(A_exp) -1,
-                'Bid':int(B_id) - 1, 'Bexp':int(B_exp.split('_')[0]) - 1, 'Aidmesh':  torch.FloatTensor(Aidmesh), 'Bidmesh': torch.FloatTensor(Bidmesh) }
+                'Bid':int(B_id) - 1, 'Bexp':int(B_exp.split('_')[0]) - 1}#, 'Aidmesh':  torch.FloatTensor(Aidmesh), 'Bidmesh': torch.FloatTensor(Bidmesh) }
 
         return input_dict
 
