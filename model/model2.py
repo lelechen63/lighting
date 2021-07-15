@@ -353,7 +353,7 @@ class TexMeshDecoder(nn.Module):
         mesh_code = self.meshfc(code).view(-1, self.num_vert, 32)
 
         for i,layer in enumerate(self.meshconv):
-            mesh_code = self.layer(mesh_code, self.edge_index[self.num_deblocks - i],
+            mesh_code = layer(mesh_code, self.edge_index[self.num_deblocks - i],
                           self.up_transform[num_deblocks - i])
         rec_mesh = self.meshlast(mesh_code, self.edge_index_list[0])
 
