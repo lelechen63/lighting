@@ -252,15 +252,10 @@ class TexMeshEncoder(nn.Module):
             nn.ReLU(True)
         )
         ## for mesh encoder        
-        self.generator = AE(3,
-                [16, 16, 16, 32],
-                256,
-                edge_index_list,
-                down_transform_list,
-                up_transform_list,
-                K=6)
+        self.edge_index = edge_index_list
+        self.down_transform = down_transform_list
 
-        self.meshconv = nn.Sequential(
+        self.meshconv = nn.ModuleList(
             Enblock(3,16,K),
             Enblock(16,16,K),
             Enblock(16,16,K),
@@ -280,7 +275,9 @@ class TexMeshEncoder(nn.Module):
         tex_encoded  = self.codefc(tex_encoded)
 
         print(mesh.shape)
-        mesh_encoded = self.meshconv(mesh).view(mesh.shape[0], -1)
+        for i, layer in enumerate( self.meshconv):
+            mesh = layer( mesh, self.edge_index[i], self.down_transform[i])
+        mesh_encoded = mesh.view(mesh.shape[0], -1)
         mesh_encoded = self.meshfc(mesh_encoded)
         code = self.fusefc( torch.cat( [ tex_encoded, mesh_encoded], 1))
         
