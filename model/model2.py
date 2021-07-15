@@ -243,7 +243,7 @@ class TexMeshEncoder(nn.Module):
      
         model = []
         for i in range(n_blocks):
-            model += [ResnetBlock(ngf * 16, padding_type=padding_type, activation=activation, norm_layer=norm_layer)]
+            model += [ResnetBlock(ngf * 16, padding_type=padding_type, activation=nn.ReLU(True) , norm_layer=norm_layer)]
         self.resblocks = nn.Sequential(*model)
 
         self.codefc = nn.Sequential(
