@@ -354,7 +354,7 @@ class TexMeshDecoder(nn.Module):
 
         for i,layer in enumerate(self.meshconv):
             mesh_code = layer(mesh_code, self.edge_index[self.num_deblocks - i],
-                          self.up_transform[num_deblocks - i])
+                          self.up_transform[self.num_deblocks - i])
         rec_mesh = self.meshlast(mesh_code, self.edge_index_list[0])
 
         return rec_tex, rec_mesh
