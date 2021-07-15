@@ -255,11 +255,11 @@ class TexMeshEncoder(nn.Module):
         self.edge_index = edge_index_list
         self.down_transform = down_transform_list
 
-        self.meshconv = nn.ModuleList(
+        self.meshconv = nn.ModuleList([
             Enblock(3,16,K),
             Enblock(16,16,K),
             Enblock(16,16,K),
-            Enblock(16,32,K)
+            Enblock(16,32,K)]
         )
         num_vert = down_transform_list[-1].size(0)
         self.meshfc = nn.Sequential(
