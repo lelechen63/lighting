@@ -266,7 +266,7 @@ class TexMeshEncoder(nn.Module):
             Enblock(16,16,K),
             Enblock(16,32,K)
         )
-        num_vert = down_transform[-1].size(0)
+        num_vert = down_transform_list[-1].size(0)
         self.meshfc = nn.Sequential(
             nn.Linear(num_vert * 32, 256),
             nn.ReLU(True)
