@@ -331,7 +331,7 @@ class TexMeshDecoder(nn.Module):
         # mesh decoder 
         self.edge_index = edge_index_list
         self.up_transform = up_transform_list
-        self.num_vert = self.down_transform[-1].size(0)
+        self.num_vert = down_transform_list[-1].size(0)
         self.meshfc = nn.Sequential(
             nn.Linear(256, self.num_vert * 32))
 
