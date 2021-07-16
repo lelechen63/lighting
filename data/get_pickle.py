@@ -163,7 +163,7 @@ def get_mesh_pickle():
     test_list = []
     ids =  os.listdir(base_p)
     ids.sort()
-    for id_p in ids[:1]:
+    for id_p in ids:
         print (id_p ,'/', len(ids))
         current_p = os.path.join( base_p , id_p, 'models_reg')
         all_files = os.listdir(current_p)
@@ -181,7 +181,7 @@ def get_mesh_pickle():
                 A_vertices = np.array(om_mesh.points())
                 print (A_vertices.shape,'++++++++=')
                 if A_vertices.shape[0] == 26317:
-                    if k < 180:
+                    if k < 100:
                         train_list.append( os.path.join( id_p , 'models_reg', motion_p) )
                     else:
                         test_list.append( os.path.join( id_p , 'models_reg',  motion_p) )
