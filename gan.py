@@ -62,7 +62,8 @@ elif opt.name == 'disgmesh2' :
     opt.datasetname = "fs_mesh"
 totalmeanmesh = torch.FloatTensor( np.load( "./predef/meanmesh.npy" ) ).view(-1,3) 
 totalstdmesh = torch.FloatTensor(np.load( "./predef/meshstd.npy" )).view(-1,3)
-
+meantex = np.load('./predef/meantex.npy')
+stdtex = np.load('./predef/stdtex.npy') + 0.00000001
 dm = FacescapeDataModule(opt)
 
 if opt.isTrain:
@@ -116,7 +117,7 @@ else:
             module(  batch['Atex'])
           
 
-            Atex = batch['Atex'].data[0].cpu()  * self.stdtex + self.meantex 
+            Atex = batch['Atex'].data[0].cpu()  * stdtex + meantex 
             Atex = util.tensor2im(Atex  , normalize = False)
             
             Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
@@ -125,7 +126,7 @@ else:
             Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
             Atex = np.clip(Atex, 0, 255)
 
-            rec_tex_A_vis =rec_tex_A.data[0].cpu() * self.stdtex + self.meantex  
+            rec_tex_A_vis =rec_tex_A.data[0].cpu() * stdtex + meantex  
             rec_tex_A_vis = util.tensor2im(rec_tex_A_vis, normalize = False)
             
             rec_tex_A_vis = np.ascontiguousarray(rec_tex_A_vis, dtype=np.uint8)
@@ -174,14 +175,28 @@ else:
 
             gt_Amesh = np.ascontiguousarray(gt_Amesh, dtype=np.uint8)
             gt_Amesh = util.writeText(gt_Amesh, batch['A_path'][0], 100)
-            Atex = util.tensor2im(batch['Atex'][0])
+            
+            Atex = batch['Atex'].data[0].cpu()  * stdtex + meantex 
+            Atex = util.tensor2im(Atex  , normalize = False)
+            
             Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
             Atex = util.writeText(Atex, batch['A_path'][0])
+
+            Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
+            Atex = np.clip(Atex, 0, 255)
+
+            rec_tex_A_vis =rec_tex_A.data[0].cpu() * stdtex + meantex  
+            rec_tex_A_vis = util.tensor2im(rec_tex_A_vis, normalize = False)
+            
+            rec_tex_A_vis = np.ascontiguousarray(rec_tex_A_vis, dtype=np.uint8)
+            rec_tex_A_vis = np.clip(rec_tex_A_vis, 0, 255)
+
+
 
             tmp = batch['A_path'][0].split('/')
             visuals = OrderedDict([
                 ('Atex', Atex),
-                ('rec_tex_A', util.tensor2im(rec_tex_A.data[0])),
+                ('rec_tex_A',rec_tex_A_vis),
                 ('gt_Amesh', gt_Amesh),
                 ('rec_Amesh', rec_Amesh),
                 ])
