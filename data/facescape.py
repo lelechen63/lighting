@@ -447,7 +447,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         # Aidmesh = ( self.meanmesh[tmp[0]]- self.totalmeanmesh ) / self.totalstdmesh
         # Aidmesh = Aidmesh.reshape(-1,3)
             
-        input_dict = { 'Atex': A_tex_tensor, 'Amesh': torch.FloatTensor(A_vertices),
+        input_dict = { 'Atex': tex_tensor, 'Amesh': torch.FloatTensor(A_vertices),
                 'A_path': self.data_list[index],
                 'map_type':0 , 'Aid': int(A_id) - 1, 'Aexp': int(A_exp) -1}
 #                'Aidmesh': Aidmesh }

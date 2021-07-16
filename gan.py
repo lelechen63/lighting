@@ -62,8 +62,8 @@ elif opt.name == 'disgmesh2' :
     opt.datasetname = "fs_mesh"
 totalmeanmesh = torch.FloatTensor( np.load( "./predef/meanmesh.npy" ) ).view(-1,3) 
 totalstdmesh = torch.FloatTensor(np.load( "./predef/meshstd.npy" )).view(-1,3)
-meantex = np.load('./predef/meantex.npy')
-stdtex = np.load('./predef/stdtex.npy') + 0.00000001
+meantex = np.load('./predef/meantex.npy').transpose(2,0,1)
+stdtex = np.load('./predef/stdtex.npy').transpose(2,0,1) + 0.00000001
 dm = FacescapeDataModule(opt)
 
 if opt.isTrain:

@@ -949,6 +949,10 @@ class MeshTexGANModule(pl.LightningModule):
         self.totalmeantex = np.load( "./predef/meantex.npy" )
         self.ckpt_path = os.path.join(opt.checkpoints_dir, opt.name)
         
+        self.meantex = np.load('/data/home/us000042/lelechen/github/lighting/predef/meantex.npy')
+        self.stdtex = np.load('/data/home/us000042/lelechen/github/lighting/predef/stdtex.npy')
+        self.meantex = torch.FloatTensor(self.meantex).permute(2, 0,1)
+        self.stdtex = torch.FloatTensor(self.stdtex).permute(2,0,1)
         
     def forward(self, A_tex, A_mesh):
         return self.generator(A_tex, A_mesh)
