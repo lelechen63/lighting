@@ -114,9 +114,23 @@ else:
             
             rec_tex_A= \
             module(  batch['Atex'])
-            Atex = util.tensor2im(batch['Atex'][0])
+          
+
+            Atex = batch['Atex'].data[0].cpu()  * self.stdtex + self.meantex 
+            Atex = util.tensor2im(Atex  , normalize = False)
+            
             Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
             Atex = util.writeText(Atex, batch['A_path'][0])
+
+            Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
+            Atex = np.clip(Atex, 0, 255)
+
+            rec_tex_A_vis =rec_tex_A.data[0].cpu() * self.stdtex + self.meantex  
+            rec_tex_A_vis = util.tensor2im(rec_tex_A_vis, normalize = False)
+            
+            rec_tex_A_vis = np.ascontiguousarray(rec_tex_A_vis, dtype=np.uint8)
+            rec_tex_A_vis = np.clip(rec_tex_A_vis, 0, 255)
+
 
             tmp = batch['A_path'][0].split('/')
             visuals = OrderedDict([

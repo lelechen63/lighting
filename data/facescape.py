@@ -384,7 +384,9 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
 
         self.totalmeanmesh = np.load( "./predef/meshmean.npy" )
         self.totalstdmesh = np.load( "./predef/meshstd.npy" )
-        self.totalmeantex = np.load( "./predef/meantex.npy" )
+        self.meantex = np.load('./predef/meantex.npy')
+        self.stdtex = np.load('./predef/stdtex.npy') + 0.00000001
+
         # self.facial_seg = cv2.imread("./predef/facial_mask_v10.png")[:,:,::-1]
         self.facial_seg = Image.open("./predef/facial_mask_v10.png")
         # self.facial_seg  = self.facial_seg.resize(self.img_size)
@@ -404,7 +406,8 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
             
             tmp = data.split('/')
             tex = self.total_t[cc]
-            self.total_tex[data] = [tex ]
+            tmp = (tex - self.meantex)/self.stdtex
+            self.total_tex[data] = [tmp ]
             A_vertices = self.total_m[cc] - self.totalmeanmesh
             self.total_tex[data].append(A_vertices  / self.totalstdmesh)
             cc += 1
@@ -434,10 +437,11 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         tex_path = os.path.join( self.dir_tex , tmp[0], tmp[-1] + '.png')
     
         tex = self.total_tex[self.data_list[index]][0]
-        tex = Image.fromarray(np.uint8(tex))
-        params = get_params(self.opt, tex.size)
-        transform = get_transform(self.opt, params)      
-        A_tex_tensor = transform(tex)
+        # tex = Image.fromarray(np.uint8(tex))
+        # params = get_params(self.opt, tex.size)
+        # transform = get_transform(self.opt, params)      
+        # A_tex_tensor = transform(tex)
+        tex_tensor = torch.FloatTensor(tex).permute(2,0,1)
         A_vertices = self.total_tex[self.data_list[index]][1]
         A_vertices = A_vertices.reshape(-1,3)
         # Aidmesh = ( self.meanmesh[tmp[0]]- self.totalmeanmesh ) / self.totalstdmesh
