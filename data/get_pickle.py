@@ -174,12 +174,10 @@ def get_mesh_pickle():
                 all_motions.append(f[:-4])
         random.shuffle(all_motions)
         for k, motion_p in enumerate(all_motions):
-            # try:
+            try:
                 mesh_path = os.path.join(current_p, motion_p + '.obj')
-                print (mesh_path,'++++++++=')
                 om_mesh = openmesh.read_trimesh(mesh_path)
                 A_vertices = np.array(om_mesh.points())
-                print (A_vertices.shape,'++++++++=')
                 if A_vertices.shape[0] == 26317:
                     if k < 100:
                         train_list.append( os.path.join( id_p , 'models_reg', motion_p) )
@@ -187,9 +185,9 @@ def get_mesh_pickle():
                         test_list.append( os.path.join( id_p , 'models_reg',  motion_p) )
                 else:
                     print(A_vertices.shape)
-            # except:
-            #     print('!!!!!!!!!!!!!', mesh_path)
-            #     continue
+            except:
+                print('!!!!!!!!!!!!!', mesh_path)
+                continue
         #     if len(train_list) == 50:
         #         break
         # if len(train_list) == 50:
