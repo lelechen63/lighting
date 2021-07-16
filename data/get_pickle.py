@@ -180,7 +180,7 @@ def get_mesh_pickle():
                 om_mesh = openmesh.read_trimesh(mesh_path)
                 A_vertices = np.array(om_mesh.points())
                 print (A_vertices.shape,'++++++++=')
-                if A_vertices.shape[0] == 26317 and tex.shape[0] == 4096:
+                if A_vertices.shape[0] == 26317:
                     if k < 180:
                         train_list.append( os.path.join( id_p , 'models_reg', motion_p) )
                     else:
