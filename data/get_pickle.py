@@ -314,7 +314,7 @@ def get_mesh_augment():
     dataroot = '/data/home/us000042/lelechen/data/Facescape/'
    
     dir_A = os.path.join(dataroot, "augmented_meshes")  
-    for id in os.listdir(dir_A):
+    # for id in os.listdir(dir_A):
     big = []
     for data in tqdm(data_list):
         print (data)
