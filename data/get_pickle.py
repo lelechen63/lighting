@@ -153,6 +153,52 @@ def get_texmesh_pickle():
     with open('/raid/celong/FaceScape/lists/texmesh_test.pkl', 'wb') as handle:
         pickle.dump(test_list, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
+
+
+
+def get_mesh_pickle():
+    
+    base_p = '/data/home/us000042/lelechen/data/Facescape/augmented_meshes'
+    train_list = []
+    test_list = []
+    ids =  os.listdir(base_p)
+    ids.sort()
+    for id_p in ids[:3]:
+        print (id_p ,'/', len(ids))
+        current_p = os.path.join( base_p , id_p, 'models_reg')
+        all_files = os.listdir(current_p)
+        all_motions = []
+        for f  in all_files:
+            if 'obj' in f:
+                all_motions.append(f[:-4])
+        random.shuffle(all_motions)
+        for k, motion_p in enumerate(all_motions):
+            try:
+                mesh_path = os.path.join(current_p, motion_p + '.obj')
+                om_mesh = openmesh.read_trimesh(mesh_path)
+                A_vertices = np.array(om_mesh.points())
+                if A_vertices.shape[0] == 26317 and tex.shape[0] == 4096:
+                    if k < 180:
+                        train_list.append( os.path.join( id_p , 'models_reg', motion_p) )
+                    else:
+                        test_list.append( os.path.join( id_p , 'models_reg',  motion_p) )
+                else:
+                    print(A_vertices.shape)
+            except:
+                continue
+        #     if len(train_list) == 50:
+        #         break
+        # if len(train_list) == 50:
+        #     break
+        print (len(train_list))
+    print (test_list[:10])
+    print (len(train_list), len(test_list))
+
+    with open('/raid/celong/FaceScape/lists/mesh_train.pkl', 'wb') as handle:
+        pickle.dump(train_list, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    with open('/raid/celong/FaceScape/lists/mesh_test.pkl', 'wb') as handle:
+        pickle.dump(test_list, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
 def get_paired_texmesh_pickle():
     base_p = '/raid/celong/FaceScape/textured_meshes'
     ids = []
@@ -246,17 +292,32 @@ def get_mesh_total():
     dataroot = '/data/home/us000042/lelechen/data/Facescape/'
     _file = open(os.path.join(dataroot, "lists/texmesh_train.pkl"), "rb")
     dir_A = os.path.join(dataroot, "textured_meshes")  
-    if not os.path.exists( os.path.join(dataroot, "meanmesh")   ):
-        os.mkdir(os.path.join(dataroot, "meanmesh"))
+
     data_list = pickle.load(_file)#[:1]
     # _file = open(os.path.join(dataroot, "lists/texmesh_test.pkl"), "rb")
-    totalmeanmesh = np.load( '/data/home/us000042/lelechen/github/lighting/predef/meanmesh.npy' )
     # data_list.extend(pickle.load(_file))
     cc = 0
     big = []
     for data in tqdm(data_list):
         print (data)
         cc += 1
+        mesh_path = os.path.join( dir_A , data + '.obj')
+        om_mesh = openmesh.read_trimesh(mesh_path)
+        A_vertices = np.array(om_mesh.points()).reshape(-1)
+        big.append(A_vertices)
+    big = np.asarray(big)
+    np.save( '/data/home/us000042/lelechen/data/Facescape/bigmeshtrain.npy', big )
+
+
+
+def get_mesh_augment():
+    dataroot = '/data/home/us000042/lelechen/data/Facescape/'
+   
+    dir_A = os.path.join(dataroot, "augmented_meshes")  
+    for id in os.listdir(dir_A):
+    big = []
+    for data in tqdm(data_list):
+        print (data)
         mesh_path = os.path.join( dir_A , data + '.obj')
         om_mesh = openmesh.read_trimesh(mesh_path)
         A_vertices = np.array(om_mesh.points()).reshape(-1)
@@ -341,7 +402,7 @@ def get_texnorm():
     np.save( '/data/home/us000042/lelechen/github/lighting/predef/stdtex.npy', stdtex)
     cv2.imwrite('./gg.png', meantex)
 # get_meanmesh()
-get_texnorm()
+get_mesh_pickle()
 # get_mesh_total()
 # get_canonical_mesh()
 # tmp()

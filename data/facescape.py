@@ -561,11 +561,8 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
     def __init__(self, opt):
         self.opt = opt
         ### input A (texture and mesh)   
-        self.dir_A = os.path.join(opt.dataroot, "textured_meshes")
+        self.dir_A = os.path.join(opt.dataroot, "augmented_meshes")
 
-        # self.dir_tex = '/raid/celong/FaceScape/texture_mapping/target/'
-        self.dir_tex = os.path.join(opt.dataroot, "texture_mapping", 'target')
-        # '/data/home/us000042/lelechen/data/Facescape/texture_mapping/target/'
         ### input B (real images)
         self.dir_B = os.path.join(opt.dataroot, "ffhq_aligned_img")
 
