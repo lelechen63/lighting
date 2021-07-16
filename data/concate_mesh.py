@@ -9,7 +9,8 @@ def concate_mesh():
 		for j in files:
 			if j[-3:] =='obj':
 				objpath = os.path.join( originalpath, j)
-				print (objpath)
+				# print (objpath)
 				command = 'cp ' + objpath +' ' + augpath
 				print(command)
+				os.system(command)
 concate_mesh()
