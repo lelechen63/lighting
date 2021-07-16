@@ -93,7 +93,7 @@ if opt.isTrain:
 else:
     print ('!!!!!!' + opt.name +'~!!!!!!!!')
     if opt.name == 'texgan' :
-        checkpoint_path = '/data/home/us000042/lelechen/github/lighting/checkpoints/texgan_novgg_nocls/latest.ckpt'
+        checkpoint_path = '/data/home/us000042/lelechen/github/lighting/checkpoints/texgan/latest.ckpt'
         
         from model.model2 import TexGenerator as module
 
