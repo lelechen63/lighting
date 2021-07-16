@@ -168,6 +168,7 @@ def get_mesh_pickle():
         current_p = os.path.join( base_p , id_p, 'models_reg')
         all_files = os.listdir(current_p)
         all_motions = []
+        print (all_files)
         for f  in all_files:
             if 'obj' in f:
                 all_motions.append(f[:-4])
