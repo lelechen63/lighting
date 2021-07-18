@@ -164,7 +164,7 @@ def get_mesh_pickle():
     ids =  os.listdir(base_p)
     ids.sort()
     for id_p in ids:
-        if 'npy' in id:
+        if 'npy' in  id_p:
             continue
         print (id_p ,'/', len(ids))
         current_p = os.path.join( base_p , id_p, 'models_reg')
@@ -408,7 +408,7 @@ def get_texnorm():
     np.save( '/data/home/us000042/lelechen/github/lighting/predef/stdtex.npy', stdtex)
     cv2.imwrite('./gg.png', meantex)
 # get_meanmesh()
-get_mesh_pickle()
+get_mesh_augment()
 # get_mesh_total()
 # get_canonical_mesh()
 # tmp()
