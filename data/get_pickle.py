@@ -164,6 +164,8 @@ def get_mesh_pickle():
     ids =  os.listdir(base_p)
     ids.sort()
     for id_p in ids:
+        if 'npy' in id:
+            continue
         print (id_p ,'/', len(ids))
         current_p = os.path.join( base_p , id_p, 'models_reg')
         all_files = os.listdir(current_p)
