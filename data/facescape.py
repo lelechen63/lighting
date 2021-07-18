@@ -573,7 +573,7 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
         self.dir_json = os.path.join(opt.dataroot, "fsmview_images")
 
         if opt.isTrain:
-            _file = open(os.path.join(opt.dataroot, "lists/texmesh_train.pkl"), "rb")
+            _file = open(os.path.join(opt.dataroot, "lists/mesh_train.pkl"), "rb")
             total_m = '/data/home/us000042/lelechen/data/Facescape/bigmeshtrain.npy'
         else:
             _file = open(os.path.join(opt.dataroot, "lists/texmesh_test.pkl"), "rb")

@@ -198,9 +198,9 @@ def get_mesh_pickle():
     print (test_list[:10])
     print (len(train_list), len(test_list))
 
-    with open('/data/home/us000042/lelechen/data/Facescape//lists/mesh_train.pkl', 'wb') as handle:
+    with open('/data/home/us000042/lelechen/data/Facescape/lists/mesh_train.pkl', 'wb') as handle:
         pickle.dump(train_list, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    with open('/data/home/us000042/lelechen/data/Facescape//mesh_test.pkl', 'wb') as handle:
+    with open('/data/home/us000042/lelechen/data/Facescape/lists/mesh_test.pkl', 'wb') as handle:
         pickle.dump(test_list, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 def get_paired_texmesh_pickle():
