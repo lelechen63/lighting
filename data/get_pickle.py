@@ -323,7 +323,6 @@ def get_mesh_augment():
     # for id in os.listdir(dir_A):
     big = []
     for data in tqdm(data_list):
-        print (data)
         mesh_path = os.path.join( dir_A , data + '.obj')
         om_mesh = openmesh.read_trimesh(mesh_path)
         A_vertices = np.array(om_mesh.points()).reshape(-1)
@@ -408,9 +407,9 @@ def get_texnorm():
     np.save( '/data/home/us000042/lelechen/github/lighting/predef/stdtex.npy', stdtex)
     cv2.imwrite('./gg.png', meantex)
 # get_meanmesh()
+get_mesh_pickle()
 get_mesh_augment()
 # get_mesh_total()
-# get_mesh_pickle()
 # get_canonical_mesh()
 # tmp()
 # get_mean()
