@@ -574,10 +574,10 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
 
         if opt.isTrain:
             _file = open(os.path.join(opt.dataroot, "lists/mesh_train.pkl"), "rb")
-            total_m = '/data/home/us000042/lelechen/data/Facescape/bigmeshtrain.npy'
+            total_m = '/data/home/us000042/lelechen/data/Facescape/augmeshtrain.npy'
         else:
             _file = open(os.path.join(opt.dataroot, "lists/texmesh_test.pkl"), "rb")
-            total_m = '/data/home/us000042/lelechen/data/Facescape/bigmeshtest.npy'
+            total_m = '/data/home/us000042/lelechen/data/Facescape/augmeshtest.npy'
 
 
         self.data_list = pickle.load(_file)#[:1]
@@ -585,14 +585,11 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
         
         ids = open(os.path.join(opt.dataroot, "lists/ids.pkl"), "rb")
         self.id_set = set(pickle.load(ids))
-        self.exp_set = get_exp()
-
         # self.meanmesh = get_meanmesh()
         print ('===========================')
         print ('id_set:',self.id_set)
         print('+++++++++++++++++++++++++++')
-        print ('exp_set:',self.exp_set)
-        print ('===========================')
+       
 
         self.totalmeanmesh = np.load( "./predef/meshmean.npy" )
         self.totalstdmesh = np.load( "./predef/meshstd.npy" )
@@ -634,43 +631,45 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
         A_vertices = self.total_tex[self.data_list[index]][0] 
         # Aidmesh = ( self.meanmesh[tmp[0]]- self.totalmeanmesh ) / self.totalstdmesh
 
-        toss = random.getrandbits(1)
+        # toss = random.getrandbits(1)
 
-        # toss 0-> same iden, diff exp
-        while True:
-            # try:
-                if toss == 0:
-                    pool = self.exp_set - set(tmp[-1])
-                    B_exp = random.sample(pool, 1)[0]
-                    B_id = tmp[0]
-                # toss 1 -> same exp, diff iden
-                else:
-                    pool = self.id_set - set(tmp[0])
-                    B_id = random.sample(pool, 1)[0]
-                    B_exp = tmp[-1]
+        # # toss 0-> same iden, diff exp
+        # while True:
+        #     # try:
+        #         if toss == 0:
+        #             pool = self.exp_set - set(tmp[-1])
+        #             B_exp = random.sample(pool, 1)[0]
+        #             B_id = tmp[0]
+        #         # toss 1 -> same exp, diff iden
+        #         else:
+        #             pool = self.id_set - set(tmp[0])
+        #             B_id = random.sample(pool, 1)[0]
+        #             B_exp = tmp[-1]
                 
-                # tex
-                tex_index = os.path.join( B_id , 'models_reg', B_exp  )
-                # Bidmesh = ( self.meanmesh[B_id]- self.totalmeanmesh ) / self.totalstdmesh
+        #         # tex
+        #         tex_index = os.path.join( B_id , 'models_reg', B_exp  )
+        #         # Bidmesh = ( self.meanmesh[B_id]- self.totalmeanmesh ) / self.totalstdmesh
                 
-                if self.opt.debug:
-                    tex_index = self.data_list[index]
+        #         if self.opt.debug:
+        #             tex_index = self.data_list[index]
 
-                if tex_index not in self.total_tex.keys():
-                    continue 
+        #         if tex_index not in self.total_tex.keys():
+        #             continue 
                
              
-                B_vertices = self.total_tex[tex_index][0]
-                if B_vertices.shape[0] != 78951:
-                    print('!!!!',B_vertices.shape )
-                    continue
-                break
-            
+        #         B_vertices = self.total_tex[tex_index][0]
+        #         if B_vertices.shape[0] != 78951:
+        #             print('!!!!',B_vertices.shape )
+        #             continue
+        #         break
         input_dict = { 'Amesh': torch.FloatTensor(A_vertices),
                 'A_path': self.data_list[index], 
-                'Bmesh': torch.FloatTensor(B_vertices), 'B_path': os.path.join( B_id, 'models_reg' , B_exp),
-                'map_type':toss, 'Aid': int(A_id) - 1, 'Aexp': int(A_exp) -1,
-                'Bid':int(B_id) - 1, 'Bexp':int(B_exp.split('_')[0]) - 1}#, 'Aidmesh':  torch.FloatTensor(Aidmesh), 'Bidmesh': torch.FloatTensor(Bidmesh) }
+                'map_type':0, 'Aid': int(A_id) - 1, 'Aexp': int(A_exp) -1}
+        # input_dict = { 'Amesh': torch.FloatTensor(A_vertices),
+        #         'A_path': self.data_list[index], 
+        #         'Bmesh': torch.FloatTensor(B_vertices), 'B_path': os.path.join( B_id, 'models_reg' , B_exp),
+        #         'map_type':toss, 'Aid': int(A_id) - 1, 'Aexp': int(A_exp) -1,
+        #         'Bid':int(B_id) - 1, 'Bexp':int(B_exp.split('_')[0]) - 1}#, 'Aidmesh':  torch.FloatTensor(Aidmesh), 'Bidmesh': torch.FloatTensor(Bidmesh) }
 
         return input_dict
 
