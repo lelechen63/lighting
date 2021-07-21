@@ -81,4 +81,4 @@ def scatter(x, colors):
     return f, ax, sc, txts
 
 scatter(digits_proj, y)
-plt.savefig('images/digits_tsne-generated.png', dpi=120)
+plt.savefig('digits_tsne-generated.png', dpi=120)
