@@ -118,7 +118,7 @@ else:
             tmp = batch['A_path'][0].split('/')
             code_p = os.path.join(code_path, tmp[0] )
             os.makedirs(code_p, exist_ok = True)
-            np.save(os.path.join(code_p, tmp[-1] + '.npy'), code.view(-1).cpu().numpy())
+            np.save(os.path.join(code_p, tmp[-1] + '.npy'), code.view(-1).detach().cpu().numpy())
             # gt_mesh = batch['Amesh'].data[0].cpu()* totalstdmesh + totalmeanmesh
             # rec_Amesh = rec_mesh_A.data[0].cpu() * totalstdmesh + totalmeanmesh 
             # gt_mesh = gt_mesh.float()
