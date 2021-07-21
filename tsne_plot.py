@@ -31,31 +31,6 @@ from moviepy.video.io.bindings import mplfig_to_npimage
 import moviepy.editor as mpy
 RS = 20150101
 
-
-digits = load_digits()
-digits.data.shape
-
-nrows, ncols = 2, 5
-plt.figure(figsize=(6,3))
-plt.gray()
-for i in range(ncols * nrows):
-    ax = plt.subplot(nrows, ncols, i + 1)
-    ax.matshow(digits.images[i,...])
-    plt.xticks([]); plt.yticks([])
-    plt.title(digits.target[i])
-plt.savefig('digits-generated.png', dpi=150)
-
-X = np.vstack([digits.data[digits.target==i]
-               for i in range(10)])
-y = np.hstack([digits.target[digits.target==i]
-               for i in range(10)])
-X = X[:100]
-y =y[:100]
-print (X.shape,y.shape)
-digits_proj = TSNE(random_state=RS).fit_transform(X)
-
-print (type(digits_proj))
-print (digits_proj.shape)
 def scatter(x, colors):
     print ('!!!!')
     print (type(x), type(colors))
@@ -85,5 +60,31 @@ def scatter(x, colors):
 
     return f, ax, sc, txts
 
-scatter(digits_proj, y)
-plt.savefig('digits_tsne-generated.png', dpi=120)
+
+def demo():
+    digits = load_digits()
+    X = np.vstack([digits.data[digits.target==i]
+                for i in range(10)])
+    y = np.hstack([digits.target[digits.target==i]
+                for i in range(10)])
+    X = X[:100]
+    y =y[:100]
+    print (X.shape,y.shape)
+    digits_proj = TSNE(random_state=RS).fit_transform(X)
+
+    print (type(digits_proj))
+    print (digits_proj.shape)
+    scatter(digits_proj, y)
+    plt.savefig('digits_tsne-generated.png', dpi=120)
+
+def code_vis(type = 1):
+    code_path = '/data/home/us000042/lelechen/data/Facescape/reg_code'
+    pids = os.listdir(code_path)
+    Y = []
+    # if type = 1, Y would be pid, else it would be exp
+    for pid in pids:
+        print(pid)
+        for exp in os.listdir( os.path.join( code_path, pid ) ):
+            code_p = os.path.join( code_path, pid, exp )
+            print (code_p)
+code_vis()       
