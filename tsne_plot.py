@@ -32,6 +32,7 @@ import moviepy.editor as mpy
 RS = 20150101
 
 def scatter(x, colors):
+    length = np.unique(colors).shape[0]
     # We choose a color palette with seaborn.
     palette = np.array(sns.color_palette("hls", 10))
 
@@ -87,10 +88,11 @@ def code_vis(type = 1):
                 Y.append(str(exp_id))
     X = np.asarray(X)
     Y = np.asarray(Y)
+    print (  np.unique(Y).shape[0])
     print (X.shape)
     print (Y.shape)
     digits_proj = TSNE(random_state=RS).fit_transform(X)
-    scatter(digits_proj, Y)
+    scatter(digits_proj, Y, )
     plt.savefig('%d.png'%type, dpi=120)
 
 code_vis(0)       
