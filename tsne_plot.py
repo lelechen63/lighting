@@ -50,6 +50,7 @@ X = np.vstack([digits.data[digits.target==i]
 y = np.hstack([digits.target[digits.target==i]
                for i in range(10)])
 x = X[:100]
+y =y[:100]
 print (X.shape,y.shape)
 digits_proj = TSNE(random_state=RS).fit_transform(X)
 
