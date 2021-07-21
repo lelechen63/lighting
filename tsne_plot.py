@@ -14,7 +14,6 @@ from sklearn.preprocessing import scale
 from sklearn.metrics.pairwise import pairwise_distances
 from sklearn.manifold.t_sne import (_joint_probabilities,
                                     _kl_divergence)
-from sklearn.utils.extmath import _ravel
 
 # We'll use matplotlib for graphics.
 import matplotlib.pyplot as plt
