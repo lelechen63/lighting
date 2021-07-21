@@ -1,5 +1,5 @@
 import os
-mport numpy as np
+import numpy as np
 from numpy import linalg
 from numpy.linalg import norm
 from scipy.spatial.distance import squareform, pdist
@@ -15,8 +15,6 @@ from sklearn.metrics.pairwise import pairwise_distances
 from sklearn.manifold.t_sne import (_joint_probabilities,
                                     _kl_divergence)
 from sklearn.utils.extmath import _ravel
-# Random state.
-RS = 20150101
 
 # We'll use matplotlib for graphics.
 import matplotlib.pyplot as plt
