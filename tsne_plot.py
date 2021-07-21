@@ -34,7 +34,7 @@ RS = 20150101
 def scatter(x, colors):
     length = np.unique(colors).shape[0]
     # We choose a color palette with seaborn.
-    palette = np.array(sns.color_palette("hls", 10))
+    palette = np.array(sns.color_palette("hls", length))
 
     # We create a scatter plot.
     f = plt.figure(figsize=(8, 8))
@@ -48,8 +48,7 @@ def scatter(x, colors):
 
     # We add the labels for each digit.
     txts = []
-    for i in range(10):
-        # Position of each label.
+    for i in range( length):
         xtext, ytext = np.median(x[colors == i, :], axis=0)
         txt = ax.text(xtext, ytext, str(i), fontsize=24)
         txt.set_path_effects([
@@ -82,17 +81,16 @@ def code_vis(type = 1):
             code_p = os.path.join( code_path, pid, exp )
             X.append(np.load(code_p))
             if type ==1:
-                Y.append(str(pid))
+                Y.append(int(pid) -1)
             else:
                 exp_id = exp.split('_')[0]
-                Y.append(str(exp_id))
+                Y.append(int(exp_id) -1)
     X = np.asarray(X)
     Y = np.asarray(Y)
-    print (  np.unique(Y).shape[0])
     print (X.shape)
     print (Y.shape)
     digits_proj = TSNE(random_state=RS).fit_transform(X)
-    scatter(digits_proj, Y, )
+    scatter(digits_proj, Y )
     plt.savefig('%d.png'%type, dpi=120)
 
 code_vis(0)       
