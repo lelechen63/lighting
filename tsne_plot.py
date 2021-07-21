@@ -79,10 +79,8 @@ def code_vis(type = 1):
     X = []
     # if type = 1, Y would be pid, else it would be exp
     for pid in pids:
-        print(pid)
         for exp in os.listdir( os.path.join( code_path, pid ) ):
             code_p = os.path.join( code_path, pid, exp )
-            print (code_p)
             X.append(np.load(code_p))
             if type ==1:
                 Y.append(str(pid))
@@ -93,6 +91,6 @@ def code_vis(type = 1):
     Y = np.asarray(Y)
     digits_proj = TSNE(random_state=RS).fit_transform(X)
     scatter(digits_proj, Y)
-    plt.savefig('digits_tsne-generated.png', dpi=120)
+    plt.savefig('%d.png'%type, dpi=120)
 
 code_vis()       
