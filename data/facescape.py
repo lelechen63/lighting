@@ -359,7 +359,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         ### json 
         self.dir_json = os.path.join(opt.dataroot, "fsmview_images")
 
-        if not opt.isTrain:
+        if  opt.isTrain:
             _file = open(os.path.join(opt.dataroot, "lists/texmesh_train.pkl"), "rb")
             total_m = '/data/home/us000042/lelechen/data/Facescape/bigmeshtrain.npy'
             total_t = '/data/home/us000042/lelechen/data/Facescape/bigtex256train.npy'
