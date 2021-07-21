@@ -20,14 +20,12 @@ from sklearn.utils.extmath import _ravel
 import matplotlib.pyplot as plt
 import matplotlib.patheffects as PathEffects
 import matplotlib
-%matplotlib inline
 
 # We import seaborn to make nice plots.
 import seaborn as sns
 sns.set_style('darkgrid')
 sns.set_palette('muted')
-sns.set_context("notebook", font_scale=1.5,
-                rc={"lines.linewidth": 2.5})
+
 
 # We'll generate an animation with matplotlib and moviepy.
 from moviepy.video.io.bindings import mplfig_to_npimage
