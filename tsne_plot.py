@@ -67,13 +67,8 @@ def demo():
                 for i in range(10)])
     y = np.hstack([digits.target[digits.target==i]
                 for i in range(10)])
-    X = X[:100]
-    y =y[:100]
-    print (X.shape,y.shape)
+   
     digits_proj = TSNE(random_state=RS).fit_transform(X)
-
-    print (type(digits_proj))
-    print (digits_proj.shape)
     scatter(digits_proj, y)
     plt.savefig('digits_tsne-generated.png', dpi=120)
 
@@ -81,10 +76,23 @@ def code_vis(type = 1):
     code_path = '/data/home/us000042/lelechen/data/Facescape/reg_code'
     pids = os.listdir(code_path)
     Y = []
+    X = []
     # if type = 1, Y would be pid, else it would be exp
     for pid in pids:
         print(pid)
         for exp in os.listdir( os.path.join( code_path, pid ) ):
             code_p = os.path.join( code_path, pid, exp )
             print (code_p)
+            X.append(np.load(code_p))
+            if type ==1:
+                Y.append(str(pid))
+            else:
+                exp_id = exp.split('_')[0]
+                Y.append(str(exp_id))
+    X = np.asarray(X)
+    Y = np.asarray(Y)
+    digits_proj = TSNE(random_state=RS).fit_transform(X)
+    scatter(digits_proj, Y)
+    plt.savefig('digits_tsne-generated.png', dpi=120)
+
 code_vis()       
