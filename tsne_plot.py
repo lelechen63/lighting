@@ -44,7 +44,7 @@ for i in range(ncols * nrows):
     ax.matshow(digits.images[i,...])
     plt.xticks([]); plt.yticks([])
     plt.title(digits.target[i])
-plt.savefig('images/digits-generated.png', dpi=150)
+plt.savefig('digits-generated.png', dpi=150)
 
 X = np.vstack([digits.data[digits.target==i]
                for i in range(10)])
