@@ -33,6 +33,7 @@ RS = 20150101
 
 def scatter(x, colors):
     length = np.unique(colors).shape[0]
+    print (length)
     # We choose a color palette with seaborn.
     palette = np.array(sns.color_palette("hls", length))
 
