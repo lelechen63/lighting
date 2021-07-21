@@ -49,8 +49,8 @@ X = np.vstack([digits.data[digits.target==i]
                for i in range(10)])
 y = np.hstack([digits.target[digits.target==i]
                for i in range(10)])
-
-print (X.shape)
+x = X[:100]
+print (X.shape,y.shape)
 digits_proj = TSNE(random_state=RS).fit_transform(X)
 
 print (type(digits_proj))
