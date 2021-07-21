@@ -13,7 +13,7 @@ import pickle
 # import torchvision.transforms as transforms
 # from torch.utils.data import DataLoader, random_split
 # from torchvision.datasets import MNIST
-
+from tqdm import tqdm
 import pytorch_lightning as pl
 from data.data import FacescapeDataModule
 from options.step1_train_options import TrainOptions
@@ -112,12 +112,12 @@ else:
         l2loss = torch.nn.MSELoss()
         module = module.to(device)
         code_path = '/data/home/us000042/lelechen/data/Facescape/reg_code'
-        for num,batch in enumerate(testdata):
+        for num,batch in enumerate(tqdm(testdata)):
             rec_tex_A, rec_mesh_A, code = \
             module(batch['Atex'].to(device), batch['Amesh'].to(device) )
             tmp = batch['A_path'][0].split('/')
             code_p = os.path.join(code_path, tmp[0] )
-            os.makedirs(code_p, exists_ok = True)
+            os.makedirs(code_p, exist_ok = True)
             np.save(os.path.join(code_p, tmp[-1] + '.npy'), code.view(-1).cpu().numpy())
             # gt_mesh = batch['Amesh'].data[0].cpu()* totalstdmesh + totalmeanmesh
             # rec_Amesh = rec_mesh_A.data[0].cpu() * totalstdmesh + totalmeanmesh 
