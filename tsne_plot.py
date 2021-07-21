@@ -91,6 +91,7 @@ def code_vis(type = 1):
     print (X.shape)
     print (Y.shape)
     digits_proj = TSNE(random_state=RS).fit_transform(X)
+    print (digits_proj.shape)
     scatter(digits_proj, Y )
     plt.savefig('%d.png'%type, dpi=120)
 
