@@ -29,6 +29,7 @@ sns.set_palette('muted')
 # We'll generate an animation with matplotlib and moviepy.
 from moviepy.video.io.bindings import mplfig_to_npimage
 import moviepy.editor as mpy
+RS = 20150101
 
 
 digits = load_digits()
