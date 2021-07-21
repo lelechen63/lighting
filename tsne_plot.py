@@ -42,8 +42,10 @@ def scatter(x, colors):
     ax = plt.subplot(aspect='equal')
     sc = ax.scatter(x[:,0], x[:,1], lw=0, s=40,
                     c=palette[colors.astype(np.int)])
-    plt.xlim(-25, 25)
-    plt.ylim(-25, 25)
+    xlim = x[:,0].max()
+    ylim = x[:,1].max()
+    plt.xlim(-xlim, xlim)
+    plt.ylim(-ylim, ylim)
     ax.axis('off')
     ax.axis('tight')
 
