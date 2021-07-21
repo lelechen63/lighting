@@ -60,8 +60,8 @@ elif opt.name == 'disgmesh' :
 elif opt.name == 'disgmesh2' :
     from model.model2 import DisGraphConvMeshModule2 as module 
     opt.datasetname = "fs_mesh"
-totalmeanmesh = torch.FloatTensor( np.load( "./predef/meanmesh.npy" ) ).view(-1,3) 
-totalstdmesh = torch.FloatTensor(np.load( "./predef/meshstd.npy" )).view(-1,3)
+totalmeanmesh = torch.FloatTensor( np.load( "./predef/meanmesh.npy" ) )#.view(-1,3) 
+totalstdmesh = torch.FloatTensor(np.load( "./predef/meshstd.npy" ))#.view(-1,3)
 
 meantex = torch.FloatTensor(np.load('./predef/meantex.npy')).permute(2, 0,1)
 stdtex = torch.FloatTensor(np.load('./predef/stdtex.npy')).permute(2,0,1)
