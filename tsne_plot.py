@@ -93,4 +93,4 @@ def code_vis(type = 1):
     scatter(digits_proj, Y)
     plt.savefig('%d.png'%type, dpi=120)
 
-code_vis()       
+code_vis(0)       
