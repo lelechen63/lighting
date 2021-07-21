@@ -35,8 +35,6 @@ RS = 20150101
 digits = load_digits()
 digits.data.shape
 
-print(digits['DESCR'])
-
 nrows, ncols = 2, 5
 plt.figure(figsize=(6,3))
 plt.gray()
@@ -52,9 +50,14 @@ X = np.vstack([digits.data[digits.target==i]
 y = np.hstack([digits.target[digits.target==i]
                for i in range(10)])
 
+print (X.shape)
 digits_proj = TSNE(random_state=RS).fit_transform(X)
 
+print (type(digits_proj))
+print (digits_proj.shape)
 def scatter(x, colors):
+    print ('!!!!')
+    print (type(x), type(colors))
     # We choose a color palette with seaborn.
     palette = np.array(sns.color_palette("hls", 10))
 
