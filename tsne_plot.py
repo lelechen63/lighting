@@ -54,7 +54,7 @@ def scatter(x, colors):
     txts = []
     for i in range( length):
         xtext, ytext = np.median(x[colors == i, :], axis=0)
-        txt = ax.text(xtext, ytext, str(i), fontsize=24)
+        txt = ax.text(xtext, ytext, str(i), fontsize=5)
         txt.set_path_effects([
             PathEffects.Stroke(linewidth=5, foreground="w"),
             PathEffects.Normal()])
@@ -98,4 +98,4 @@ def code_vis(type = 1):
     scatter(digits_proj, Y )
     plt.savefig('%d.png'%type, dpi=120)
 
-code_vis(0)       
+code_vis(1)       
