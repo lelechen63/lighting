@@ -44,6 +44,7 @@ def scatter(x, colors):
                     c=palette[colors.astype(np.int)])
     xlim = x[:,0].max()
     ylim = x[:,1].max()
+    print(xlim, ylim)
     plt.xlim(-xlim, xlim)
     plt.ylim(-ylim, ylim)
     ax.axis('off')
