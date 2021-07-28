@@ -6,7 +6,7 @@ import torch
 
 
 def np_normalize(x, low= 0, high = 1):
-    # input x: size 256x256x3, output: 245x256x3
+    # input x: size 256x256x3, output: 3x245x256
     if x.shape[0] != 3:
         x = x.transpose(2, 0, 1)
     x_max = x.reshape(*x.shape[:-2], -1).max(axis=-1)[0][..., None, None]
@@ -55,8 +55,6 @@ def np_augument_tex_color( img, smoothness=100, directionality=0.9, noise_sigma=
         # L = a[3] * ix ** 2 + a[4] * iy ** 2 + a[5]
         s_range = np.random.rand(2, *F.shape[:-2], 1, 1) * directionality
 
-        print (L.shape)
-        print (s_range.shape)
         F *= np_normalize(L, low=1 - s_range[0], high=1 + s_range[1])
     # contrast normalization
     v_range = (
@@ -65,6 +63,10 @@ def np_augument_tex_color( img, smoothness=100, directionality=0.9, noise_sigma=
     F = np_normalize(F, 0 + v_range[0], 255 + v_range[1])
     # gaussian noise
     if noise_sigma > 0:
+    	print (noise_sigma)
+    	print (type(noise_sigma))
+    	print  (F.shape)
+    	
         F += np.random.randn(F.shape) * noise_sigma
     # convert to unsigned char
     return F.clip( 0, 255 )
@@ -73,7 +75,9 @@ def np_augument_tex_color( img, smoothness=100, directionality=0.9, noise_sigma=
 img = cv2.imread('/data/home/us000042/lelechen/data/Facescape/textured_meshes/1/models_reg/10_dimpler.jpg')
 # cv2.imwrite('./gg.png', img)
 img = img.transpose(2,0,1)
-newimg = np_augument_tex_color(img).transpose(1,2,0)
+newimg = np_augument_tex_color(img)
+print (newimg,shape)
+newimg = img.transpose(1,2,0)
 img = img.transpose(1,2,0)
 out = np.concatenate(img, newimg,axis =0 )
 cv2.imwrite('./gg.png', out )
