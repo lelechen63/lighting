@@ -21,7 +21,11 @@ def np_normalize(x, low= 0, high = 1):
     print (x_max.shape)
     x_max =x_max.max(axis=-1)[0]
     print (x_max.shape)
+
+    print ('!!!!!!!!!!!!!!!!!!!')
     x_max = x_max[..., None, None]
+
+    print (x_max)
     x_min = x.view(*x.shape[:-2], -1).min(axis=-1)[0][..., None, None]
     scale = (high - low) / (x_max - x_min)
 
