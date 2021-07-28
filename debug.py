@@ -35,7 +35,10 @@ def np_normalize(x, low= 0, high = 1):
     print (x_min, '++=')
     scale = (high - low) / (x_max - x_min)
 
-
+    print (x.shape)
+    print (x_min.shape)
+    print (scale.shape)
+    
     x =  (x - x_min) * scale + low
 
     if x.shape[0] == 3:
