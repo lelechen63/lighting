@@ -71,7 +71,7 @@ def np_augument_tex_color( img, smoothness=100, directionality=0.9, noise_sigma=
 img = cv2.imread('/data/home/us000042/lelechen/data/Facescape/textured_meshes/1/models_reg/10_dimpler.jpg')
 # cv2.imwrite('./gg.png', img)
 img = img.transpose(2,0,1)
-newimg = np_augument_tex_color(img)
+newimg = np_augument_tex_color(img, 40, 0.5, 0.5, 50)
 print (newimg.shape)
 newimg = img.transpose(1,2,0)
 img = img.transpose(1,2,0)
