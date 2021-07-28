@@ -16,9 +16,8 @@ def np_normalize(x, low= 0, high = 1):
 
     x =  (x - x_min) * scale + low
 
-    if x.shape[0] == 3:
-        x = x.transpose(1,2,0)
-    print ('!!!!')
+    if x.shape[2] == 3:
+        x = x.transpose(2,0,1)
     return x
 
 
