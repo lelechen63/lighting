@@ -72,7 +72,7 @@ img = cv2.imread('/data/home/us000042/lelechen/data/Facescape/textured_meshes/1/
 # cv2.imwrite('./gg.png', img)
 img = img.transpose(2,0,1)
 newimg = np_augument_tex_color(img)
-print (newimg,shape)
+print (newimg.shape)
 newimg = img.transpose(1,2,0)
 img = img.transpose(1,2,0)
 out = np.concatenate(img, newimg,axis =0 )
