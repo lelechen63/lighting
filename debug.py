@@ -13,10 +13,10 @@ def th_normalize(x, low=0, high=1):
 
 
 def np_normalize(x, low= 0, high = 1):
-	# input x: size 256x256x3, output: 245x256x3
-	if x.shape[0] != 3:
-		x = x.transpose(2, 0, 1)
-	x_max = x.reshape(*x.shape[:-2], -1).max(dim=-1)[0][..., None, None]
+    # input x: size 256x256x3, output: 245x256x3
+    if x.shape[0] != 3:
+        x = x.transpose(2, 0, 1)
+    x_max = x.reshape(*x.shape[:-2], -1).max(dim=-1)[0][..., None, None]
     x_min = x.view(*x.shape[:-2], -1).min(dim=-1)[0][..., None, None]
     scale = (high - low) / (x_max - x_min)
 
@@ -25,7 +25,7 @@ def np_normalize(x, low= 0, high = 1):
     x =  (x - x_min) * scale + low
 
     if x.shape[0] == 3:
-    	x = x.transpose(1,2,0)
+        x = x.transpose(1,2,0)
     return x
 
 def th_augument_tex_color( img, smoothness=100, directionality=0.9, noise_sigma=2.0, contrast=20.0 ):
