@@ -100,7 +100,7 @@ def np_augument_tex_color( img, smoothness=100, directionality=0.9, noise_sigma=
         iy = iy.reshape(*([1] * len(F.shape[:-2])), *F.shape[-2:])
         ix = ix.reshape(*([1] * len(F.shape[:-2])), *F.shape[-2:])
         # a = torch.rand([6, *F.shape[:-2], 1, 1], device=img_device) * 2 - 1
-        a = np.random.randn([6, *F.shape[:-2], 1, 1])
+        a = np.random.randn(6, *F.shape[:-2], 1, 1)
         # L = a[0] * ix + a[1] * iy + a[2] * ix * iy + a[3] * ix ** 2 + a[4] * iy ** 2 + a[5]
         # L = (a[0] * ix + a[1] * iy + a[2]) * (a[3] * ix + a[4] * iy + a[5])
         L = (a[0] * ix + a[1] * iy + a[2]).pow(2) * a[3] + (
