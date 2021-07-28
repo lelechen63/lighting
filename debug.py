@@ -16,8 +16,8 @@ def np_normalize(x, low= 0, high = 1):
     # input x: size 256x256x3, output: 245x256x3
     if x.shape[0] != 3:
         x = x.transpose(2, 0, 1)
-    x_max = x.reshape(*x.shape[:-2], -1).max(dim=-1)[0][..., None, None]
-    x_min = x.view(*x.shape[:-2], -1).min(dim=-1)[0][..., None, None]
+    x_max = x.reshape(*x.shape[:-2], -1).max(axis=-1)[0][..., None, None]
+    x_min = x.view(*x.shape[:-2], -1).min(axis=-1)[0][..., None, None]
     scale = (high - low) / (x_max - x_min)
 
     print (x.shape, x_min.shape)
