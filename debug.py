@@ -26,10 +26,12 @@ def np_normalize(x, low= 0, high = 1):
     x_max = x_max[..., None, None]
 
     print (x_max)
-    x_min = x.view(*x.shape[:-2], -1).min(axis=-1)[0][..., None, None]
+    x_min = x.view(*x.shape[:-2], -1).min(axis=-1)[0]
+    print (x_min, '!!')
+    x_min = x_min[..., None, None]
+    print (x_min, '++=')
     scale = (high - low) / (x_max - x_min)
 
-    print (x.shape, x_min.shape)
 
     x =  (x - x_min) * scale + low
 
