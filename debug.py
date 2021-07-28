@@ -16,29 +16,12 @@ def np_normalize(x, low= 0, high = 1):
     # input x: size 256x256x3, output: 245x256x3
     if x.shape[0] != 3:
         x = x.transpose(2, 0, 1)
-    print (x.shape)
-    x_max = x.reshape(*x.shape[:-2], -1)
-    print (x_max.shape)
-    x_max =x_max.max(axis=-1)[0]
-    print (x_max.shape)
+    x_max = x.reshape(*x.shape[:-2], -1).max(axis=-1)[0][..., None, None]
 
-    print ('!!!!!!!!!!!!!!!!!!!')
-    x_max = x_max[..., None, None]
-
-    print (x_max)
-    print (x.shape)
-    x_min = x.reshape(*x.shape[:-2], -1)
-    print (x_min.shape, '++++++++')
-    x_min = x_min.min(axis=-1)[0]
-    print (x_min, '!!')
-    x_min = x_min[..., None, None]
-    print (x_min, '++=')
+    x_min = x.reshape(*x.shape[:-2], -1).min(axis=-1)[0][..., None, None]
     scale = (high - low) / (x_max - x_min)
 
-    print (x.shape)
-    print (x_min.shape)
-    print (scale.shape)
-    
+
     x =  (x - x_min) * scale + low
 
     if x.shape[0] == 3:
@@ -143,5 +126,6 @@ img = cv2.imread('/data/home/us000042/lelechen/data/Facescape/textured_meshes/1/
 # cv2.imwrite('./gg.png', img)
 img = img.transpose(2,0,1)
 newimg = np_augument_tex_color(img).transpose(1,2,0)
+img = img.transpose(1,2,0)
 out = np.concatenate(img, newimg,axis =0 )
 cv2.imwrite('./gg.png', out )
