@@ -26,7 +26,8 @@ def np_normalize(x, low= 0, high = 1):
     x_max = x_max[..., None, None]
 
     print (x_max)
-    x_min = x.view(*x.shape[:-2], -1)
+    print (x.shape)
+    x_min = x.reshape(*x.shape[:-2], -1)
     print (x_min.shape, '++++++++')
     x_min = x_min.min(axis=-1)[0]
     print (x_min, '!!')
