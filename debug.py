@@ -112,7 +112,7 @@ def np_augument_tex_color( img, smoothness=100, directionality=0.9, noise_sigma=
         F *= np_normalize(L, low=1 - s_range[0], high=1 + s_range[1])
     # contrast normalization
     v_range = (
-        (np.random.rand([2, *F.shape[:-2], 1, 1]) - 0.5) * 2 * contrast
+        (np.random.rand(2, *F.shape[:-2], 1, 1) - 0.5) * 2 * contrast
     )
     F = np_normalize(F, 0 + v_range[0], 255 + v_range[1])
     # gaussian noise
