@@ -86,7 +86,7 @@ def np_augument_tex_color( img, smoothness=100, directionality=0.9, noise_sigma=
         b = u[:, 1:2] * 99 + 1
         c = u[:, 2:3] * 10
         x_sum = (c / (1.0 + np.exp(-b * (x[None, :] - a)))).sum(0)
-        F = x_sum[img.astype(long) ]
+        F = x_sum[img]
     else:
         F = img.astype(float)
     
