@@ -44,12 +44,12 @@ def get_exp():
 
 def get_meanmesh():
     dataroot = '/data/home/us000042/lelechen/data/Facescape/'
-    meanmeshpath = os.path.join(dataroot, "meanmesh")
+    meanmeshpath = os.patorch.join(dataroot, "meanmesh")
     total = os.listdir( meanmeshpath)
     meanmesh = {}
     for kk in total:
         if kk[-3:] == 'npy':
-            meanmesh[kk[:-4]] = np.load( os.path.join( meanmeshpath, kk)  )
+            meanmesh[kk[:-4]] = np.load( os.patorch.join( meanmeshpath, kk)  )
     return meanmesh
 
 def normmesh(mesh):
@@ -72,35 +72,89 @@ def get_anlge_list():
 def get_blacklist():
     bl = ['66/models_reg/15_lip_roll', "267/models_reg/3_mouth_stretch","191/models_reg/17_cheek_blowing"]
     return bl
+
+def th_normalize(x, low=0, high=1):
+    x_max = x.view(*x.shape[:-2], -1).max(dim=-1)[0][..., None, None]
+    x_min = x.view(*x.shape[:-2], -1).min(dim=-1)[0][..., None, None]
+    scale = (high - low) / (x_max - x_min)
+
+    print (x.shape, x_min.shape)
+    return (x - x_min) * scale + low
+def th_augument_tex_color( img, smoothness=100, directionality=0.9, noise_sigma=2.0, contrast=20.0 ):
+    img_device = img.device
+
+    # intensity histogram augmentation
+    if smoothness > 0:
+        x = torch.arange(256, device=img_device).float() / 255 - 0.5
+        smoothness = int(smoothness)
+        u = torch.rand((smoothness, 3), device=img_device)
+        a = u[:, 0:1] - 0.5
+        b = u[:, 1:2] * 99 + 1
+        c = u[:, 2:3] * 10
+        x_sum = (c / (1.0 + torch.exp(-b * (x[None, :] - a)))).sum(0)
+        F = x_sum[img.long()]
+    else:
+        F = img.float()
+    
+    # spatially varying intensity multiplier (second degree polynomial)
+    if directionality > 0:
+        h, w = F.shape[-2:]
+        iy, ix = torch.meshgrid(
+            (torch.arange(h, device=img_device).float() / (h // 2)) - 1,
+            (torch.arange(w, device=img_device).float() / (w // 2)) - 1,
+        )
+        iy = iy.view(*([1] * len(F.shape[:-2])), *F.shape[-2:])
+        ix = ix.view(*([1] * len(F.shape[:-2])), *F.shape[-2:])
+        # a = torch.rand([6, *F.shape[:-2], 1, 1], device=img_device) * 2 - 1
+        a = torch.randn([6, *F.shape[:-2], 1, 1], device=img_device)
+        # L = a[0] * ix + a[1] * iy + a[2] * ix * iy + a[3] * ix ** 2 + a[4] * iy ** 2 + a[5]
+        # L = (a[0] * ix + a[1] * iy + a[2]) * (a[3] * ix + a[4] * iy + a[5])
+        L = (a[0] * ix + a[1] * iy + a[2]).pow(2) * a[3] + (
+            -a[1] * ix + a[0] * iy + a[4]
+        ).pow(2) * a[5]
+        # L = a[3] * ix ** 2 + a[4] * iy ** 2 + a[5]
+        s_range = torch.rand([2, *F.shape[:-2], 1, 1], device=img_device) * directionality
+        F *= th_normalize(L, low=1 - s_range[0], high=1 + s_range[1])
+    # contrast normalization
+    v_range = (
+        (torch.rand([2, *F.shape[:-2], 1, 1], device=img_device) - 0.5) * 2 * contrast
+    )
+    F = th_normalize(F, 0 + v_range[0], 255 + v_range[1])
+    # gaussian noise
+    if noise_sigma > 0:
+        F += torch.randn(F.shape, device=img_device) * noise_sigma
+    # convert to unsigned char
+    return F.clamp( min=0.0, max=255.0 )
+
 class FacescapeDirDataset(torch.utils.data.Dataset):
     def __init__(self, opt):
         self.opt = opt
 
         ### input A (renderred image)
-        self.dir_A = os.path.join(opt.dataroot, "ffhq_aligned_img")
+        self.dir_A = os.patorch.join(opt.dataroot, "ffhq_aligned_img")
 
         ### input B (real images)
-        self.dir_B = os.path.join(opt.dataroot, "ffhq_aligned_img")
+        self.dir_B = os.patorch.join(opt.dataroot, "ffhq_aligned_img")
 
         ### input C (eye parsing images)
-        self.dir_C = os.path.join(opt.dataroot, "fsmview_landmarks")
+        self.dir_C = os.patorch.join(opt.dataroot, "fsmview_landmarks")
 
         ### json 
-        self.dir_json = os.path.join(opt.dataroot, "fsmview_images")
+        self.dir_json = os.patorch.join(opt.dataroot, "fsmview_images")
 
         # /raid/celong/FaceScape/fsmview_landmarks/99/14_sadness/1_eye.png
         self.exp_set =  get_exp()
 
         if opt.isTrain:
-            _file = open(os.path.join(opt.dataroot, "lists/img_alone_test.pkl"), "rb")
+            _file = open(os.patorch.join(opt.dataroot, "lists/img_alone_test.pkl"), "rb")
             
         else:
-            _file = open(os.path.join(opt.dataroot, "lists/img_alone_test.pkl"), "rb")
+            _file = open(os.patorch.join(opt.dataroot, "lists/img_alone_test.pkl"), "rb")
        
         self.data_list = pickle.load(_file)#[:1]
         _file.close()
         
-        dic_file = open(os.path.join(opt.dataroot, "lists/img_dic_train.pkl"), "rb")
+        dic_file = open(os.patorch.join(opt.dataroot, "lists/img_dic_train.pkl"), "rb")
         self.dic_list = pickle.load(dic_file)#[:10]
 
         self.angle_list = get_anlge_list()
@@ -108,9 +162,9 @@ class FacescapeDirDataset(torch.utils.data.Dataset):
     def __getitem__(self, index):
 
         tmp = self.data_list[index].split('/')
-        A_path = os.path.join( self.dir_A , self.data_list[index] ) 
-        mask_path = os.path.join( self.dir_A , self.data_list[index][:-4] + '_mask.png' )
-        json_path = os.path.join( self.dir_json , tmp[0], tmp[1], 'params.json' )
+        A_path = os.patorch.join( self.dir_A , self.data_list[index] ) 
+        mask_path = os.patorch.join( self.dir_A , self.data_list[index][:-4] + '_mask.png' )
+        json_path = os.patorch.join( self.dir_json , tmp[0], tmp[1], 'params.json' )
         
         f  = open(json_path , 'r')
         params = json.load(f)
@@ -156,17 +210,17 @@ class FacescapeDirDataset(torch.utils.data.Dataset):
             small_index = diff.argsort()[kk]
             try:
                 # print (small_index)
-                B_path =  os.path.join( self.dir_A ,  B_id, B_exp, str(small_index) +'.jpg' )   
+                B_path =  os.patorch.join( self.dir_A ,  B_id, B_exp, str(small_index) +'.jpg' )   
                 # print (B_path)
                 ### input mask (binary mask to segment person out)
-                mask_path =os.path.join( self.dir_A ,B_id, B_exp, str(small_index)+ '_mask.png' )   
+                mask_path =os.patorch.join( self.dir_A ,B_id, B_exp, str(small_index)+ '_mask.png' )   
                 # mask = Image.open(mask_path).convert('RGB')
                 mask = cv2.imread(mask_path)[:,:,::-1] 
                 B = cv2.imread(B_path)[:,:,::-1]
                 break
             except:
                 continue
-        json_path = os.path.join( self.dir_json , B_id, B_exp, 'params.json' )
+        json_path = os.patorch.join( self.dir_json , B_id, B_exp, 'params.json' )
         f  = open(json_path , 'r')
         params = json.load(f)
         
@@ -177,7 +231,7 @@ class FacescapeDirDataset(torch.utils.data.Dataset):
         viewpoint = np.asarray(viewpoint)
         viewpoint = torch.FloatTensor(viewpoint)
 
-        input_dict = { 'image':A_tensor, 'pair_image': B_tensor, 'pair_type': toss, 'viewpoint' : viewpoint, 'A_path': self.data_list[index][:-4] , 'B_path': os.path.join(B_id, B_exp, str(small_index)) }
+        input_dict = { 'image':A_tensor, 'pair_image': B_tensor, 'pair_type': toss, 'viewpoint' : viewpoint, 'A_path': self.data_list[index][:-4] , 'B_path': os.patorch.join(B_id, B_exp, str(small_index)) }
 
         return input_dict
 
@@ -192,33 +246,33 @@ class FacescapeDisMeshTexDataset(torch.utils.data.Dataset):
     def __init__(self, opt):
         self.opt = opt
         ### input A (texture and mesh)   
-        self.dir_A = os.path.join(opt.dataroot, "textured_meshes")
+        self.dir_A = os.patorch.join(opt.dataroot, "textured_meshes")
 
         # self.dir_tex = '/raid/celong/FaceScape/texture_mapping/target/'
-        self.dir_tex = os.path.join(opt.dataroot, "texture_mapping", 'target')
+        self.dir_tex = os.patorch.join(opt.dataroot, "texture_mapping", 'target')
         # '/data/home/us000042/lelechen/data/Facescape/texture_mapping/target/'
         ### input B (real images)
-        self.dir_B = os.path.join(opt.dataroot, "ffhq_aligned_img")
+        self.dir_B = os.patorch.join(opt.dataroot, "ffhq_aligned_img")
 
         ### input C (eye parsing images)
-        self.dir_C = os.path.join(opt.dataroot, "fsmview_landmarks")
+        self.dir_C = os.patorch.join(opt.dataroot, "fsmview_landmarks")
 
         ### json 
-        self.dir_json = os.path.join(opt.dataroot, "fsmview_images")
+        self.dir_json = os.patorch.join(opt.dataroot, "fsmview_images")
 
         if opt.isTrain:
-            _file = open(os.path.join(opt.dataroot, "lists/texmesh_train.pkl"), "rb")
+            _file = open(os.patorch.join(opt.dataroot, "lists/texmesh_train.pkl"), "rb")
             total_m = '/data/home/us000042/lelechen/data/Facescape/bigmeshtrain.npy'
             total_t = '/data/home/us000042/lelechen/data/Facescape/bigtex256train.npy'
         else:
-            _file = open(os.path.join(opt.dataroot, "lists/texmesh_test.pkl"), "rb")
+            _file = open(os.patorch.join(opt.dataroot, "lists/texmesh_test.pkl"), "rb")
             total_m = '/data/home/us000042/lelechen/data/Facescape/bigmeshtest.npy'
             total_t = '/data/home/us000042/lelechen/data/Facescape/bigtex256test.npy'
 
         self.data_list = pickle.load(_file)#[:1]
         _file.close()
         
-        ids = open(os.path.join(opt.dataroot, "lists/ids.pkl"), "rb")
+        ids = open(os.patorch.join(opt.dataroot, "lists/ids.pkl"), "rb")
         self.id_set = set(pickle.load(ids))
         self.exp_set = get_exp()
 
@@ -278,7 +332,7 @@ class FacescapeDisMeshTexDataset(torch.utils.data.Dataset):
         A_exp = int(tmp[-1].split('_')[0])
         # id_p , 'models_reg', motion_p
         # tex 
-        tex_path = os.path.join( self.dir_tex , tmp[0], tmp[-1] + '.png')
+        tex_path = os.patorch.join( self.dir_tex , tmp[0], tmp[-1] + '.png')
     
         tex = self.total_tex[self.data_list[index]][0]
         tex = Image.fromarray(np.uint8(tex))
@@ -305,7 +359,7 @@ class FacescapeDisMeshTexDataset(torch.utils.data.Dataset):
                     B_exp = tmp[-1]
                 
                 # tex
-                tex_index = os.path.join( B_id , 'models_reg', B_exp  )
+                tex_index = os.patorch.join( B_id , 'models_reg', B_exp  )
                 
                 if self.opt.debug:
                     tex_index = self.data_list[index]
@@ -327,7 +381,7 @@ class FacescapeDisMeshTexDataset(torch.utils.data.Dataset):
             
         input_dict = { 'Atex': A_tex_tensor, 'Amesh': torch.FloatTensor(A_vertices),
                 'A_path': self.data_list[index], 'Btex':B_tex_tensor,
-                'Bmesh': torch.FloatTensor(B_vertices), 'B_path': os.path.join( B_id, 'models_reg' , B_exp),
+                'Bmesh': torch.FloatTensor(B_vertices), 'B_path': os.patorch.join( B_id, 'models_reg' , B_exp),
                 'map_type':toss, 'Aid': int(A_id) - 1, 'Aexp': int(A_exp) -1,
                 'Bid':int(B_id) - 1, 'Bexp':int(B_exp.split('_')[0]) - 1 , 'Aidmesh': Aidmesh, 'Bidmesh': Bidmesh }
 
@@ -345,33 +399,33 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
     def __init__(self, opt):
         self.opt = opt
         ### input A (texture and mesh)   
-        self.dir_A = os.path.join(opt.dataroot, "textured_meshes")
+        self.dir_A = os.patorch.join(opt.dataroot, "textured_meshes")
 
         # self.dir_tex = '/raid/celong/FaceScape/texture_mapping/target/'
-        self.dir_tex = os.path.join(opt.dataroot, "texture_mapping", 'target')
+        self.dir_tex = os.patorch.join(opt.dataroot, "texture_mapping", 'target')
         # '/data/home/us000042/lelechen/data/Facescape/texture_mapping/target/'
         ### input B (real images)
-        self.dir_B = os.path.join(opt.dataroot, "ffhq_aligned_img")
+        self.dir_B = os.patorch.join(opt.dataroot, "ffhq_aligned_img")
 
         ### input C (eye parsing images)
-        self.dir_C = os.path.join(opt.dataroot, "fsmview_landmarks")
+        self.dir_C = os.patorch.join(opt.dataroot, "fsmview_landmarks")
 
         ### json 
-        self.dir_json = os.path.join(opt.dataroot, "fsmview_images")
+        self.dir_json = os.patorch.join(opt.dataroot, "fsmview_images")
 
         if  opt.isTrain:
-            _file = open(os.path.join(opt.dataroot, "lists/texmesh_train.pkl"), "rb")
+            _file = open(os.patorch.join(opt.dataroot, "lists/texmesh_train.pkl"), "rb")
             total_m = '/data/home/us000042/lelechen/data/Facescape/bigmeshtrain.npy'
             total_t = '/data/home/us000042/lelechen/data/Facescape/bigtex256train.npy'
         else:
-            _file = open(os.path.join(opt.dataroot, "lists/texmesh_test.pkl"), "rb")
+            _file = open(os.patorch.join(opt.dataroot, "lists/texmesh_test.pkl"), "rb")
             total_m = '/data/home/us000042/lelechen/data/Facescape/bigmeshtest.npy'
             total_t = '/data/home/us000042/lelechen/data/Facescape/bigtex256test.npy'
 
         self.data_list = pickle.load(_file)#[:1]
         _file.close()
         
-        ids = open(os.path.join(opt.dataroot, "lists/ids.pkl"), "rb")
+        ids = open(os.patorch.join(opt.dataroot, "lists/ids.pkl"), "rb")
         self.id_set = set(pickle.load(ids))
         self.exp_set = get_exp()
 
@@ -434,7 +488,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         A_exp = int(tmp[-1].split('_')[0])
         # id_p , 'models_reg', motion_p
         # tex 
-        tex_path = os.path.join( self.dir_tex , tmp[0], tmp[-1] + '.png')
+        tex_path = os.patorch.join( self.dir_tex , tmp[0], tmp[-1] + '.png')
     
         tex = self.total_tex[self.data_list[index]][0]
         # tex = Image.fromarray(np.uint8(tex))
@@ -465,26 +519,26 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
     def __init__(self, opt):
         self.opt = opt
         ### input A (texture and mesh)   
-        self.dir_A = os.path.join(opt.dataroot, "textured_meshes")
+        self.dir_A = os.patorch.join(opt.dataroot, "textured_meshes")
 
         # self.dir_tex = '/raid/celong/FaceScape/texture_mapping/target/'
-        self.dir_tex = os.path.join(opt.dataroot, "texture_mapping", 'target')
+        self.dir_tex = os.patorch.join(opt.dataroot, "texture_mapping", 'target')
         # '/data/home/us000042/lelechen/data/Facescape/texture_mapping/target/'
         ### input B (real images)
-        self.dir_B = os.path.join(opt.dataroot, "ffhq_aligned_img")
+        self.dir_B = os.patorch.join(opt.dataroot, "ffhq_aligned_img")
 
         ### input C (eye parsing images)
-        self.dir_C = os.path.join(opt.dataroot, "fsmview_landmarks")
+        self.dir_C = os.patorch.join(opt.dataroot, "fsmview_landmarks")
 
         ### json 
-        self.dir_json = os.path.join(opt.dataroot, "fsmview_images")
+        self.dir_json = os.patorch.join(opt.dataroot, "fsmview_images")
 
         if opt.isTrain:
-            _file = open(os.path.join(opt.dataroot, "lists/texmesh_train.pkl"), "rb")
+            _file = open(os.patorch.join(opt.dataroot, "lists/texmesh_train.pkl"), "rb")
             total_m = '/data/home/us000042/lelechen/data/Facescape/bigmeshtrain.npy'
             total_t = '/data/home/us000042/lelechen/data/Facescape/bigtex256train.npy'
         else:
-            _file = open(os.path.join(opt.dataroot, "lists/texmesh_test.pkl"), "rb")
+            _file = open(os.patorch.join(opt.dataroot, "lists/texmesh_test.pkl"), "rb")
             total_m = '/data/home/us000042/lelechen/data/Facescape/bigmeshtest.npy'
             total_t = '/data/home/us000042/lelechen/data/Facescape/bigtex256test.npy'
 
@@ -496,7 +550,7 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
 
         _file.close()
         
-        ids = open(os.path.join(opt.dataroot, "lists/ids.pkl"), "rb")
+        ids = open(os.patorch.join(opt.dataroot, "lists/ids.pkl"), "rb")
         self.id_set = set(pickle.load(ids))
         self.exp_set = get_exp()
         self.total_tex = {}
@@ -533,7 +587,7 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         tmp = self.data_list[index].split('/')
         # id_p , 'models_reg', motion_p
         # tex 
-        tex_path = os.path.join( self.dir_tex , tmp[0], tmp[-1] + '.png')
+        tex_path = os.patorch.join( self.dir_tex , tmp[0], tmp[-1] + '.png')
      
         tex = self.total_tex[self.data_list[index]][0]
 
@@ -561,29 +615,29 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
     def __init__(self, opt):
         self.opt = opt
         ### input A (texture and mesh)   
-        self.dir_A = os.path.join(opt.dataroot, "augmented_meshes")
+        self.dir_A = os.patorch.join(opt.dataroot, "augmented_meshes")
 
         ### input B (real images)
-        self.dir_B = os.path.join(opt.dataroot, "ffhq_aligned_img")
+        self.dir_B = os.patorch.join(opt.dataroot, "ffhq_aligned_img")
 
         ### input C (eye parsing images)
-        self.dir_C = os.path.join(opt.dataroot, "fsmview_landmarks")
+        self.dir_C = os.patorch.join(opt.dataroot, "fsmview_landmarks")
 
         ### json 
-        self.dir_json = os.path.join(opt.dataroot, "fsmview_images")
+        self.dir_json = os.patorch.join(opt.dataroot, "fsmview_images")
 
         if opt.isTrain:
-            _file = open(os.path.join(opt.dataroot, "lists/mesh_train.pkl"), "rb")
+            _file = open(os.patorch.join(opt.dataroot, "lists/mesh_train.pkl"), "rb")
             total_m = '/data/home/us000042/lelechen/data/Facescape/augmeshtrain.npy'
         else:
-            _file = open(os.path.join(opt.dataroot, "lists/texmesh_test.pkl"), "rb")
+            _file = open(os.patorch.join(opt.dataroot, "lists/texmesh_test.pkl"), "rb")
             total_m = '/data/home/us000042/lelechen/data/Facescape/augmeshtest.npy'
 
 
         self.data_list = pickle.load(_file)#[:1]
         _file.close()
         
-        ids = open(os.path.join(opt.dataroot, "lists/ids.pkl"), "rb")
+        ids = open(os.patorch.join(opt.dataroot, "lists/ids.pkl"), "rb")
         self.id_set = set(pickle.load(ids))
         # self.meanmesh = get_meanmesh()
         print ('===========================')
@@ -647,7 +701,7 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
         #             B_exp = tmp[-1]
                 
         #         # tex
-        #         tex_index = os.path.join( B_id , 'models_reg', B_exp  )
+        #         tex_index = os.patorch.join( B_id , 'models_reg', B_exp  )
         #         # Bidmesh = ( self.meanmesh[B_id]- self.totalmeanmesh ) / self.totalstdmesh
                 
         #         if self.opt.debug:
@@ -667,7 +721,7 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
                 'map_type':0, 'Aid': int(A_id) - 1, 'Aexp': int(A_exp) -1}
         # input_dict = { 'Amesh': torch.FloatTensor(A_vertices),
         #         'A_path': self.data_list[index], 
-        #         'Bmesh': torch.FloatTensor(B_vertices), 'B_path': os.path.join( B_id, 'models_reg' , B_exp),
+        #         'Bmesh': torch.FloatTensor(B_vertices), 'B_path': os.patorch.join( B_id, 'models_reg' , B_exp),
         #         'map_type':toss, 'Aid': int(A_id) - 1, 'Aexp': int(A_exp) -1,
         #         'Bid':int(B_id) - 1, 'Bexp':int(B_exp.split('_')[0]) - 1}#, 'Aidmesh':  torch.FloatTensor(Aidmesh), 'Bidmesh': torch.FloatTensor(Bidmesh) }
 
