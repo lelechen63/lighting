@@ -66,8 +66,8 @@ def np_augument_tex_color( img, smoothness=100, directionality=0.9, noise_sigma=
     	print (noise_sigma)
     	print (type(noise_sigma))
     	print  (F.shape)
-    	
-        F += np.random.randn(F.shape) * noise_sigma
+
+        F += np.random.randn(*F.shape) * noise_sigma
     # convert to unsigned char
     return F.clip( 0, 255 )
 
