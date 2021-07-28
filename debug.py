@@ -103,9 +103,8 @@ def np_augument_tex_color( img, smoothness=100, directionality=0.9, noise_sigma=
         a = np.random.randn(6, *F.shape[:-2], 1, 1)
         # L = a[0] * ix + a[1] * iy + a[2] * ix * iy + a[3] * ix ** 2 + a[4] * iy ** 2 + a[5]
         # L = (a[0] * ix + a[1] * iy + a[2]) * (a[3] * ix + a[4] * iy + a[5])
-        L = np.power(a[0] * ix + a[1] * iy + a[2], 2) * a[3] + (
-            -a[1] * ix + a[0] * iy + a[4]
-        ).pow(2) * a[5]
+        L = np.power(a[0] * ix + a[1] * iy + a[2], 2) * a[3] + np.power(
+            -a[1] * ix + a[0] * iy + a[4], 2) * a[5]
         # L = a[3] * ix ** 2 + a[4] * iy ** 2 + a[5]
         s_range = np.random.rand([2, *F.shape[:-2], 1, 1]) * directionality
 
