@@ -141,7 +141,7 @@ else:
                 ('rec_tex_A', util.tensor2im(rec_tex_A.data[0]))
                 ])
 
-            visualizer.display_current_results(visuals, num, 1000000)
+            # visualizer.display_current_results(visuals, num, 1000000)
 
 
     elif opt.name =='meshtexgan':
@@ -202,7 +202,7 @@ else:
                 ('gt_Amesh', gt_Amesh),
                 ('rec_Amesh', rec_Amesh),
                 ])
-            visualizer.display_current_results(visuals, num, 1000000)
+            # visualizer.display_current_results(visuals, num, 1000000)
     elif opt.name =='mesh':
         from model.model2 import MeshGenerator as module 
         checkpoint_path = '/data/home/us000042/lelechen/github/lighting/checkpoints/mesh/latest.ckpt'
