@@ -200,11 +200,14 @@ def get_mesh_pickle(debug = False):
         print (len(train_list))
     print (test_list[:10])
     print (len(train_list), len(test_list))
-    meshtrain = '/data/home/uss00022/lelechen/data/Facescape/lists/mesh_train.pkl'
-    meshtest = '/data/home/uss00022/lelechen/data/Facescape/lists/mesh_test.pkl'
+    meshtrain = '/data/home/uss00022/lelechen/data/Facescape/lists/mesh_train'
+    meshtest = '/data/home/uss00022/lelechen/data/Facescape/lists/mesh_test'
     if debug:
-        meshtrain +='_debug'
-        meshtest +='_debug'
+        meshtrain +='_debug.pkl'
+        meshtest +='_debug.pkl'
+    else:
+        meshtrain +='.pkl'
+        meshtest +='.pkl'
     with open(meshtrain, 'wb') as handle:
         pickle.dump(train_list, handle, protocol=pickle.HIGHEST_PROTOCOL)
     with open(meshtest, 'wb') as handle:
@@ -425,7 +428,7 @@ def get_texnorm():
     np.save( '/data/home/uss00022/lelechen/github/lighting/predef/meantex.npy', meantex)
     np.save( '/data/home/uss00022/lelechen/github/lighting/predef/stdtex.npy', stdtex)
     cv2.imwrite('./gg.png', meantex)
-# get_meanmesh()
+get_mesh_pickle(True)
 get_mesh_augment(True)
 # get_mesh_augment()
 # get_mesh_total()
