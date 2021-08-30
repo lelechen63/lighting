@@ -371,7 +371,6 @@ def get_tex_total():
     dir_A = os.path.join(dataroot, "textured_meshes")  
     
     data_list = pickle.load(_file)#[:1]
-    # _file = open(os.path.join(dataroot, "lists/texmesh_test.pkl"), "rb")
     totalmeanmesh = np.load( '/data/home/uss00022/lelechen/github/lighting/predef/meanmesh.npy' )
     # data_list.extend(pickle.load(_file))
     dir_tex  = os.path.join(dataroot, "texture_mapping", 'target')
