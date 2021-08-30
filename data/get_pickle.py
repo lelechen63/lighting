@@ -190,10 +190,12 @@ def get_mesh_pickle(debug = False):
             except:
                 print('!!!!!!!!!!!!!', mesh_path)
                 continue
-            
             if debug:
-                if len(train_list) >= 50:
-                    break
+                # if k > 5:
+                #     break
+        if debug:
+            if len(train_list) >= 1000:
+                break
         
         print (len(train_list))
     print (test_list[:10])
