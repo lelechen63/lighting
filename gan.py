@@ -94,9 +94,9 @@ if opt.isTrain:
     trainer.fit(model, dm)
 
 else:
-    print ('!!!!!!' + opt.name +'~!!!!!!!!')
+    print ('!!!!!!' + opt.name +'!!!!!!!!')
     if opt.name == 'texgan' :
-        checkpoint_path = '/data/home/us000042/lelechen/github/lighting/checkpoints/texgan/latest.ckpt'
+        checkpoint_path = './checkpoints/texgan/latest.ckpt'
         
         from model.model2 import TexGenerator as module
 
