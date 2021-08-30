@@ -156,8 +156,7 @@ def get_texmesh_pickle():
 
 
 
-def get_mesh_pickle():
-    
+def get_mesh_pickle(debug = False):
     base_p = '/data/home/uss00022/lelechen/data/Facescape/augmented_meshes'
     train_list = []
     test_list = []
@@ -190,17 +189,21 @@ def get_mesh_pickle():
             except:
                 print('!!!!!!!!!!!!!', mesh_path)
                 continue
-        #     if len(train_list) == 50:
-        #         break
-        # if len(train_list) == 50:
-        #     break
+            if debug:
+            if len(train_list) == 50:
+                break
+        
         print (len(train_list))
     print (test_list[:10])
     print (len(train_list), len(test_list))
-
-    with open('/data/home/uss00022/lelechen/data/Facescape/lists/mesh_train.pkl', 'wb') as handle:
+    meshtrain = '/data/home/uss00022/lelechen/data/Facescape/lists/mesh_train.pkl'
+    meshtest = '/data/home/uss00022/lelechen/data/Facescape/lists/mesh_test.pkl'
+    if debug:
+        meshtrain +='_debug'
+        meshtest +='_debug'
+    with open(meshtrain, 'wb') as handle:
         pickle.dump(train_list, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    with open('/data/home/uss00022/lelechen/data/Facescape/lists/mesh_test.pkl', 'wb') as handle:
+    with open(meshtest, 'wb') as handle:
         pickle.dump(test_list, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 def get_paired_texmesh_pickle():
@@ -406,8 +409,8 @@ def get_texnorm():
     np.save( '/data/home/uss00022/lelechen/github/lighting/predef/stdtex.npy', stdtex)
     cv2.imwrite('./gg.png', meantex)
 # get_meanmesh()
-# get_mesh_pickle()
-get_mesh_augment()
+get_mesh_pickle(True)
+# get_mesh_augment()
 # get_mesh_total()
 # get_canonical_mesh()
 # tmp()

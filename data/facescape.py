@@ -632,12 +632,11 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
             # _file = open(os.path.join(opt.dataroot, "lists/mesh_train.pkl"), "rb")
             # total_m = '/data/home/us000042/lelechen/data/Facescape/augmeshtrain.npy'
 
-            _file = open(os.path.join(opt.dataroot, "lists/texmesh_test.pkl"), "rb")
-            total_m = '/data/home/us000042/lelechen/data/Facescape/bigmeshtest.npy'
-        # else:
+            # _file = open(os.path.join(opt.dataroot, "lists/texmesh_test.pkl"), "rb")
+            # total_m = '/data/home/us000042/lelechen/data/Facescape/bigmeshtest.npy'
 
-        #     _file = open(os.path.join(opt.dataroot, "lists/texmesh_test.pkl"), "rb")
-        #     total_m = '/data/home/us000042/lelechen/data/Facescape/augmeshtest.npy'
+            _file = open(os.path.join(opt.dataroot, "lists/texmesh_test.pkl"), "rb")
+            total_m = '/data/home/us000042/lelechen/data/Facescape/augmeshtest.npy'
 
 
         self.data_list = pickle.load(_file)#[:1]
