@@ -109,16 +109,14 @@ else:
 
         dm.setup()
         testdata = dm.test_dataloader()
-        # testdata = random.shuffle(testdata)
         opt.name = opt.name + '_test'
         visualizer = Visualizer(opt)
         l2loss = torch.nn.MSELoss()
+        print ('***********', len(testdata),'*************')
         for num,batch in enumerate(testdata):
-            
+            print (num)
             rec_tex_A= \
             module(  batch['Atex'])
-          
-
             Atex = batch['Atex'].data[0].cpu()  * stdtex + meantex 
             Atex = util.tensor2im(Atex  , normalize = False)
             
@@ -134,14 +132,11 @@ else:
             rec_tex_A_vis = np.ascontiguousarray(rec_tex_A_vis, dtype=np.uint8)
             rec_tex_A_vis = np.clip(rec_tex_A_vis, 0, 255)
 
-
             tmp = batch['A_path'][0].split('/')
             visuals = OrderedDict([
                 ('Atex', Atex),
                 ('rec_tex_A', util.tensor2im(rec_tex_A.data[0]))
                 ])
-
-            # visualizer.display_current_results(visuals, num, 1000000)
 
 
     elif opt.name =='meshtexgan':

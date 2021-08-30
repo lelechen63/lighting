@@ -579,7 +579,6 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
                 print(element)
                 
         print ('******************', len(self.data_list), len(self.total_tex))
-        # free the memory
         self.total_t = []
         self.total_m = []
     def __getitem__(self, index):
