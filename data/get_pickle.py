@@ -321,11 +321,16 @@ def get_mesh_total():
 
 
 
-def get_mesh_augment():
+def get_mesh_augment(debug =False, type ='train'):
     dataroot = '/data/home/uss00022/lelechen/data/Facescape/'
-   
+    if type == 'train':
+        lists =  "lists/mesh_train.pkl"
+    else:
+        lists =  "lists/mesh_test.pkl"
+    if debug:
+        lists = lists[:-4] + '_debug.pkl'
     dir_A = os.path.join(dataroot, "augmented_meshes")  
-    _file = open(os.path.join(dataroot, "lists/mesh_test.pkl"), "rb")
+    _file = open(os.path.join(dataroot, lists), "rb")
     data_list = pickle.load(_file)
     # for id in os.listdir(dir_A):
     big = []
@@ -335,7 +340,15 @@ def get_mesh_augment():
         A_vertices = np.array(om_mesh.points()).reshape(-1)
         big.append(A_vertices)
     big = np.asarray(big)
-    np.save( '/data/home/uss00022/lelechen/data/Facescape/augmeshtest.npy', big )
+    if type =='train'
+        npsave = '/data/home/uss00022/lelechen/data/Facescape/augmeshtrain'
+    else:
+        npsave = '/data/home/uss00022/lelechen/data/Facescape/augmeshtest'
+    if debug:
+        npsave += '_debug.npy'
+    else:
+        npsave += '.npy'
+    np.save( npsave, big )
 
 def getmeshnorm():
     # dataroot = '/data/home/uss00022/lelechen/data/Facescape/'
@@ -413,7 +426,7 @@ def get_texnorm():
     np.save( '/data/home/uss00022/lelechen/github/lighting/predef/stdtex.npy', stdtex)
     cv2.imwrite('./gg.png', meantex)
 # get_meanmesh()
-get_mesh_pickle(True)
+get_mesh_augment(True)
 # get_mesh_augment()
 # get_mesh_total()
 # get_canonical_mesh()
