@@ -340,7 +340,7 @@ def get_mesh_augment(debug =False, type ='train'):
         A_vertices = np.array(om_mesh.points()).reshape(-1)
         big.append(A_vertices)
     big = np.asarray(big)
-    if type =='train'
+    if type =='train':
         npsave = '/data/home/uss00022/lelechen/data/Facescape/augmeshtrain'
     else:
         npsave = '/data/home/uss00022/lelechen/data/Facescape/augmeshtest'
