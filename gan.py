@@ -114,7 +114,6 @@ else:
         l2loss = torch.nn.MSELoss()
         print ('***********', len(testdata),'*************')
         for num,batch in enumerate(testdata):
-            print (num)
             rec_tex_A= \
             module(  batch['Atex'])
             Atex = batch['Atex'].data[0].cpu()  * stdtex + meantex 
@@ -137,7 +136,7 @@ else:
                 ('Atex', Atex),
                 ('rec_tex_A', util.tensor2im(rec_tex_A.data[0]))
                 ])
-
+            visualizer.display_current_results(visuals, num, 1000000)
 
     elif opt.name =='meshtexgan':
         checkpoint_path = '/data/home/us000042/lelechen/github/lighting/checkpoints/meshtexgan/latest.ckpt'
@@ -197,7 +196,7 @@ else:
                 ('gt_Amesh', gt_Amesh),
                 ('rec_Amesh', rec_Amesh),
                 ])
-            # visualizer.display_current_results(visuals, num, 1000000)
+            visualizer.display_current_results(visuals, num, 1000000)
     elif opt.name =='mesh':
         from model.model2 import MeshGenerator as module 
         checkpoint_path = '/data/home/us000042/lelechen/github/lighting/checkpoints/mesh/latest.ckpt'
@@ -270,7 +269,7 @@ else:
                 ('rec_Amesh', rec_Amesh),
             
                 ])
-
+            visualizer.display_current_results(visuals, num, 1000000)
     elif opt.name =='disgmesh2':
         from model.meshnetwork import DisAE2 as module 
         checkpoint_path = '/data/home/us000042/lelechen/github/lighting/checkpoints/gmesh/latest.ckpt'
@@ -346,8 +345,8 @@ else:
                 ('id_Amesh', rec_Aidmesh)
                 ])
 
-    visualizer.display_current_results(visuals, num, 1000000)
-    print ('++++++++++++ SUCCESS ++++++++++++++++!')
+            visualizer.display_current_results(visuals, num, 1000000)
+print ('++++++++++++ SUCCESS ++++++++++++++++!')
 # if opt.name.split('_')[0] == 'texmesh':
 #             rec_tex_A, rec_mesh_A, rec_tex_B, rec_mesh_B, \
 #             rec_tex_AB, rec_mesh_AB, rec_tex_BA, rec_mesh_BA = \
