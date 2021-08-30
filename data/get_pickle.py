@@ -175,6 +175,7 @@ def get_mesh_pickle(debug = False):
                 all_motions.append(f[:-4])
         random.shuffle(all_motions)
         for k, motion_p in enumerate(all_motions):
+            print (len(train_list))
             try:
                 mesh_path = os.path.join(current_p, motion_p + '.obj')
                 om_mesh = openmesh.read_trimesh(mesh_path)
@@ -189,8 +190,9 @@ def get_mesh_pickle(debug = False):
             except:
                 print('!!!!!!!!!!!!!', mesh_path)
                 continue
+            
             if debug:
-                if len(train_list) == 50:
+                if len(train_list) >= 50:
                     break
         
         print (len(train_list))
