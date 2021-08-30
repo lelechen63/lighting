@@ -5,7 +5,7 @@ import openmesh
 from PIL import Image
 import numpy as np
 import sys
-sys.path.append("/data/home/us000042/lelechen/github/lighting")
+sys.path.append("/data/home/uss00022/lelechen/github/lighting")
 from util.render_class import meshrender
 from tqdm import tqdm
 import torch
@@ -158,7 +158,7 @@ def get_texmesh_pickle():
 
 def get_mesh_pickle():
     
-    base_p = '/data/home/us000042/lelechen/data/Facescape/augmented_meshes'
+    base_p = '/data/home/uss00022/lelechen/data/Facescape/augmented_meshes'
     train_list = []
     test_list = []
     ids =  os.listdir(base_p)
@@ -198,9 +198,9 @@ def get_mesh_pickle():
     print (test_list[:10])
     print (len(train_list), len(test_list))
 
-    with open('/data/home/us000042/lelechen/data/Facescape/lists/mesh_train.pkl', 'wb') as handle:
+    with open('/data/home/uss00022/lelechen/data/Facescape/lists/mesh_train.pkl', 'wb') as handle:
         pickle.dump(train_list, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    with open('/data/home/us000042/lelechen/data/Facescape/lists/mesh_test.pkl', 'wb') as handle:
+    with open('/data/home/uss00022/lelechen/data/Facescape/lists/mesh_test.pkl', 'wb') as handle:
         pickle.dump(test_list, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 def get_paired_texmesh_pickle():
@@ -237,7 +237,7 @@ def gettexmesh_pid_expid():
         pickle.dump(pid, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 def get_mesh_mean_id():
-    dataroot = '/data/home/us000042/lelechen/data/Facescape/'
+    dataroot = '/data/home/uss00022/lelechen/data/Facescape/'
     _file = open(os.path.join(dataroot, "lists/texmesh_train.pkl"), "rb")
     dir_A = os.path.join(dataroot, "textured_meshes")  
     if not os.path.exists( os.path.join(dataroot, "meanmesh")   ):
@@ -277,7 +277,7 @@ def get_mesh_mean_id():
 
 
 def get_meanmesh():
-    dataroot = '/data/home/us000042/lelechen/data/Facescape/'
+    dataroot = '/data/home/uss00022/lelechen/data/Facescape/'
     meanmeshpath = os.path.join(dataroot, "meanmesh")
     total = os.listdir( meanmeshpath)
     meanmesh = []
@@ -287,13 +287,13 @@ def get_meanmesh():
     meanmesh = np.asarray(meanmesh)
     print (meanmesh.shape, 'meanmesh')
     meanmesh = np.mean(meanmesh, axis=0)
-    save_p = '/data/home/us000042/lelechen/github/lighting/predef/meanmesh.npy'
+    save_p = '/data/home/uss00022/lelechen/github/lighting/predef/meanmesh.npy'
     np.save( save_p, meanmesh )
 
 
 
 def get_mesh_total():
-    dataroot = '/data/home/us000042/lelechen/data/Facescape/'
+    dataroot = '/data/home/uss00022/lelechen/data/Facescape/'
     _file = open(os.path.join(dataroot, "lists/texmesh_train.pkl"), "rb")
     dir_A = os.path.join(dataroot, "textured_meshes")  
 
@@ -310,12 +310,12 @@ def get_mesh_total():
         A_vertices = np.array(om_mesh.points()).reshape(-1)
         big.append(A_vertices)
     big = np.asarray(big)
-    np.save( '/data/home/us000042/lelechen/data/Facescape/bigmeshtrain.npy', big )
+    np.save( '/data/home/uss00022/lelechen/data/Facescape/bigmeshtrain.npy', big )
 
 
 
 def get_mesh_augment():
-    dataroot = '/data/home/us000042/lelechen/data/Facescape/'
+    dataroot = '/data/home/uss00022/lelechen/data/Facescape/'
    
     dir_A = os.path.join(dataroot, "augmented_meshes")  
     _file = open(os.path.join(dataroot, "lists/mesh_test.pkl"), "rb")
@@ -328,24 +328,24 @@ def get_mesh_augment():
         A_vertices = np.array(om_mesh.points()).reshape(-1)
         big.append(A_vertices)
     big = np.asarray(big)
-    np.save( '/data/home/us000042/lelechen/data/Facescape/augmeshtest.npy', big )
+    np.save( '/data/home/uss00022/lelechen/data/Facescape/augmeshtest.npy', big )
 
 def getmeshnorm():
-    # dataroot = '/data/home/us000042/lelechen/data/Facescape/'
+    # dataroot = '/data/home/uss00022/lelechen/data/Facescape/'
     # _file = open(os.path.join(dataroot, "lists/texmesh_train.pkl"), "rb")
     # data_list = pickle.load(_file)
     # _file = open(os.path.join(dataroot, "lists/texmesh_test.pkl"), "rb")
     # data_list.extend(pickle.load(_file))
 
-    big = np.load( '/data/home/us000042/lelechen/data/Facescape/bigmeshtrain.npy' )
+    big = np.load( '/data/home/uss00022/lelechen/data/Facescape/bigmeshtrain.npy' )
     print (big.shape)
     trainmean = np.mean(big, axis = 0)
     trainstd = np.std(big, axis = 0)
     print (trainmean.shape, trainstd.shape)
-    np.save( '/data/home/us000042/lelechen/github/lighting/predef/meshmean.npy', trainmean )
-    np.save( '/data/home/us000042/lelechen/github/lighting/predef/stdmean.npy', trainstd )
+    np.save( '/data/home/uss00022/lelechen/github/lighting/predef/meshmean.npy', trainmean )
+    np.save( '/data/home/uss00022/lelechen/github/lighting/predef/stdmean.npy', trainstd )
 
-    # totalmeanmesh = np.load( '/data/home/us000042/lelechen/github/lighting/predef/meanmesh.npy' )
+    # totalmeanmesh = np.load( '/data/home/uss00022/lelechen/github/lighting/predef/meanmesh.npy' )
     # big = big -  totalmeanmesh
     # maxv = []
     # minv = []
@@ -353,31 +353,31 @@ def getmeshnorm():
     #     maxv.append(big[i].max())
     #     minv.append(big[i].min())
     #     if big[i].max() > 40 or big[i].min() < -40:
-    #         print( '/data/home/us000042/lelechen/data/Facescape/textured_meshes/' + data_list[i], big[i].max(),big[i].min() )
+    #         print( '/data/home/uss00022/lelechen/data/Facescape/textured_meshes/' + data_list[i], big[i].max(),big[i].min() )
 
     # plt.plot(maxv,minv, 'o',color='b')
     # plt.show()
     # plt.savefig('./gg.png')
 
 def get_canonical_mesh():
-    points = np.load('/data/home/us000042/lelechen/github/lighting/predef/meshmean.npy').reshape(-1,3)
-    ommesh  = openmesh.read_trimesh('/data/home/us000042/lelechen/data/Facescape/textured_meshes/1/models_reg/1_neutral.obj')
+    points = np.load('/data/home/uss00022/lelechen/github/lighting/predef/meshmean.npy').reshape(-1,3)
+    ommesh  = openmesh.read_trimesh('/data/home/uss00022/lelechen/data/Facescape/textured_meshes/1/models_reg/1_neutral.obj')
     vertex_indices = ommesh.face_vertex_indices()
-    openmesh.write_mesh('/data/home/us000042/lelechen/github/lighting/predef/meshmean.obj', openmesh.TriMesh(points, vertex_indices))
+    openmesh.write_mesh('/data/home/uss00022/lelechen/github/lighting/predef/meshmean.obj', openmesh.TriMesh(points, vertex_indices))
 
 def get_tex_total():
-    dataroot = '/data/home/us000042/lelechen/data/Facescape/'
+    dataroot = '/data/home/uss00022/lelechen/data/Facescape/'
     _file = open(os.path.join(dataroot, "lists/texmesh_test.pkl"), "rb")
     dir_A = os.path.join(dataroot, "textured_meshes")  
     
     data_list = pickle.load(_file)#[:1]
     # _file = open(os.path.join(dataroot, "lists/texmesh_test.pkl"), "rb")
-    totalmeanmesh = np.load( '/data/home/us000042/lelechen/github/lighting/predef/meanmesh.npy' )
+    totalmeanmesh = np.load( '/data/home/uss00022/lelechen/github/lighting/predef/meanmesh.npy' )
     # data_list.extend(pickle.load(_file))
     dir_tex  = os.path.join(dataroot, "texture_mapping", 'target')
     cc = 0
     big = []
-    facial_seg = Image.open("/data/home/us000042/lelechen/github/lighting/predef/facial_mask_v10.png")
+    facial_seg = Image.open("/data/home/uss00022/lelechen/github/lighting/predef/facial_mask_v10.png")
     facial_seg  = np.array(facial_seg ) / 255.0
     facial_seg = np.expand_dims(facial_seg, axis=2)
     x = 1169-150
@@ -397,14 +397,14 @@ def get_tex_total():
         tex = cv2.resize(tex, (256,256), interpolation = cv2.INTER_AREA)
         big.append(tex)
     big = np.asarray(big)
-    np.save( '/data/home/us000042/lelechen/data/Facescape/bigtex256test.npy', big )
+    np.save( '/data/home/uss00022/lelechen/data/Facescape/bigtex256test.npy', big )
 
 def get_texnorm():
-    big = np.load( '/data/home/us000042/lelechen/data/Facescape/bigtex256train.npy' )
+    big = np.load( '/data/home/uss00022/lelechen/data/Facescape/bigtex256train.npy' )
     meantex = np.mean(big, axis=0)
     stdtex = np.std(big, axis = 0)
-    np.save( '/data/home/us000042/lelechen/github/lighting/predef/meantex.npy', meantex)
-    np.save( '/data/home/us000042/lelechen/github/lighting/predef/stdtex.npy', stdtex)
+    np.save( '/data/home/uss00022/lelechen/github/lighting/predef/meantex.npy', meantex)
+    np.save( '/data/home/uss00022/lelechen/github/lighting/predef/stdtex.npy', stdtex)
     cv2.imwrite('./gg.png', meantex)
 # get_meanmesh()
 # get_mesh_pickle()
