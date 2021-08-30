@@ -626,18 +626,21 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
         self.dir_json = os.path.join(opt.dataroot, "fsmview_images")
 
         if opt.isTrain:
-            _file = open(os.path.join(opt.dataroot, "lists/mesh_train.pkl"), "rb")
-            total_m = '/data/home/us000042/lelechen/data/Facescape/augmeshtrain.npy'
+
+            meshpkl = 'list/mesh_train'
+            total_m  = '/data/home/us000042/lelechen/data/Facescape/augmeshtrain'
         else:
-            # _file = open(os.path.join(opt.dataroot, "lists/mesh_train.pkl"), "rb")
-            # total_m = '/data/home/us000042/lelechen/data/Facescape/augmeshtrain.npy'
+            meshpkl = 'list/mesh_test'
+            total_m  = '/data/home/us000042/lelechen/data/Facescape/augmeshtest'
 
-            # _file = open(os.path.join(opt.dataroot, "lists/texmesh_test.pkl"), "rb")
-            # total_m = '/data/home/us000042/lelechen/data/Facescape/bigmeshtest.npy'
-
-            _file = open(os.path.join(opt.dataroot, "lists/texmesh_test.pkl"), "rb")
-            total_m = '/data/home/us000042/lelechen/data/Facescape/augmeshtest.npy'
-
+        if opt.debug:
+            meshpkl +='_debug.pkl'
+            total_m += '_debug.npy'
+        else:
+            meshpkl +='.pkl'
+            total_m += '.npy'
+            
+        _file = open(os.path.join(opt.dataroot, meshpkl), "rb")
 
         self.data_list = pickle.load(_file)#[:1]
         _file.close()
