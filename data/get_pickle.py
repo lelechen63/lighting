@@ -190,8 +190,8 @@ def get_mesh_pickle(debug = False):
                 print('!!!!!!!!!!!!!', mesh_path)
                 continue
             if debug:
-            if len(train_list) == 50:
-                break
+                if len(train_list) == 50:
+                    break
         
         print (len(train_list))
     print (test_list[:10])
