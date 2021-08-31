@@ -692,7 +692,7 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
         # id_p , 'models_reg', motion_p
       
         A_vertices = self.total_tex[self.data_list[index]][0] 
-        Aidmesh = ( self.meanmesh[tmp[0]]- self.totalmeanmesh ) / self.totalstdmesh
+        # Aidmesh = ( self.meanmesh[tmp[0]]- self.totalmeanmesh ) / self.totalstdmesh
 
         # toss = random.getrandbits(1)
 
