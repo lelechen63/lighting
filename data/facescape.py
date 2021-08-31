@@ -538,9 +538,13 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
             total_m = '/data/home/uss00022/lelechen/data/Facescape/bigmeshtrain.npy'
             total_t = '/data/home/uss00022/lelechen/data/Facescape/bigtex256train.npy'
         else:
-            _file = open(os.path.join(opt.dataroot, "lists/texmesh_test.pkl"), "rb")
-            total_m = '/data/home/uss00022/lelechen/data/Facescape/bigmeshtest.npy'
-            total_t = '/data/home/uss00022/lelechen/data/Facescape/bigtex256test.npy'
+            # _file = open(os.path.join(opt.dataroot, "lists/texmesh_test.pkl"), "rb")
+            # total_m = '/data/home/uss00022/lelechen/data/Facescape/bigmeshtest.npy'
+            # total_t = '/data/home/uss00022/lelechen/data/Facescape/bigtex256test.npy'
+
+            _file = open(os.path.join(opt.dataroot, "lists/texmesh_train.pkl"), "rb")
+            total_m = '/data/home/uss00022/lelechen/data/Facescape/bigmeshtrain.npy'
+            total_t = '/data/home/uss00022/lelechen/data/Facescape/bigtex256train.npy'
 
 
         self.data_list = pickle.load(_file)#[:1]
@@ -587,14 +591,7 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         # id_p , 'models_reg', motion_p
         # tex 
         tex_path = os.path.join( self.dir_tex , tmp[0], tmp[-1] + '.png')
-     
         tex = self.total_tex[self.data_list[index]][0]
-
-        # tex = Image.fromarray(np.uint8(tex))
-        
-        # params = get_params(self.opt, tex.size)
-        # transform = get_transform(self.opt, params, normalize = False)      
-        # tex_tensor = transform(tex)
         tex_tensor = torch.FloatTensor(tex).permute(2,0,1)
         input_dict = { 'Atex':tex_tensor, 'Aid': int(tmp[0]) - 1, 'Aexp': int(tmp[-1].split('_')[0] )- 1, 'A_path': self.data_list[index]}
        
@@ -689,51 +686,13 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
         tmp = self.data_list[index].split('/')
         A_id = int(tmp[0])
         A_exp = int(tmp[-1].split('_')[0])
-        # id_p , 'models_reg', motion_p
       
         A_vertices = self.total_tex[self.data_list[index]][0] 
-        # Aidmesh = ( self.meanmesh[tmp[0]]- self.totalmeanmesh ) / self.totalstdmesh
 
-        # toss = random.getrandbits(1)
-
-        # # toss 0-> same iden, diff exp
-        # while True:
-        #     # try:
-        #         if toss == 0:
-        #             pool = self.exp_set - set(tmp[-1])
-        #             B_exp = random.sample(pool, 1)[0]
-        #             B_id = tmp[0]
-        #         # toss 1 -> same exp, diff iden
-        #         else:
-        #             pool = self.id_set - set(tmp[0])
-        #             B_id = random.sample(pool, 1)[0]
-        #             B_exp = tmp[-1]
-                
-        #         # tex
-        #         tex_index = os.path.join( B_id , 'models_reg', B_exp  )
-        #         # Bidmesh = ( self.meanmesh[B_id]- self.totalmeanmesh ) / self.totalstdmesh
-                
-        #         if self.opt.debug:
-        #             tex_index = self.data_list[index]
-
-        #         if tex_index not in self.total_tex.keys():
-        #             continue 
-               
-             
-        #         B_vertices = self.total_tex[tex_index][0]
-        #         if B_vertices.shape[0] != 78951:
-        #             print('!!!!',B_vertices.shape )
-        #             continue
-        #         break
         input_dict = { 'Amesh': torch.FloatTensor(A_vertices),
                 'A_path': self.data_list[index], 
                 'map_type':0, 'Aid': int(A_id) - 1, 'Aexp': int(A_exp) -1}
-        # input_dict = { 'Amesh': torch.FloatTensor(A_vertices),
-        #         'A_path': self.data_list[index], 
-        #         'Bmesh': torch.FloatTensor(B_vertices), 'B_path': os.path.join( B_id, 'models_reg' , B_exp),
-        #         'map_type':toss, 'Aid': int(A_id) - 1, 'Aexp': int(A_exp) -1,
-        #         'Bid':int(B_id) - 1, 'Bexp':int(B_exp.split('_')[0]) - 1}#, 'Aidmesh':  torch.FloatTensor(Aidmesh), 'Bidmesh': torch.FloatTensor(Bidmesh) }
-
+       
         return input_dict
 
     def __len__(self):
