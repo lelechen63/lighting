@@ -664,9 +664,9 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
             
             tmp = data.split('/')
             self.total_tex[data] = []
-            self.total_tex[data].append(self.total_m[cc])
-            # A_vertices = self.total_m[cc]  - self.totalmeanmesh
-            # self.total_tex[data].append(A_vertices  / self.totalstdmesh)
+            # self.total_tex[data].append(self.total_m[cc])
+            A_vertices = self.total_m[cc]  - self.totalmeanmesh
+            self.total_tex[data].append(A_vertices  / self.totalstdmesh)
             cc += 1
             # if opt.debug:
             #     if len(self.total_tex) == 13:
@@ -692,7 +692,7 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
         # id_p , 'models_reg', motion_p
       
         A_vertices = self.total_tex[self.data_list[index]][0] 
-        # Aidmesh = ( self.meanmesh[tmp[0]]- self.totalmeanmesh ) / self.totalstdmesh
+        Aidmesh = ( self.meanmesh[tmp[0]]- self.totalmeanmesh ) / self.totalstdmesh
 
         # toss = random.getrandbits(1)
 
