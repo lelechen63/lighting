@@ -252,7 +252,7 @@ else:
             gt_mesh = gt_mesh.float()
             rec_Amesh = rec_Amesh.float()
 
-            print (gt_mesh.type())
+            print (gt_mesh.shape,' +++++++')
             gt_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gt_mesh )
             rec_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), rec_Amesh )
             # rec_id = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), idmesh.data[0] + totalmeanmesh)
