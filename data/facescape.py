@@ -663,9 +663,10 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
         for data in tqdm(self.data_list):
             
             tmp = data.split('/')
-            self.total_tex[data] = [ ]
-            A_vertices = self.total_m[cc] - self.totalmeanmesh
-            self.total_tex[data].append(A_vertices  / self.totalstdmesh)
+            self.total_tex[data] = []
+            self.total_tex[data].append(self.total_m[cc])
+            # A_vertices = self.total_m[cc]  - self.totalmeanmesh
+            # self.total_tex[data].append(A_vertices  / self.totalstdmesh)
             cc += 1
             # if opt.debug:
             #     if len(self.total_tex) == 13:
