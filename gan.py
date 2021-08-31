@@ -42,7 +42,7 @@ def pl2normal(checkpoint):
 
 opt = TrainOptions().parse()
 
-opt.datasetname = "fs_texmesh"
+# opt.datasetname = "fs_texmesh"
 
 if  opt.name == 'meshtexgan':
     from model.model2 import MeshTexGANModule as module 
@@ -56,7 +56,6 @@ elif opt.name == 'gmesh' :
 elif opt.name == 'disgmesh' :
     from model.model2 import DisGraphConvMeshModule as module 
     opt.datasetname = "fs_mesh"
-
 elif opt.name == 'disgmesh2' :
     from model.model2 import DisGraphConvMeshModule2 as module 
     opt.datasetname = "fs_mesh"
@@ -139,7 +138,7 @@ else:
             visualizer.display_current_results(visuals, num, 1000000)
 
     elif opt.name =='meshtexgan':
-        checkpoint_path = '/data/home/us000042/lelechen/github/lighting/checkpoints/meshtexgan/latest.ckpt'
+        checkpoint_path = './checkpoints/meshtexgan/latest.ckpt'
         device = torch.device('cuda', 0)
         from model.model2 import MeshTexGenerator as module 
         module = module(opt.loadSize, not opt.no_linearity, 
@@ -199,12 +198,12 @@ else:
             visualizer.display_current_results(visuals, num, 1000000)
     elif opt.name =='mesh':
         from model.model2 import MeshGenerator as module 
-        checkpoint_path = '/data/home/us000042/lelechen/github/lighting/checkpoints/mesh/latest.ckpt'
+        checkpoint_path = './checkpoints/mesh/latest.ckpt'
         module =  module(opt.loadSize, not opt.no_linearity, 3, opt.code_n,opt.encoder_fc_n, opt.ngf,opt.n_downsample_global, opt.n_blocks_global,opt.norm)
         pass 
     elif opt.name =='gmesh':
         from model.meshnetwork import AE as module 
-        checkpoint_path = '/data/home/us000042/lelechen/github/lighting/checkpoints/gmesh/latest.ckpt'
+        checkpoint_path = './checkpoints/gmesh/latest.ckpt'
         homepath = './predef'
         device = torch.device('cuda', 0)
 
@@ -251,8 +250,8 @@ else:
             print (batch['A_path'][0], loss.data)
             tmp = batch['A_path'][0].split('/')
             print (batch['Amesh'].data[0].cpu().shape, totalmeanmesh.shape, totalstdmesh.shape)
-            gt_mesh = batch['Amesh'].data[0].cpu()* totalstdmesh + totalmeanmesh
-            rec_Amesh = rec_mesh_A.data[0].cpu().view(-1) * totalstdmesh + totalmeanmesh 
+            gt_mesh = batch['Amesh'].data[0].cpu() #* totalstdmesh + totalmeanmesh
+            rec_Amesh = rec_mesh_A.data[0].cpu().view(-1) #* totalstdmesh + totalmeanmesh 
             gt_mesh = gt_mesh.float()
             rec_Amesh = rec_Amesh.float()
 
@@ -272,7 +271,7 @@ else:
             visualizer.display_current_results(visuals, num, 1000000)
     elif opt.name =='disgmesh2':
         from model.meshnetwork import DisAE2 as module 
-        checkpoint_path = '/data/home/us000042/lelechen/github/lighting/checkpoints/gmesh/latest.ckpt'
+        checkpoint_path = './checkpoints/gmesh/latest.ckpt'
         homepath = './predef'
         device = torch.device('cuda', 0)
 
