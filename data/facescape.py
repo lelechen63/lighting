@@ -667,9 +667,9 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
             A_vertices = self.total_m[cc] - self.totalmeanmesh
             self.total_tex[data].append(A_vertices  / self.totalstdmesh)
             cc += 1
-            if opt.debug:
-                if len(self.total_tex) == 13:
-                    break
+            # if opt.debug:
+            #     if len(self.total_tex) == 13:
+            #         break
 
         # remove blacklisted item
         for element in bk:
