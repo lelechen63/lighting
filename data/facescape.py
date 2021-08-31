@@ -538,13 +538,13 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
             total_m = '/data/home/uss00022/lelechen/data/Facescape/bigmeshtrain.npy'
             total_t = '/data/home/uss00022/lelechen/data/Facescape/bigtex256train.npy'
         else:
-            # _file = open(os.path.join(opt.dataroot, "lists/texmesh_test.pkl"), "rb")
-            # total_m = '/data/home/uss00022/lelechen/data/Facescape/bigmeshtest.npy'
-            # total_t = '/data/home/uss00022/lelechen/data/Facescape/bigtex256test.npy'
+            _file = open(os.path.join(opt.dataroot, "lists/texmesh_test.pkl"), "rb")
+            total_m = '/data/home/uss00022/lelechen/data/Facescape/bigmeshtest.npy'
+            total_t = '/data/home/uss00022/lelechen/data/Facescape/bigtex256test.npy'
 
-            _file = open(os.path.join(opt.dataroot, "lists/texmesh_train.pkl"), "rb")
-            total_m = '/data/home/uss00022/lelechen/data/Facescape/bigmeshtrain.npy'
-            total_t = '/data/home/uss00022/lelechen/data/Facescape/bigtex256train.npy'
+            # _file = open(os.path.join(opt.dataroot, "lists/texmesh_train.pkl"), "rb")
+            # total_m = '/data/home/uss00022/lelechen/data/Facescape/bigmeshtrain.npy'
+            # total_t = '/data/home/uss00022/lelechen/data/Facescape/bigtex256train.npy'
 
 
         self.data_list = pickle.load(_file)#[:1]
@@ -571,7 +571,7 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
             self.total_tex[data] = [ tmp ]
             cc += 1
             if opt.debug:
-                if len(self.total_tex) == 13:
+                if len(self.total_tex) == 65:
                     break
 
         # remove blacklisted item
