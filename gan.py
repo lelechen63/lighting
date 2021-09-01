@@ -41,7 +41,8 @@ def pl2normal(checkpoint):
 
 
 opt = TrainOptions().parse()
-
+if opt.debug:
+    opt.nThreads = 1
 # opt.datasetname = "fs_texmesh"
 
 if  opt.name == 'meshtexgan':
