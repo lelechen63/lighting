@@ -403,7 +403,7 @@ class GraphConvMeshModule(pl.LightningModule):
                 K=6)
         self.visualizer = Visualizer(opt)
         self.ckpt_path = os.path.join(opt.checkpoints_dir, opt.name)
-    def forward(self, A_mesh):
+    def forward(self, A_mesh): 
         
         return self.generator(A_mesh)
     
@@ -758,8 +758,8 @@ class TexGANModule(pl.LightningModule):
        
         self.GANloss = lossNet.GANLoss()
         self.visualizer = Visualizer(opt)
-        self.meantex = np.load('/data/home/us000042/lelechen/github/lighting/predef/meantex.npy')
-        self.stdtex = np.load('/data/home/us000042/lelechen/github/lighting/predef/stdtex.npy')
+        self.meantex = np.load('./predef/meantex.npy')
+        self.stdtex = np.load('./predef/stdtex.npy')
         self.meantex = torch.FloatTensor(self.meantex).permute(2, 0,1)
         self.stdtex = torch.FloatTensor(self.stdtex).permute(2,0,1)
         self.ckpt_path = os.path.join(opt.checkpoints_dir, opt.name)
@@ -835,18 +835,13 @@ class TexGANModule(pl.LightningModule):
            
             Atex = batch['Atex'].data[0].cpu()  * self.stdtex + self.meantex 
             Atex = util.tensor2im(Atex  , normalize = False)
-            
             Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
             Atex = util.writeText(Atex, batch['A_path'][0])
-
             Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
             Atex = np.clip(Atex, 0, 255)
 
             rec_tex_A_vis =rec_tex_A.data[0].cpu() * self.stdtex + self.meantex  
-            rec_tex_A_vis = util.tensor2im(rec_tex_A_vis, normalize = False)
-            
-            
-            # rec_tex_A_vis = rec_tex_A_vis + self.totalmeantex
+            rec_tex_A_vis = util.tensor2im(rec_tex_A_vis, normalize = False)            
             rec_tex_A_vis = np.ascontiguousarray(rec_tex_A_vis, dtype=np.uint8)
             rec_tex_A_vis = np.clip(rec_tex_A_vis, 0, 255)
             visuals = OrderedDict([
@@ -965,6 +960,7 @@ class MeshTexGANModule(pl.LightningModule):
         self(batch['Atex'], batch['Amesh'] )
         map_type = batch['map_type']
 
+
         if optimizer_idx ==0:       
             
             # pix loss
@@ -1023,7 +1019,7 @@ class MeshTexGANModule(pl.LightningModule):
         return [opt_g, opt_d], []
 
     def on_epoch_end(self):
-        if self.current_epoch % 10 == 0:
+        if self.current_epoch % 1 == 0:
             batch = self.batch
             rec_tex_A, _, _ = \
             self(batch['Atex'], batch['Amesh'] )
@@ -1046,11 +1042,6 @@ class MeshTexGANModule(pl.LightningModule):
             rec_tex_A_vis = np.ascontiguousarray(rec_tex_A_vis, dtype=np.uint8)
             rec_tex_A_vis = np.clip(rec_tex_A_vis, 0, 255)
 
-
-
-            # rec_tex_A_vis = rec_tex_A_vis + self.totalmeantex
-            # rec_tex_A_vis = np.ascontiguousarray(rec_tex_A_vis, dtype=np.uint8)
-            # rec_tex_A_vis = np.clip(rec_tex_A_vis, 0, 255)
             visuals = OrderedDict([
             ('Atex', Atex),
             ('rec_tex_A', rec_tex_A_vis ),
@@ -1059,7 +1050,7 @@ class MeshTexGANModule(pl.LightningModule):
        
             self.visualizer.display_current_results(visuals, self.current_epoch, 1000000) 
 
-            self.trainer.save_checkpoint( os.path.join( self.ckpt_path, 'latest.ckpt') )
+            # self.trainer.save_checkpoint( os.path.join( self.ckpt_path, 'latest.ckpt') )
 
 
 class MultiscaleDiscriminator(nn.Module):
