@@ -501,7 +501,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         print (tex.shape)
         print (tex.dtype)
         print (tex.max(), tex.min())
-        tex =  self.augseq(tex)
+        tex =  self.augseq(tex.astype(np.uint8)).astype(np.float64)
         tex = (tex - self.meantex)/self.stdtex
         # tex = Image.fromarray(np.uint8(tex))
         # params = get_params(self.opt, tex.size)
