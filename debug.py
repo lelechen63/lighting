@@ -92,15 +92,23 @@ seq = iaa.Sequential([
     iaa.WithHueAndSaturation(iaa.WithChannels(0, iaa.Add((0, 50))))
 ])
 
-
+print ('1111')
 img = cv2.imread('/data/home/uss00022/lelechen/data/Facescape/textured_meshes/1/models_reg/10_dimpler.jpg')
+print ('1111')
 
 imgs = np.zeros((64, img.shape[0], img.shape[1], 3))
+print ('1111')
+
 for i in range(64):
     imgs[i] = img
+print ('1111')
 
 t = time.time()
+print ('1111')
+
 images_aug = seq(images=imgs)
+print ('1111')
+
 print (time.time() - t)
 img_grid = gallery(images_aug, 8)
 print (time.time() - t)
