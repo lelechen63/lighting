@@ -95,10 +95,10 @@ seq = iaa.Sequential([
 print ('1111')
 img = cv2.imread('/data/home/uss00022/lelechen/data/Facescape/textured_meshes/1/models_reg/10_dimpler.jpg')
 print ('1111')
+img = cv2.resize(img, (256,256), interpolation = cv2.INTER_AREA)
 
 imgs = np.zeros((64, img.shape[0], img.shape[1], 3))
 
-imgs = cv2.resize(imgs, (256,256), interpolation = cv2.INTER_AREA)
 print ('1111')
 
 for i in range(64):
