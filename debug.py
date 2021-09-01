@@ -2,6 +2,7 @@ import numpy as np
 import cv2 
 import torch 
 
+from imgaug import augmenters as iaa
 
 
 
@@ -67,14 +68,39 @@ def np_augument_tex_color( img, smoothness=100, directionality=0.9, noise_sigma=
     # convert to unsigned char
     return F.clip( 0, 255 )
 
+def gallery(array, ncols=3):
+    nrows = np.math.ceil(len(array)/float(ncols))
+    cell_w = array.shape[2]
+    cell_h = array.shape[1]
+    channels = array.shape[3]
+    result = np.zeros((cell_h*nrows, cell_w*ncols, channels), dtype=array.dtype)
+    for i in range(0, nrows):
+        for j in range(0, ncols):
+            result[i*cell_h:(i+1)*cell_h, j*cell_w:(j+1)*cell_w, :] = array[i*ncols+j]
+    return result
 
-img = cv2.imread('/data/home/us000042/lelechen/data/Facescape/textured_meshes/1/models_reg/10_dimpler.jpg')
-# cv2.imwrite('./gg.png', img)
-img = img.transpose(2,0,1)
-newimg = np_augument_tex_color(img, 40, 0.5, 0.5, 50)
-print (newimg.shape)
-newimg = img.transpose(1,2,0)
-img = img.transpose(1,2,0)
-out = np.concatenate((img, newimg, newimg - img),axis =1 )
-# (newimg - img)
-cv2.imwrite('./gg.png', out )
+seq = iaa.Sequential([
+    # iaa.Crop(px=(0, 16)), # crop images from each side by 0 to 16px (randomly chosen)
+    # iaa.Fliplr(0.5), # horizontally flip 50% of the images
+    iaa.GaussianBlur(sigma=(0, 3.0)) # blur images with a sigma of 0 to 3.0
+    # Strengthen or weaken the contrast in each image.
+    iaa.LinearContrast((0.75, 1.5)),
+    iaa.AdditiveGaussianNoise(loc=0, scale=(0.0, 0.05*255), per_channel=0.5),
+    # Make some images brighter and some darker.
+    # In 20% of all cases, we sample the multiplier once per channel,
+    # which can end up changing the color of the images.
+    iaa.Multiply((0.8, 1.2), per_channel=0.2),
+    iaa.AddToBrightness((-30, 30),
+    iaa.WithHueAndSaturation(iaa.WithChannels(0, iaa.Add((0, 50)
+
+])
+
+
+img = cv2.imread('/data/home/uss00022/lelechen/data/Facescape/textured_meshes/1/models_reg/10_dimpler.jpg')
+
+imgs = np.zeros(64, img.shape[0], img.shape[1], 3)
+
+images_aug = seq(images=imgs)
+img_grid = gallery(images_aug, 8)
+
+cv2.imwrite('./gg.png', img_grid )
