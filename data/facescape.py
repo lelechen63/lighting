@@ -497,7 +497,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         A_exp = int(tmp[-1].split('_')[0])
         # id_p , 'models_reg', motion_p
         tex_path = os.path.join( self.dir_tex , tmp[0], tmp[-1] + '.png')
-        
+
         tex = self.total_tex[self.data_list[index]][0]
         tex = tex.astype(np.uint8)
         tex = np.expand_dims(tex, axis=0)
@@ -508,8 +508,6 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         tex_tensor = torch.FloatTensor(tex).permute(2,0,1)
         A_vertices = self.total_tex[self.data_list[index]][1]
         A_vertices = A_vertices.reshape(-1,3)
-        # Aidmesh = ( self.meanmesh[tmp[0]]- self.totalmeanmesh ) / self.totalstdmesh
-        # Aidmesh = Aidmesh.reshape(-1,3)
             
         input_dict = { 'Atex': tex_tensor, 'Amesh': torch.FloatTensor(A_vertices),
                 'A_path': self.data_list[index],
@@ -562,6 +560,12 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         self.meantex = np.load('/data/home/uss00022/lelechen/github/lighting/predef/meantex.npy')
         self.stdtex = np.load('/data/home/uss00022/lelechen/github/lighting/predef/stdtex.npy') + 0.00000001
 
+        self.augseq = iaa.Sequential([
+                iaa.LinearContrast((0.75, 1.5)),
+                iaa.Multiply((0.8, 1.2), per_channel=0.2),
+                iaa.WithHueAndSaturation(iaa.WithChannels(0, iaa.Add((0, 50))))
+            ])
+
         _file.close()
         
         ids = open(os.path.join(opt.dataroot, "lists/ids.pkl"), "rb")
@@ -576,9 +580,9 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
             
             tmp = data.split('/')
             tex = self.total_t[cc]
-            tmp = (tex - self.meantex)/self.stdtex
+            # tmp = (tex - self.meantex)/self.stdtex
             
-            self.total_tex[data] = [ tmp ]
+            self.total_tex[data] = [ tex ]
             cc += 1
             if opt.debug:
                 if len(self.total_tex) == 265:
@@ -602,6 +606,12 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         # tex 
         tex_path = os.path.join( self.dir_tex , tmp[0], tmp[-1] + '.png')
         tex = self.total_tex[self.data_list[index]][0]
+        tex = tex.astype(np.uint8)
+        tex = np.expand_dims(tex, axis=0)
+        tex =  self.augseq( images = tex )
+        tex = tex.astype(np.float64)[0]
+        tex = (tex - self.meantex)/self.stdtex
+
         tex_tensor = torch.FloatTensor(tex).permute(2,0,1)
         input_dict = { 'Atex':tex_tensor, 'Aid': int(tmp[0]) - 1, 'Aexp': int(tmp[-1].split('_')[0] )- 1, 'A_path': self.data_list[index]}
        
