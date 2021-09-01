@@ -470,7 +470,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
             self.total_tex[data].append(A_vertices  / self.totalstdmesh)
             cc += 1
             if opt.debug:
-                if len(self.total_tex) == 1:
+                if len(self.total_tex) == 12:
                     break
 
         # remove blacklisted item
@@ -485,12 +485,13 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         # free the memory
         self.total_t = []
         self.total_m = []
-    def __getitem__(self, index):
         self.augseq = iaa.Sequential([
                 iaa.LinearContrast((0.75, 1.5)),
                 iaa.Multiply((0.8, 1.2), per_channel=0.2),
                 iaa.WithHueAndSaturation(iaa.WithChannels(0, iaa.Add((0, 50))))
             ])
+    def __getitem__(self, index):
+        
 
         t = time.time()
         tmp = self.data_list[index].split('/')
