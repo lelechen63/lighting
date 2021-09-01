@@ -87,7 +87,7 @@ seq = iaa.Sequential([
     # which can end up changing the color of the images.
     # iaa.Multiply((0.8, 1.2), per_channel=0.2),
     # iaa.AddToBrightness((-30, 30)),
-    # iaa.WithHueAndSaturation(iaa.WithChannels(0, iaa.Add((0, 50))))
+    iaa.WithHueAndSaturation(iaa.WithChannels(0, iaa.Add((0, 50))))
 ])
 
 print ('1111')
