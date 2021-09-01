@@ -503,7 +503,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         tex = np.expand_dims(tex, axis=0)
         tex =  self.augseq( images = tex )
         tex = tex.astype(np.float64)[0]
-        cv2.imwrite('gg2.png', tex)
+        cv2.imwrite('gg2.png', tex[:,:,::-1])
         tex_tensor = (tex - self.meantex)/self.stdtex
        
         tex_tensor = torch.FloatTensor(tex_tensor).permute(2,0,1)
