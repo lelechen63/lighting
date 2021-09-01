@@ -90,19 +90,21 @@ img = cv2.imread('/data/home/uss00022/lelechen/data/Facescape/textured_meshes/1/
 print ('1111')
 img = cv2.resize(img, (256,256), interpolation = cv2.INTER_AREA)
 print (img.dtype)
-imgs = np.zeros((64, img.shape[0], img.shape[1], 3), dtype =np.uint8)
+imgs = np.zeros((1, img.shape[0], img.shape[1], 3), dtype =np.uint8)
 
 print ('1111')
 
-for i in range(64):
+for i in range(1):
     imgs[i] = img
 print ('1111')
 print (imgs.dtype)
 
 t = time.time()
+images_aug = []
 print ('1111')
-
-images_aug = seq(images=imgs)
+for i in range(64):
+    images_aug.append( seq(images=imgs)[0])
+images_aug = np.asarray(images_aug)
 print ('1111')
 
 print (time.time() - t)
