@@ -497,21 +497,14 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         A_exp = int(tmp[-1].split('_')[0])
         # id_p , 'models_reg', motion_p
         tex_path = os.path.join( self.dir_tex , tmp[0], tmp[-1] + '.png')
+        
         tex = self.total_tex[self.data_list[index]][0]
         tex = tex.astype(np.uint8)
         tex = np.expand_dims(tex, axis=0)
-        print (tex.shape)
-        print (tex.dtype)
-        print (tex.max(), tex.min())
-
         tex =  self.augseq( images = tex )
-
         tex = tex.astype(np.float64)[0]
         tex = (tex - self.meantex)/self.stdtex
-        # tex = Image.fromarray(np.uint8(tex))
-        # params = get_params(self.opt, tex.size)
-        # transform = get_transform(self.opt, params)      
-        # A_tex_tensor = transform(tex)
+       
         tex_tensor = torch.FloatTensor(tex).permute(2,0,1)
         A_vertices = self.total_tex[self.data_list[index]][1]
         A_vertices = A_vertices.reshape(-1,3)
