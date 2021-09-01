@@ -97,7 +97,7 @@ img = cv2.imread('/data/home/uss00022/lelechen/data/Facescape/textured_meshes/1/
 print ('1111')
 img = cv2.resize(img, (256,256), interpolation = cv2.INTER_AREA)
 print (img.dtype)
-imgs = np.zeros((64, img.shape[0], img.shape[1], 3), dtype =int)
+imgs = np.zeros((64, img.shape[0], img.shape[1], 3), dtype =np.uint8)
 
 print ('1111')
 
