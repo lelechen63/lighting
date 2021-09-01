@@ -1,7 +1,7 @@
 import numpy as np 
 import cv2 
 import torch 
-
+import time
 from imgaug import augmenters as iaa
 
 
@@ -96,8 +96,12 @@ seq = iaa.Sequential([
 img = cv2.imread('/data/home/uss00022/lelechen/data/Facescape/textured_meshes/1/models_reg/10_dimpler.jpg')
 
 imgs = np.zeros((64, img.shape[0], img.shape[1], 3))
+for i in range(64):
+    imgs[i] = img
 
+t = time.time()
 images_aug = seq(images=imgs)
+print (time.time() - t)
 img_grid = gallery(images_aug, 8)
-
+print (time.time() - t)
 cv2.imwrite('./gg.png', img_grid )
