@@ -95,7 +95,7 @@ seq = iaa.Sequential([
 
 img = cv2.imread('/data/home/uss00022/lelechen/data/Facescape/textured_meshes/1/models_reg/10_dimpler.jpg')
 
-imgs = np.zeros(64, img.shape[0], img.shape[1], 3)
+imgs = np.zeros((64, img.shape[0], img.shape[1], 3))
 
 images_aug = seq(images=imgs)
 img_grid = gallery(images_aug, 8)
