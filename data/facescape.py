@@ -457,12 +457,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         bk = get_blacklist()
         cc = 0
 
-        self.augseq = iaa.Sequential([
-                iaa.LinearContrast((0.75, 1.5)),
-                iaa.Multiply((0.8, 1.2), per_channel=0.2),
-                iaa.WithHueAndSaturation(iaa.WithChannels(0, iaa.Add((0, 50))))
-            ])
-
+        
         for data in tqdm(self.data_list):
             
             tmp = data.split('/')
@@ -491,6 +486,12 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         self.total_t = []
         self.total_m = []
     def __getitem__(self, index):
+        self.augseq = iaa.Sequential([
+                iaa.LinearContrast((0.75, 1.5)),
+                iaa.Multiply((0.8, 1.2), per_channel=0.2),
+                iaa.WithHueAndSaturation(iaa.WithChannels(0, iaa.Add((0, 50))))
+            ])
+
         t = time.time()
         tmp = self.data_list[index].split('/')
         A_id = int(tmp[0])
@@ -501,7 +502,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         tex = self.total_tex[self.data_list[index]][0]
         tex = tex.astype(np.uint8)
         tex = np.expand_dims(tex, axis=0)
-        # tex =  self.augseq( images = tex )
+        tex =  self.augseq( images = tex )
         tex = tex.astype(np.float64)[0]
         cv2.imwrite('./tmp/gg' + str(len(os.listdir('./tmp'))) +'.png', tex[:,:,::-1])
         tex_tensor = (tex - self.meantex)/self.stdtex
