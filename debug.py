@@ -82,7 +82,7 @@ def gallery(array, ncols=3):
 seq = iaa.Sequential([
     # iaa.Crop(px=(0, 16)), # crop images from each side by 0 to 16px (randomly chosen)
     # iaa.Fliplr(0.5), # horizontally flip 50% of the images
-    iaa.GaussianBlur(sigma=(0, 3.0)) # blur images with a sigma of 0 to 3.0
+    iaa.GaussianBlur(sigma=(0, 3.0)), # blur images with a sigma of 0 to 3.0
     # Strengthen or weaken the contrast in each image.
     iaa.LinearContrast((0.75, 1.5)),
     iaa.AdditiveGaussianNoise(loc=0, scale=(0.0, 0.05*255), per_channel=0.5),
