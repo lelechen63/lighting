@@ -14,6 +14,8 @@ import torch
 import openmesh
 from tqdm import tqdm
 import  os, time
+from imgaug import augmenters as iaa
+
 def get_exp():
     expressions = {
         1: "1_neutral",
@@ -441,12 +443,10 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         self.meantex = np.load('./predef/meantex.npy')
         self.stdtex = np.load('./predef/stdtex.npy') + 0.00000001
 
-        # self.facial_seg = cv2.imread("./predef/facial_mask_v10.png")[:,:,::-1]
         self.facial_seg = Image.open("./predef/facial_mask_v10.png")
-        # self.facial_seg  = self.facial_seg.resize(self.img_size)
         self.facial_seg  = np.array(self.facial_seg ) / 255.0
         self.facial_seg = np.expand_dims(self.facial_seg, axis=2)
-        self.x = 1169-150
+        self.x = 1019
         self.y =500
         self.w =2000
         self.h = 1334
@@ -456,12 +456,21 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         self.total_m = np.load(total_m)
         bk = get_blacklist()
         cc = 0
+
+        self.augseq = iaa.Sequential([
+                iaa.LinearContrast((0.75, 1.5)),
+                iaa.Multiply((0.8, 1.2), per_channel=0.2),
+                iaa.WithHueAndSaturation(iaa.WithChannels(0, iaa.Add((0, 50))))
+            ])
+
         for data in tqdm(self.data_list):
             
             tmp = data.split('/')
-            tex = self.total_t[cc]
-            tmp = (tex - self.meantex)/self.stdtex
-            self.total_tex[data] = [tmp ]
+            tex = self.total_t[cc] 
+            
+            self.total_tex[data] = [tex ]
+
+            # normalize the mesh
             A_vertices = self.total_m[cc] - self.totalmeanmesh
             self.total_tex[data].append(A_vertices  / self.totalstdmesh)
             cc += 1
@@ -487,10 +496,10 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         A_id = int(tmp[0])
         A_exp = int(tmp[-1].split('_')[0])
         # id_p , 'models_reg', motion_p
-        # tex 
         tex_path = os.path.join( self.dir_tex , tmp[0], tmp[-1] + '.png')
-    
         tex = self.total_tex[self.data_list[index]][0]
+        tex =  self.augseq(tex)
+        tex = (tex - self.meantex)/self.stdtex
         # tex = Image.fromarray(np.uint8(tex))
         # params = get_params(self.opt, tex.size)
         # transform = get_transform(self.opt, params)      

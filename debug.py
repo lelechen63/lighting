@@ -80,13 +80,8 @@ def gallery(array, ncols=3):
     return result
 
 seq = iaa.Sequential([
-    # Strengthen or weaken the contrast in each image.
     iaa.LinearContrast((0.75, 1.5)),
-    # Make some images brighter and some darker.
-    # In 20% of all cases, we sample the multiplier once per channel,
-    # which can end up changing the color of the images.
     iaa.Multiply((0.8, 1.2), per_channel=0.2),
-    # iaa.AddToBrightness((-30, 30)),
     iaa.WithHueAndSaturation(iaa.WithChannels(0, iaa.Add((0, 50))))
 ])
 
