@@ -1037,8 +1037,6 @@ class MeshTexGANModule(pl.LightningModule):
             rec_tex_A_vis =rec_tex_A.data[0].cpu() * self.stdtex + self.meantex  
             rec_tex_A_vis = util.tensor2im(rec_tex_A_vis, normalize = False)
             
-            
-            # rec_tex_A_vis = rec_tex_A_vis + self.totalmeantex
             rec_tex_A_vis = np.ascontiguousarray(rec_tex_A_vis, dtype=np.uint8)
             rec_tex_A_vis = np.clip(rec_tex_A_vis, 0, 255)
 
