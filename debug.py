@@ -190,7 +190,7 @@ def apply_lut_(image, table):
 
         return np.concatenate(subluts, axis=2)
 
-    assert image.dtype == _UINT8_DTYPE, (
+    assert image.dtype == np.dtype("uint8"), (
         "Expected uint8 image, got dtype %s." % (image.dtype.name,))
 
     image = cv2.LUT(image, table, dst=image)
