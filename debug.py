@@ -285,7 +285,7 @@ for i in range(64):
     im = multiply(im, random.uniform(0.8, 1.2) )
     # red_hue = (random.uniform(0, 50)/255) * (360/2)  
     # im = shift_hue(im,red_hue)
-    # im = cv2.cvtColor(im, cv2.COLOR_RGB2BGR)
+    im = cv2.cvtColor(im, cv2.COLOR_RGB2BGR)
     images_aug.append( im)
     # images_aug.append( cv2.cvtColor(seq(images=imgs)[0], cv2.COLOR_RGB2BGR) )
 images_aug = np.asarray(images_aug)
