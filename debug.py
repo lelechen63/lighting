@@ -4,8 +4,6 @@ import torch
 import time
 from imgaug import augmenters as iaa
 import random
-import Image
-import numpy as np
 
 def rgb_to_hsv(rgb):
     # Translated from source of colorsys.rgb_to_hsv
