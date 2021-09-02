@@ -507,8 +507,6 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
 
         self.meantex = np.load('/data/home/uss00022/lelechen/github/lighting/predef/meantex.npy')
         self.stdtex = np.load('/data/home/uss00022/lelechen/github/lighting/predef/stdtex.npy') + 0.00000001
-
-        self.augseq = iaa.Sequential([
       
         _file.close()
         
@@ -553,7 +551,7 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         
         tex = adjust_contrast_linear(tex, random.uniform(0.75, 1.5))
         tex = multiply(tex, random.uniform(0.8, 1.2) )
-        
+
         tex = (tex - self.meantex)/self.stdtex
 
         tex_tensor = torch.FloatTensor(tex).permute(2,0,1)
