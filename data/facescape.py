@@ -526,7 +526,7 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
             self.total_tex[data] = [ tex ]
             cc += 1
             if opt.debug:
-                if len(self.total_tex) == 265:
+                if len(self.total_tex) == 1:
                     break
 
         # remove blacklisted item
