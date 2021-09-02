@@ -340,13 +340,14 @@ for i in range(64):
     # im = shift_hue(im,red_hue)
     # im = cv2.cvtColor(im, cv2.COLOR_RGB2BGR)
     # images_aug.append( im)
-    images_aug.append( seq(images=imgs)[0])
+    images_aug.append( cv2.cvtColor(seq(images=imgs)[0], cv2.COLOR_RGB2BGR) )
 images_aug = np.asarray(images_aug)
 print ('1111')
 
 print (time.time() - t)
 img_grid = gallery(images_aug, 8)
 print (time.time() - t)
+
 cv2.imwrite('./gg.png', img_grid )
 
 
