@@ -4,6 +4,60 @@ import torch
 import time
 from imgaug import augmenters as iaa
 import random
+import Image
+import numpy as np
+
+def rgb_to_hsv(rgb):
+    # Translated from source of colorsys.rgb_to_hsv
+    # r,g,b should be a numpy arrays with values between 0 and 255
+    # rgb_to_hsv returns an array of floats between 0.0 and 1.0.
+    rgb = rgb.astype('float')
+    hsv = np.zeros_like(rgb)
+    # in case an RGBA array was passed, just copy the A channel
+    hsv[..., 3:] = rgb[..., 3:]
+    r, g, b = rgb[..., 0], rgb[..., 1], rgb[..., 2]
+    maxc = np.max(rgb[..., :3], axis=-1)
+    minc = np.min(rgb[..., :3], axis=-1)
+    hsv[..., 2] = maxc
+    mask = maxc != minc
+    hsv[mask, 1] = (maxc - minc)[mask] / maxc[mask]
+    rc = np.zeros_like(r)
+    gc = np.zeros_like(g)
+    bc = np.zeros_like(b)
+    rc[mask] = (maxc - r)[mask] / (maxc - minc)[mask]
+    gc[mask] = (maxc - g)[mask] / (maxc - minc)[mask]
+    bc[mask] = (maxc - b)[mask] / (maxc - minc)[mask]
+    hsv[..., 0] = np.select(
+        [r == maxc, g == maxc], [bc - gc, 2.0 + rc - bc], default=4.0 + gc - rc)
+    hsv[..., 0] = (hsv[..., 0] / 6.0) % 1.0
+    return hsv
+
+def hsv_to_rgb(hsv):
+    # Translated from source of colorsys.hsv_to_rgb
+    # h,s should be a numpy arrays with values between 0.0 and 1.0
+    # v should be a numpy array with values between 0.0 and 255.0
+    # hsv_to_rgb returns an array of uints between 0 and 255.
+    rgb = np.empty_like(hsv)
+    rgb[..., 3:] = hsv[..., 3:]
+    h, s, v = hsv[..., 0], hsv[..., 1], hsv[..., 2]
+    i = (h * 6.0).astype('uint8')
+    f = (h * 6.0) - i
+    p = v * (1.0 - s)
+    q = v * (1.0 - s * f)
+    t = v * (1.0 - s * (1.0 - f))
+    i = i % 6
+    conditions = [s == 0.0, i == 1, i == 2, i == 3, i == 4, i == 5]
+    rgb[..., 0] = np.select(conditions, [v, q, p, p, t, v], default=v)
+    rgb[..., 1] = np.select(conditions, [v, v, v, q, p, p], default=t)
+    rgb[..., 2] = np.select(conditions, [v, p, t, v, v, q], default=p)
+    return rgb.astype('uint8')
+
+
+def shift_hue(arr,hout):
+    hsv=rgb_to_hsv(arr)
+    hsv[...,0]=hout
+    rgb=hsv_to_rgb(hsv)
+    return rgb
 
 
 def np_normalize(x, low= 0, high = 1):
@@ -267,6 +321,7 @@ img = cv2.imread('/data/home/uss00022/lelechen/data/Facescape/textured_meshes/1/
 print ('1111')
 img = cv2.resize(img, (256,256), interpolation = cv2.INTER_AREA)
 print (img.dtype)
+img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 imgs = np.zeros((1, img.shape[0], img.shape[1], 3), dtype =np.uint8)
 
 print ('1111')
@@ -282,7 +337,13 @@ print ('1111')
 for i in range(64):
     alpha = random.uniform(0.75, 1.5)
     im = adjust_contrast_linear(imgs[0], alpha)
-    # im = multiply(im, random.uniform(0.8, 1.2) )
+    im = multiply(im, random.uniform(0.8, 1.2) )
+
+    green_hue = (180-78)/360.0
+    red_hue = (180-180)/360.0
+
+    im = shift_hue(im,red_hue)
+    im = cv2.cvtColor(im, cv2.COLOR_RGB2BGR)
     images_aug.append( im)
     # images_aug.append( seq(images=imgs)[0])
 images_aug = np.asarray(images_aug)
@@ -292,3 +353,9 @@ print (time.time() - t)
 img_grid = gallery(images_aug, 8)
 print (time.time() - t)
 cv2.imwrite('./gg.png', img_grid )
+
+
+
+
+
+    
