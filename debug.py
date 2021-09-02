@@ -272,8 +272,8 @@ images_aug = []
 print ('1111')
 for i in range(64):
     alpha = random.uniform(0.75, 1.5)
-    im = adjust_contrast_linear(imgs, alpha)
-    images_aug.append( im[0])
+    im = adjust_contrast_linear(imgs[0], alpha)
+    images_aug.append( im)
     # images_aug.append( seq(images=imgs)[0])
 images_aug = np.asarray(images_aug)
 print ('1111')
