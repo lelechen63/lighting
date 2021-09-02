@@ -252,7 +252,16 @@ def adjust_contrast_linear(arr, alpha):
     table = center_value + alpha * (value_range - center_value)
     table = np.clip(table, min_value, max_value).astype(arr.dtype)
     arr_aug = apply_lut(arr, table)
-    return arr_aug
+    return apply_lut_(image, value_range)
+
+def multiply(image, multiplier):
+    nb_channels = 1 if image.ndim == 2 else image.shape[-1]
+    multiplier = np.float32(multiplier)
+    value_range = np.arange(0, 256, dtype=np.float32)
+
+    value_range = value_range * multiplier
+    value_range = np.clip(value_range, 0, 255).astype(image.dtype)
+    return apply_lut_(image, value_range)
 print ('1111')
 img = cv2.imread('/data/home/uss00022/lelechen/data/Facescape/textured_meshes/1/models_reg/10_dimpler.jpg')
 print ('1111')
@@ -273,6 +282,7 @@ print ('1111')
 for i in range(64):
     alpha = random.uniform(0.75, 1.5)
     im = adjust_contrast_linear(imgs[0], alpha)
+    im = multiply(im, random.uniform(0.8, 1.2) )
     images_aug.append( im)
     # images_aug.append( seq(images=imgs)[0])
 images_aug = np.asarray(images_aug)
