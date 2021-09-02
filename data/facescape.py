@@ -1,7 +1,7 @@
 import os.path
 from data.base_dataset import *
 from data.image_folder import make_dataset
-
+from data.data_utils import *
 from PIL import Image, ImageChops, ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 import PIL
@@ -14,7 +14,6 @@ import torch
 import openmesh
 from tqdm import tqdm
 import  os, time
-from imgaug import augmenters as iaa
 
 def get_exp():
     expressions = {
@@ -75,58 +74,8 @@ def get_blacklist():
     bl = ['66/models_reg/15_lip_roll', "267/models_reg/3_mouth_stretch","191/models_reg/17_cheek_blowing"]
     return bl
 
-def th_normalize(x, low=0, high=1):
-    x_max = x.view(*x.shape[:-2], -1).max(dim=-1)[0][..., None, None]
-    x_min = x.view(*x.shape[:-2], -1).min(dim=-1)[0][..., None, None]
-    scale = (high - low) / (x_max - x_min)
 
-    print (x.shape, x_min.shape)
-    return (x - x_min) * scale + low
-def th_augument_tex_color( img, smoothness=100, directionality=0.9, noise_sigma=2.0, contrast=20.0 ):
-    img_device = img.device
 
-    # intensity histogram augmentation
-    if smoothness > 0:
-        x = torch.arange(256, device=img_device).float() / 255 - 0.5
-        smoothness = int(smoothness)
-        u = torch.rand((smoothness, 3), device=img_device)
-        a = u[:, 0:1] - 0.5
-        b = u[:, 1:2] * 99 + 1
-        c = u[:, 2:3] * 10
-        x_sum = (c / (1.0 + torch.exp(-b * (x[None, :] - a)))).sum(0)
-        F = x_sum[img.long()]
-    else:
-        F = img.float()
-    
-    # spatially varying intensity multiplier (second degree polynomial)
-    if directionality > 0:
-        h, w = F.shape[-2:]
-        iy, ix = torch.meshgrid(
-            (torch.arange(h, device=img_device).float() / (h // 2)) - 1,
-            (torch.arange(w, device=img_device).float() / (w // 2)) - 1,
-        )
-        iy = iy.view(*([1] * len(F.shape[:-2])), *F.shape[-2:])
-        ix = ix.view(*([1] * len(F.shape[:-2])), *F.shape[-2:])
-        # a = torch.rand([6, *F.shape[:-2], 1, 1], device=img_device) * 2 - 1
-        a = torch.randn([6, *F.shape[:-2], 1, 1], device=img_device)
-        # L = a[0] * ix + a[1] * iy + a[2] * ix * iy + a[3] * ix ** 2 + a[4] * iy ** 2 + a[5]
-        # L = (a[0] * ix + a[1] * iy + a[2]) * (a[3] * ix + a[4] * iy + a[5])
-        L = (a[0] * ix + a[1] * iy + a[2]).pow(2) * a[3] + (
-            -a[1] * ix + a[0] * iy + a[4]
-        ).pow(2) * a[5]
-        # L = a[3] * ix ** 2 + a[4] * iy ** 2 + a[5]
-        s_range = torch.rand([2, *F.shape[:-2], 1, 1], device=img_device) * directionality
-        F *= th_normalize(L, low=1 - s_range[0], high=1 + s_range[1])
-    # contrast normalization
-    v_range = (
-        (torch.rand([2, *F.shape[:-2], 1, 1], device=img_device) - 0.5) * 2 * contrast
-    )
-    F = th_normalize(F, 0 + v_range[0], 255 + v_range[1])
-    # gaussian noise
-    if noise_sigma > 0:
-        F += torch.randn(F.shape, device=img_device) * noise_sigma
-    # convert to unsigned char
-    return F.clamp( min=0.0, max=255.0 )
 
 class FacescapeDirDataset(torch.utils.data.Dataset):
     def __init__(self, opt):
@@ -485,11 +434,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         # free the memory
         self.total_t = []
         self.total_m = []
-        self.augseq = iaa.Sequential([
-                iaa.LinearContrast((0.75, 1.5)),
-                iaa.Multiply((0.8, 1.2), per_channel=0.2),
-                iaa.WithHueAndSaturation(iaa.WithChannels(0, iaa.Add((0, 50))))
-            ])
+       
     def __getitem__(self, index):
         
 
@@ -501,10 +446,10 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         tex_path = os.path.join( self.dir_tex , tmp[0], tmp[-1] + '.png')
 
         tex = self.total_tex[self.data_list[index]][0]
-        tex = tex.astype(np.uint8)
-        tex = np.expand_dims(tex, axis=0)
-        tex =  self.augseq( images = tex )
-        tex = tex.astype(np.float64)[0]
+
+        tex = adjust_contrast_linear(tex, random.uniform(0.75, 1.5))
+        tex = multiply(tex, random.uniform(0.8, 1.2) )
+
         cv2.imwrite('./tmp/gg' + str(len(os.listdir('./tmp'))) +'.png', tex[:,:,::-1])
         tex_tensor = (tex - self.meantex)/self.stdtex
        
@@ -564,11 +509,7 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         self.stdtex = np.load('/data/home/uss00022/lelechen/github/lighting/predef/stdtex.npy') + 0.00000001
 
         self.augseq = iaa.Sequential([
-                iaa.LinearContrast((0.75, 1.5)),
-                iaa.Multiply((0.8, 1.2), per_channel=0.2),
-                iaa.WithHueAndSaturation(iaa.WithChannels(0, iaa.Add((0, 50))))
-            ])
-
+      
         _file.close()
         
         ids = open(os.path.join(opt.dataroot, "lists/ids.pkl"), "rb")
@@ -609,10 +550,10 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         # tex 
         tex_path = os.path.join( self.dir_tex , tmp[0], tmp[-1] + '.png')
         tex = self.total_tex[self.data_list[index]][0]
-        tex = tex.astype(np.uint8)
-        tex = np.expand_dims(tex, axis=0)
-        tex =  self.augseq( images = tex )
-        tex = tex.astype(np.float64)[0]
+        
+        tex = adjust_contrast_linear(tex, random.uniform(0.75, 1.5))
+        tex = multiply(tex, random.uniform(0.8, 1.2) )
+        
         tex = (tex - self.meantex)/self.stdtex
 
         tex_tensor = torch.FloatTensor(tex).permute(2,0,1)
