@@ -251,7 +251,7 @@ def adjust_contrast_linear(arr, alpha):
     alpha = np.float32(alpha)
     table = center_value + alpha * (value_range - center_value)
     table = np.clip(table, min_value, max_value).astype(arr.dtype)
-    arr_aug = ia.apply_lut(arr, table)
+    arr_aug = apply_lut(arr, table)
     return arr_aug
 print ('1111')
 img = cv2.imread('/data/home/uss00022/lelechen/data/Facescape/textured_meshes/1/models_reg/10_dimpler.jpg')
