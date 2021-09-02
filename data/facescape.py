@@ -445,12 +445,13 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         # id_p , 'models_reg', motion_p
         tex_path = os.path.join( self.dir_tex , tmp[0], tmp[-1] + '.png')
 
-        tex = self.total_tex[self.data_list[index]][0]
+        tex = self.total_tex[self.data_list[index]][0].astype(np.uint8)
 
         tex = adjust_contrast_linear(tex, random.uniform(0.75, 1.5))
         tex = multiply(tex, random.uniform(0.8, 1.2) )
 
         cv2.imwrite('./tmp/gg' + str(len(os.listdir('./tmp'))) +'.png', tex[:,:,::-1])
+        tex = tex.astype(np.uint8)
         tex_tensor = (tex - self.meantex)/self.stdtex
        
         tex_tensor = torch.FloatTensor(tex_tensor).permute(2,0,1)
