@@ -237,7 +237,7 @@ def adjust_contrast_linear(arr, alpha):
 
     # int8 is also possible according to docs
     # but here it seemed like `d` was 0 for CV_8S, causing that to fail
-    iinfo = np.iinfo(arry.dtype)
+    iinfo = np.iinfo(arr.dtype)
 
     min_value, center_value, max_value = iinfo.min, iinfo.min + 0.5 * iinfo.max, iinfo.max
     # TODO get rid of this int(...)
