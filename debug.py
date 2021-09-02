@@ -252,7 +252,7 @@ def adjust_contrast_linear(arr, alpha):
     table = center_value + alpha * (value_range - center_value)
     table = np.clip(table, min_value, max_value).astype(arr.dtype)
     arr_aug = apply_lut(arr, table)
-    return apply_lut_(image, value_range)
+    return arr_aug
 
 def multiply(image, multiplier):
     nb_channels = 1 if image.ndim == 2 else image.shape[-1]
