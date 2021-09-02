@@ -337,8 +337,7 @@ for i in range(64):
     im = adjust_contrast_linear(imgs[0], alpha)
     im = multiply(im, random.uniform(0.8, 1.2) )
 
-    green_hue = (180-78)/360.0
-    red_hue = (180-180)/360.0
+    red_hue = (180-random.uniform(0, 50))/360.0
 
     im = shift_hue(im,red_hue)
     im = cv2.cvtColor(im, cv2.COLOR_RGB2BGR)
