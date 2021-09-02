@@ -336,9 +336,7 @@ for i in range(64):
     alpha = random.uniform(0.75, 1.5)
     im = adjust_contrast_linear(imgs[0], alpha)
     im = multiply(im, random.uniform(0.8, 1.2) )
-
-    red_hue = (random.uniform(0, 10)/255) * (360/2)  
-
+    red_hue = (random.uniform(0, 50)/255) * (360/2)  
     im = shift_hue(im,red_hue)
     im = cv2.cvtColor(im, cv2.COLOR_RGB2BGR)
     images_aug.append( im)
