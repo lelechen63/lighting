@@ -3,6 +3,7 @@ import cv2
 import torch 
 import time
 import random
+
 def apply_lut(image, table):
     """Map an input image to a new one using a lookup table.
     Added in 0.4.0.
@@ -170,7 +171,7 @@ def adjust_contrast_linear(arr, alpha):
     table = np.clip(table, min_value, max_value).astype(arr.dtype)
     arr_aug = apply_lut(arr, table)
     return arr_aug
-    
+
 def multiply(image, multiplier):
     nb_channels = 1 if image.ndim == 2 else image.shape[-1]
     multiplier = np.float32(multiplier)

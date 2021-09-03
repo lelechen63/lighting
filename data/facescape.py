@@ -448,7 +448,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         tex = self.total_tex[self.data_list[index]][0].astype(np.uint8)
         tex = adjust_contrast_linear(tex, random.uniform(0.75, 1.5))
         tex = multiply(tex, random.uniform(0.8, 1.2) )
-        cv2.imwrite('./tmp/gg' + str(len(os.listdir('./tmp'))) +'.png', tex[:,:,::-1])
+        # cv2.imwrite('./tmp/gg' + str(len(os.listdir('./tmp'))) +'.png', tex[:,:,::-1])
         tex = tex.astype(np.float64)
         tex_tensor = (tex - self.meantex)/self.stdtex
        
@@ -550,7 +550,7 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         
         tex = adjust_contrast_linear(tex, random.uniform(0.75, 1.5))
         tex = multiply(tex, random.uniform(0.8, 1.2) )
-        cv2.imwrite('./tmp/gg' + str(len(os.listdir('./tmp'))) +'.png', tex[:,:,::-1])
+        # cv2.imwrite('./tmp/gg' + str(len(os.listdir('./tmp'))) +'.png', tex[:,:,::-1])
         tex = tex.astype(np.float64)
         tex = (tex - self.meantex)/self.stdtex
 
