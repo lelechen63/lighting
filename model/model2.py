@@ -1019,7 +1019,7 @@ class MeshTexGANModule(pl.LightningModule):
         return [opt_g, opt_d], []
 
     def on_epoch_end(self):
-        if self.current_epoch % 1 == 0:
+        if self.current_epoch % 10 == 0:
             batch = self.batch
             rec_tex_A, _, _ = \
             self(batch['Atex'], batch['Amesh'] )
@@ -1048,7 +1048,7 @@ class MeshTexGANModule(pl.LightningModule):
        
             self.visualizer.display_current_results(visuals, self.current_epoch, 1000000) 
 
-            # self.trainer.save_checkpoint( os.path.join( self.ckpt_path, 'latest.ckpt') )
+            self.trainer.save_checkpoint( os.path.join( self.ckpt_path, 'latest.ckpt') )
 
 
 class MultiscaleDiscriminator(nn.Module):
