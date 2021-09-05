@@ -553,6 +553,7 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         # print ('===222==', tex.max(), tex.min())
         tex = multiply(tex, random.uniform(0.8, 1.2) )
         # print ('===333==', tex.max(), tex.min())
+        tex = np.clip(tex, 0, 255)
         # cv2.imwrite('./tmp/gg' + str(len(os.listdir('./tmp'))) +'.png', tex[:,:,::-1])
         tex = tex.astype(np.float64)
         # print ('==444===', tex.max(), tex.min())
