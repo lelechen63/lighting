@@ -876,7 +876,7 @@ class TexModule(pl.LightningModule):
     def forward(self, A_tex):
         return self.generator(A_tex)
     
-    def training_step(self, batch, batch_idx, optimizer_idx):
+    def training_step(self, batch, batch_idx):
         self.batch = batch
         # train generator
         # generate images
