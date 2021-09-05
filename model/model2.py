@@ -886,6 +886,7 @@ class TexModule(pl.LightningModule):
         # pix loss
         loss_G_pix = 0
         # reconstruction loss
+        print (rec_tex_A.max(), batch['Atex'].max(),rec_tex_A.min(), batch['Atex'].min())
         if not self.opt.no_pix_loss:
             loss_G_pix += self.l1loss(rec_tex_A, batch['Atex']) * self.opt.lambda_pix
 
