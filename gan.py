@@ -51,6 +51,9 @@ if  opt.name == 'meshtexgan':
 elif opt.name == 'texgan':
     from model.model2 import TexGANModule as module 
     opt.datasetname = "fs_tex"
+elif opt.name == 'tex':
+    from model.model2 import TexModule as module 
+    opt.datasetname = "fs_tex"
 elif opt.name == 'gmesh' :
     from model.model2 import GraphConvMeshModule as module 
     opt.datasetname = "fs_mesh"
@@ -97,6 +100,46 @@ else:
     print ('!!!!!!' + opt.name +'!!!!!!!!')
     if opt.name == 'texgan' :
         checkpoint_path = './checkpoints/texgan/latest.ckpt'
+        
+        from model.model2 import TexGenerator as module
+
+        module = module(opt.loadSize, not opt.no_linearity,
+            3, opt.code_n,opt.encoder_fc_n, opt.ngf, 
+            opt.n_downsample_global, opt.n_blocks_global,opt.norm)
+    
+        checkpoint = torch.load(checkpoint_path)
+        module.load_state_dict(pl2normal(checkpoint['state_dict']))
+
+        dm.setup()
+        testdata = dm.test_dataloader()
+        opt.name = opt.name + '_test'
+        visualizer = Visualizer(opt)
+        l2loss = torch.nn.MSELoss()
+        print ('***********', len(testdata),'*************')
+        for num,batch in enumerate(testdata):
+            rec_tex_A= \
+            module(  batch['Atex'])
+            Atex = batch['Atex'].data[0].cpu()  * stdtex + meantex 
+            Atex = util.tensor2im(Atex  , normalize = False)
+            Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
+            Atex = util.writeText(Atex, batch['A_path'][0])
+            Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
+            Atex = np.clip(Atex, 0, 255)
+
+
+            rec_tex_A_vis =rec_tex_A.data[0].cpu() * stdtex + meantex  
+            rec_tex_A_vis = util.tensor2im(rec_tex_A_vis, normalize = False)
+            rec_tex_A_vis = np.ascontiguousarray(rec_tex_A_vis, dtype=np.uint8)
+            rec_tex_A_vis = np.clip(rec_tex_A_vis, 0, 255)
+
+            tmp = batch['A_path'][0].split('/')
+            visuals = OrderedDict([
+                ('Atex', Atex),
+                ('rec_tex_A',rec_tex_A_vis)
+                ])
+            visualizer.display_current_results(visuals, num, 1000000)
+    elif opt.name == 'tex' :
+        checkpoint_path = './checkpoints/tex/latest.ckpt'
         
         from model.model2 import TexGenerator as module
 
