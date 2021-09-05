@@ -854,6 +854,92 @@ class TexGANModule(pl.LightningModule):
 
             self.trainer.save_checkpoint( os.path.join( self.ckpt_path, 'latest.ckpt') )
 
+class TexModule(pl.LightningModule):
+    def __init__(self, opt ):
+        super().__init__()
+        self.opt = opt
+        input_nc = 3
+        # networks
+        self.generator = TexGenerator(opt.loadSize, not opt.no_linearity, 
+            input_nc, opt.code_n,opt.encoder_fc_n, opt.ngf, 
+            opt.n_downsample_global, opt.n_blocks_global,opt.norm)
+
+        self.l1loss = torch.nn.L1Loss()
+        self.l2loss = torch.nn.MSELoss()
+       
+        self.visualizer = Visualizer(opt)
+        self.meantex = np.load('./predef/meantex.npy')
+        self.stdtex = np.load('./predef/stdtex.npy')
+        self.meantex = torch.FloatTensor(self.meantex).permute(2, 0,1)
+        self.stdtex = torch.FloatTensor(self.stdtex).permute(2,0,1)
+        self.ckpt_path = os.path.join(opt.checkpoints_dir, opt.name)
+    def forward(self, A_tex):
+        return self.generator(A_tex)
+    
+    def training_step(self, batch, batch_idx, optimizer_idx):
+        self.batch = batch
+        # train generator
+        # generate images
+        rec_tex_A = \
+        self(batch['Atex'])
+          
+        # pix loss
+        loss_G_pix = 0
+        # reconstruction loss
+        if not self.opt.no_pix_loss:
+            loss_G_pix += self.l1loss(rec_tex_A, batch['Atex']) * self.opt.lambda_pix
+
+      
+        loss = loss_G_pix    
+        tqdm_dict = {'loss_pix': loss_G_pix }
+        output = OrderedDict({
+            'loss': loss,
+            'progress_bar': tqdm_dict,
+            'log': tqdm_dict
+        })
+
+        errors = {k: v.data.item() if not isinstance(v, int) else v for k, v in tqdm_dict.items()}            
+        self.visualizer.print_current_errors(self.current_epoch, batch_idx, errors, 0)
+        self.visualizer.plot_current_errors(errors, batch_idx)
+        return output
+    
+        
+    def configure_optimizers(self):
+        lr = self.opt.lr
+        opt_g = torch.optim.Adam(self.generator.parameters(), lr=lr, betas=(self.opt.beta1, 0.999))
+        
+
+        return [opt_g], []
+
+    def on_epoch_end(self):
+        if self.current_epoch % 10 == 0:
+            batch = self.batch
+            rec_tex_A = \
+            self(batch['Atex'])
+
+            
+            # Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
+           
+            Atex = batch['Atex'].data[0].cpu()  * self.stdtex + self.meantex 
+            Atex = util.tensor2im(Atex  , normalize = False)
+            Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
+            Atex = util.writeText(Atex, batch['A_path'][0])
+            Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
+            Atex = np.clip(Atex, 0, 255)
+
+            rec_tex_A_vis =rec_tex_A.data[0].cpu() * self.stdtex + self.meantex  
+            rec_tex_A_vis = util.tensor2im(rec_tex_A_vis, normalize = False)            
+            rec_tex_A_vis = np.ascontiguousarray(rec_tex_A_vis, dtype=np.uint8)
+            rec_tex_A_vis = np.clip(rec_tex_A_vis, 0, 255)
+            visuals = OrderedDict([
+            ('Atex', Atex),
+            ('rec_tex_A', rec_tex_A_vis ),
+        
+            ])
+       
+            self.visualizer.display_current_results(visuals, self.current_epoch, 1000000) 
+
+            self.trainer.save_checkpoint( os.path.join( self.ckpt_path, 'latest.ckpt') )
 class MeshTexGenerator(nn.Module):
     def __init__(self, tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
                 ngf=64, n_downsampling=5, n_blocks=4, norm_layer='batch', \
