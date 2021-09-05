@@ -888,6 +888,16 @@ class TexModule(pl.LightningModule):
         # reconstruction loss
         print ('!!!!!!!', rec_tex_A[0].max(), batch['Atex'][0].max())
         print ( '======', rec_tex_A[0].min(), batch['Atex'][0].min())
+        if batch['Atex'].data[0].cpu().max() > 255 :
+            Atex = batch['Atex'].data[0].cpu()  * self.stdtex + self.meantex 
+            Atex = util.tensor2im(Atex  , normalize = False)
+            Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
+            Atex = util.writeText(Atex, batch['A_path'][0])
+            
+            Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
+            Atex = np.clip(Atex, 0, 255)
+            util.save_image(Atex, './gg/%d.png'%len(os.listdir('./gg')))
+
         if not self.opt.no_pix_loss:
             loss_G_pix += self.l1loss(rec_tex_A, batch['Atex']) * self.opt.lambda_pix
 
@@ -926,6 +936,7 @@ class TexModule(pl.LightningModule):
             Atex = util.tensor2im(Atex  , normalize = False)
             Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
             Atex = util.writeText(Atex, batch['A_path'][0])
+
             Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
             Atex = np.clip(Atex, 0, 255)
 
