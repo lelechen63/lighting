@@ -451,7 +451,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
         # cv2.imwrite('./tmp/gg' + str(len(os.listdir('./tmp'))) +'.png', tex[:,:,::-1])
         tex = tex.astype(np.float64)
         tex_tensor = (tex - self.meantex)/self.stdtex
-       
+        tex = np.clip(tex, -10, 10)
         tex_tensor = torch.FloatTensor(tex_tensor).permute(2,0,1)
         A_vertices = self.total_tex[self.data_list[index]][1]
         A_vertices = A_vertices.reshape(-1,3)
