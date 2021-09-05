@@ -882,7 +882,7 @@ class TexModule(pl.LightningModule):
         # generate images
         rec_tex_A = \
         self(batch['Atex'])
-        print (rec_tex_A.shape,  batch['Atex'].shape )
+        # print (rec_tex_A.shape,  batch['Atex'].shape )
         # pix loss
         loss_G_pix = 0
         # reconstruction loss
