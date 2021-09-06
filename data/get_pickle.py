@@ -436,20 +436,20 @@ def get_tex_total(mode = 'train'):
     if original:
         np.save( '/data/home/uss00022/lelechen/data/Facescape/originalbigtex256{}.npy'.format(mode), big )
     else:
-        np.save( '/data/home/uss00022/lelechen/data/Facescape/bigtex256{}.npy'.format(mode), big )
+        np.save( '/data/home/uss00022/lelechen/data/Facescape/originalbigtex256{}.npy'.format(mode), big )
 def get_texnorm():
     big = np.load( '/data/home/uss00022/lelechen/data/Facescape/bigtex256train.npy' )
     meantex = np.mean(big, axis=0)
     stdtex = np.std(big, axis = 0)
-    np.save( '/data/home/uss00022/lelechen/github/lighting/predef/meantex.npy', meantex)
-    np.save( '/data/home/uss00022/lelechen/github/lighting/predef/stdtex.npy', stdtex)
+    np.save( '/data/home/uss00022/lelechen/github/lighting/predef/originalmeantex.npy', meantex)
+    np.save( '/data/home/uss00022/lelechen/github/lighting/predef/originalstdtex.npy', stdtex)
     cv2.imwrite('./gg.png', meantex)
 # get_mesh_pickle(True)
 # get_mesh_augment(True,'test')
 # get_mesh_augment()
-get_tex_total()
-get_tex_total('test')
-
+# get_tex_total()
+# get_tex_total('test')
+get_texnorm()
 # get_mesh_total()
 # get_canonical_mesh()
 # tmp()
