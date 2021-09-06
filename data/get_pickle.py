@@ -417,7 +417,7 @@ def get_tex_total(mode = 'train'):
         print (data)
         tmp = data.split('/')
         if original:
-            tex_path = os.path.join( dir_tex , tmp[0], 'models_reg', tmp[-1] + '.png')
+            tex_path = os.path.join( dir_tex , tmp[0], 'models_reg', tmp[-1] + '.jpg')
         else:
             tex_path = os.path.join( dir_tex , tmp[0], tmp[-1] + '.png')
         tex = Image.open(tex_path).convert('RGB')#.resize(img_size)
