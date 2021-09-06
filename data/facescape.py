@@ -477,7 +477,7 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         self.dir_A = os.path.join(opt.dataroot, "textured_meshes")
 
         # self.dir_tex = '/raid/celong/FaceScape/texture_mapping/target/'
-        self.dir_tex = os.path.join(opt.dataroot, "texture_mapping", 'target')
+        # self.dir_tex = os.path.join(opt.dataroot, "texture_mapping", 'target')
         # '/data/home/uss00022/lelechen/data/Facescape/texture_mapping/target/'
         ### input B (real images)
         self.dir_B = os.path.join(opt.dataroot, "ffhq_aligned_img")
@@ -491,11 +491,11 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         if opt.isTrain:
             _file = open(os.path.join(opt.dataroot, "lists/texmesh_train.pkl"), "rb")
             total_m = '/data/home/uss00022/lelechen/data/Facescape/bigmeshtrain.npy'
-            total_t = '/data/home/uss00022/lelechen/data/Facescape/bigtex256train.npy'
+            total_t = '/data/home/uss00022/lelechen/data/Facescape/originalbigtex256train.npy'
         else:
             _file = open(os.path.join(opt.dataroot, "lists/texmesh_test.pkl"), "rb")
             total_m = '/data/home/uss00022/lelechen/data/Facescape/bigmeshtest.npy'
-            total_t = '/data/home/uss00022/lelechen/data/Facescape/bigtex256test.npy'
+            total_t = '/data/home/uss00022/lelechen/data/Facescape/originalbigtex256test.npy'
 
             # _file = open(os.path.join(opt.dataroot, "lists/texmesh_train.pkl"), "rb")
             # total_m = '/data/home/uss00022/lelechen/data/Facescape/bigmeshtrain.npy'
@@ -504,8 +504,8 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
 
         self.data_list = pickle.load(_file)#[:1]
 
-        self.meantex = np.load('/data/home/uss00022/lelechen/github/lighting/predef/meantex.npy')
-        self.stdtex = np.load('/data/home/uss00022/lelechen/github/lighting/predef/stdtex.npy') + 0.00000001
+        self.meantex = np.load('/data/home/uss00022/lelechen/github/lighting/predef/originalmeantex.npy')
+        self.stdtex = np.load('/data/home/uss00022/lelechen/github/lighting/predef/originalstdtex.npy') + 0.00000001
       
         _file.close()
         
@@ -545,7 +545,7 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         tmp = self.data_list[index].split('/')
         # id_p , 'models_reg', motion_p
 
-        tex_path = os.path.join( self.dir_tex , tmp[0], tmp[-1] + '.png')
+        # tex_path = os.path.join( self.dir_tex , tmp[0], tmp[-1] + '.png')
         tex = self.total_tex[self.data_list[index]][0].astype(np.uint8)
         # print ('=11====', tex.max(), tex.min())
         
