@@ -407,6 +407,9 @@ def get_tex_total(mode = 'train'):
     facial_seg = Image.open("/data/home/uss00022/lelechen/github/lighting/predef/facial_mask_v10.png")
     facial_seg  = np.array(facial_seg ) / 255.0
     facial_seg = np.expand_dims(facial_seg, axis=2)
+    facial_seg = facial_seg[y:y+l,x :x +l,:]
+    facial_seg = cv2.resize(facial_seg, (256,256), interpolation = cv2.INTER_AREA)
+
     x = 1169-150
     y =600-100
     w =2000
@@ -422,9 +425,10 @@ def get_tex_total(mode = 'train'):
             tex_path = os.path.join( dir_tex , tmp[0], tmp[-1] + '.png')
         tex = Image.open(tex_path).convert('RGB')#.resize(img_size)
         tex  = np.array(tex)
-        tex = tex * facial_seg
         tex =  tex[y:y+l,x :x +l,:]
         tex = cv2.resize(tex, (256,256), interpolation = cv2.INTER_AREA)
+        tex = tex * facial_seg
+        
         big.append(tex)
     big = np.asarray(big)
     if original:
