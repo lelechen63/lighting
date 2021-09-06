@@ -388,15 +388,17 @@ def get_canonical_mesh():
     vertex_indices = ommesh.face_vertex_indices()
     openmesh.write_mesh('/data/home/uss00022/lelechen/github/lighting/predef/meshmean.obj', openmesh.TriMesh(points, vertex_indices))
 
-def get_tex_total():
+def get_tex_total(mode = 'train'):
     dataroot = '/data/home/uss00022/lelechen/data/Facescape/'
-    _file = open(os.path.join(dataroot, "lists/texmesh_test.pkl"), "rb")
+
+    _file = open(os.path.join(dataroot, "lists/texmesh_{}.pkl".format(mode)), "rb")
     dir_A = os.path.join(dataroot, "textured_meshes")  
     
     data_list = pickle.load(_file)#[:1]
     totalmeanmesh = np.load( '/data/home/uss00022/lelechen/github/lighting/predef/meanmesh.npy' )
     # data_list.extend(pickle.load(_file))
-    dir_tex  = os.path.join(dataroot, "texture_mapping", 'target')
+    dir_tex  = os.path.join(dataroot, "textured_meshes")
+    # dir_tex  = os.path.join(dataroot, "texture_mapping", 'target')
     cc = 0
     big = []
     facial_seg = Image.open("/data/home/uss00022/lelechen/github/lighting/predef/facial_mask_v10.png")
@@ -419,7 +421,7 @@ def get_tex_total():
         tex = cv2.resize(tex, (256,256), interpolation = cv2.INTER_AREA)
         big.append(tex)
     big = np.asarray(big)
-    np.save( '/data/home/uss00022/lelechen/data/Facescape/bigtex256test.npy', big )
+    np.save( '/data/home/uss00022/lelechen/data/Facescape/originalbigtex256{}.npy'.format(mode), big )
 
 def get_texnorm():
     big = np.load( '/data/home/uss00022/lelechen/data/Facescape/bigtex256train.npy' )
@@ -429,8 +431,9 @@ def get_texnorm():
     np.save( '/data/home/uss00022/lelechen/github/lighting/predef/stdtex.npy', stdtex)
     cv2.imwrite('./gg.png', meantex)
 # get_mesh_pickle(True)
-get_mesh_augment(True,'test')
+# get_mesh_augment(True,'test')
 # get_mesh_augment()
+get_tex_total()
 # get_mesh_total()
 # get_canonical_mesh()
 # tmp()
