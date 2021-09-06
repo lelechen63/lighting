@@ -414,9 +414,8 @@ def get_tex_total(mode = 'train'):
     facial_seg  = np.array(facial_seg ) / 255.0
     
     facial_seg = facial_seg[y:y+l,x :x +l]
-    facial_seg = np.expand_dims(facial_seg, axis=2)
     facial_seg = cv2.resize(facial_seg, (256,256), interpolation = cv2.INTER_AREA)
-
+    facial_seg = np.expand_dims(facial_seg, axis=2)
     
     for data in tqdm(data_list):
         cc += 1
