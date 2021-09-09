@@ -557,7 +557,7 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         # print ('===333==', tex.max(), tex.min())
         
         # cv2.imwrite('./tmp/gg' + str(len(os.listdir('./tmp'))) +'.png', tex[:,:,::-1])
-        tex = tex.astype(np.float64)
+        # tex = tex.astype(np.float64)
         
         # print ('==444===', tex.max(), tex.min())
         # tex = (tex - self.meantex)/self.stdtex
