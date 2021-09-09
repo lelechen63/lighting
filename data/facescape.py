@@ -14,6 +14,7 @@ import torch
 import openmesh
 from tqdm import tqdm
 import  os, time
+import torchvision.transforms as transforms
 
 def get_exp():
     expressions = {
@@ -473,12 +474,7 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
 class FacescapeTexDataset(torch.utils.data.Dataset):
     def __init__(self, opt):
         self.opt = opt
-        ### input A (texture and mesh)   
-        self.dir_A = os.path.join(opt.dataroot, "textured_meshes")
-
-        # self.dir_tex = '/raid/celong/FaceScape/texture_mapping/target/'
-        # self.dir_tex = os.path.join(opt.dataroot, "texture_mapping", 'target')
-        # '/data/home/uss00022/lelechen/data/Facescape/texture_mapping/target/'
+     
         ### input B (real images)
         self.dir_B = os.path.join(opt.dataroot, "ffhq_aligned_img")
 
@@ -515,6 +511,12 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         self.total_tex = {}
         self.total_t = np.load(total_t)
         self.total_m = np.load(total_m)
+        transform_list = [transforms.ToTensor()]
+        transform_list += [transforms.Normalize((0.5, 0.5, 0.5),
+                                                (0.5, 0.5, 0.5))]
+        self.transform = transforms.Compose(transform_list)
+
+        
         bk = get_blacklist()
         cc = 0
         for data in tqdm(self.data_list):
@@ -556,11 +558,14 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         
         # cv2.imwrite('./tmp/gg' + str(len(os.listdir('./tmp'))) +'.png', tex[:,:,::-1])
         tex = tex.astype(np.float64)
+        
         # print ('==444===', tex.max(), tex.min())
-        tex = (tex - self.meantex)/self.stdtex
-        tex = np.clip(tex, -10, 10)
+        # tex = (tex - self.meantex)/self.stdtex
+        # tex = np.clip(tex, -10, 10)
         # print ('===555==', tex.max(), tex.min())
-        tex_tensor = torch.FloatTensor(tex).permute(2,0,1)
+        # tex_tensor = torch.FloatTensor(tex).permute(2,0,1)
+        tex_tensor = self.transform(tex)
+        print (tex_tensor.shape)
         input_dict = { 'Atex':tex_tensor, 'Aid': int(tmp[0]) - 1, 'Aexp': int(tmp[-1].split('_')[0] )- 1, 'A_path': self.data_list[index]}
        
        
