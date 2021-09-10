@@ -879,6 +879,15 @@ class TexModule(pl.LightningModule):
         self.meantex = torch.FloatTensor(self.meantex).permute(2, 0,1)
         self.stdtex = torch.FloatTensor(self.stdtex).permute(2,0,1)
         self.ckpt_path = os.path.join(opt.checkpoints_dir, opt.name)
+
+
+        facial_seg = Image.open("/data/home/uss00022/lelechen/github/lighting/predef/facial_mask_v10.png")
+        facial_seg  = np.array(facial_seg ) / 255.0
+        
+        facial_seg = facial_seg[y:y+l,x :x +l]
+        facial_seg = cv2.resize(facial_seg, (256,256), interpolation = cv2.INTER_AREA)
+        self.facial_seg = np.expand_dims(facial_seg, axis=2)
+        self.facial_seg = torch.FloatTensor(self.facial_seg)
     def forward(self, A_tex):
         return self.generator(A_tex)
     
@@ -893,7 +902,7 @@ class TexModule(pl.LightningModule):
         loss_G_pix = 0
 
         # if not self.opt.no_pix_loss:
-        loss_G_pix += self.l1loss(rec_tex_A, batch['Atex'])  #  * self.opt.lambda_pix
+        loss_G_pix += self.l1loss(rec_tex_A * self.facial_seg  , batch['Atex'] * self.facial_seg)  #  * self.opt.lambda_pix
 
       
         loss = loss_G_pix    
