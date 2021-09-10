@@ -891,7 +891,7 @@ class TexModule(pl.LightningModule):
         facial_seg = facial_seg[y:y+l,x :x +l]
         facial_seg = cv2.resize(facial_seg, (256,256), interpolation = cv2.INTER_AREA)
         self.facial_seg = np.expand_dims(facial_seg, axis=0)
-        self.facial_seg = torch.FloatTensor(self.facial_seg)
+        self.facial_seg = torch.FloatTensor(self.facial_seg).cuda()
     def forward(self, A_tex):
         return self.generator(A_tex)
     
@@ -907,7 +907,7 @@ class TexModule(pl.LightningModule):
 
         # if not self.opt.no_pix_loss:
         print (rec_tex_A.shape, self.facial_seg.shape)
-        loss_G_pix += self.l1loss(rec_tex_A * self.facial_seg  , batch['Atex'] * self.facial_seg)  #  * self.opt.lambda_pix
+        loss_G_pix += self.l1loss(rec_tex_A * self.facial_seg.type_as(rec_tex_A)  , batch['Atex'] * self.facial_seg.type_as(batch['Atex']))  #  * self.opt.lambda_pix
 
       
         loss = loss_G_pix    
