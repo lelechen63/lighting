@@ -879,7 +879,11 @@ class TexModule(pl.LightningModule):
         self.stdtex = torch.FloatTensor(self.stdtex).permute(2,0,1)
         self.ckpt_path = os.path.join(opt.checkpoints_dir, opt.name)
 
-
+        x = 1019
+        y =500
+        w =2000
+        h = 1334
+        l = max(w ,h)
         facial_seg = Image.open("/data/home/uss00022/lelechen/github/lighting/predef/facial_mask_v10.png")
         facial_seg  = np.array(facial_seg ) / 255.0
         
