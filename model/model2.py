@@ -23,6 +23,7 @@ from model.conv import ChebConv
 from .inits import reset
 from torch_scatter import scatter_add
 from PIL import Image
+import cv2
 
 def get_norm_layer(norm_type='instance'):
     if norm_type == 'batch':
