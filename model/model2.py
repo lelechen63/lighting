@@ -906,7 +906,7 @@ class TexModule(pl.LightningModule):
         loss_G_pix = 0
 
         # if not self.opt.no_pix_loss:
-        print (rec_tex_A.shape, self.facial_seg.shape)
+        # print (rec_tex_A.shape, self.facial_seg.shape)
         loss_G_pix += self.l1loss(rec_tex_A * self.facial_seg.type_as(rec_tex_A)  , batch['Atex'] * self.facial_seg.type_as(batch['Atex']))  #  * self.opt.lambda_pix
 
       
