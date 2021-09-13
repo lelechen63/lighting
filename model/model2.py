@@ -91,7 +91,7 @@ class TexDecoder2(nn.Module):
     def forward(self, tex_code):
         # tex_code = self.tex_fc_dec(tex_code)
         # tex_dec = tex_code.view(tex_code.shape[0], 256, 4,4) # not sure 
-        decoded = self.tex_decoder(tex_dec)
+        decoded = self.tex_decoder(tex_code)
         return decoded   
 
 class TexEncoder(nn.Module):
