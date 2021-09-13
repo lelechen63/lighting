@@ -86,8 +86,8 @@ class TexDecoder2(nn.Module):
             ConvTranspose2dWNUB( 64, 32, 64, 64, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),
             ConvTranspose2dWNUB( 32, 8, 128, 128, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),
             ConvTranspose2dWNUB( 8, 3, 256, 256, 4, 2, 1 ) )
-        self.apply( lambda x: glorot( x, 0.2 ) )
-        glorot( self.tex_fc_dec[ -1 ], 1.0 )
+        # self.apply( lambda x: glorot( x, 0.2 ) )
+        # glorot( self.tex_fc_dec[ -1 ], 1.0 )
     def forward(self, tex_code):
         # tex_code = self.tex_fc_dec(tex_code)
         # tex_dec = tex_code.view(tex_code.shape[0], 256, 4,4) # not sure 
