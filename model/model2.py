@@ -51,19 +51,19 @@ class TexEncoder2(nn.Module):
             Conv2dWNUB( 128, 256, 4, 4, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),#64
         )
 
-        self.codefc = nn.Sequential(
-            LinearWN(256 * 4 * 4, 2048 ), nn.LeakyReLU( 0.2, inplace = True ),
-            LinearWN(2048, 1024 ), nn.LeakyReLU( 0.2, inplace = True ), 
-            LinearWN(1024, 1024 ), nn.LeakyReLU( 0.2, inplace = True )
-            )
-        self.codelast = LinearWN( 1024, 1024 )
-        self.apply( lambda x: glorot( x, 0.2 ) )
-        glorot( self.codelast, 1.0 )
+        # self.codefc = nn.Sequential(
+        #     LinearWN(256 * 4 * 4, 2048 ), nn.LeakyReLU( 0.2, inplace = True ),
+        #     LinearWN(2048, 1024 ), nn.LeakyReLU( 0.2, inplace = True ), 
+        #     LinearWN(1024, 1024 ), nn.LeakyReLU( 0.2, inplace = True )
+        #     )
+        # self.codelast = LinearWN( 1024, 1024 )
+        # self.apply( lambda x: glorot( x, 0.2 ) )
+        # glorot( self.codelast, 1.0 )
     def forward(self, tex):
         tex_encoded = self.CNNencoder(tex)
-        tex_encoded = tex_encoded.view(tex.shape[0], -1)
-        tex_encoded  = self.codefc(tex_encoded)
-        tex_encoded = self.codelast(tex_encoded)
+        # tex_encoded = tex_encoded.view(tex.shape[0], -1)
+        # tex_encoded  = self.codefc(tex_encoded)
+        # tex_encoded = self.codelast(tex_encoded)
         return tex_encoded
 
 
@@ -74,11 +74,11 @@ class TexDecoder2(nn.Module):
         super().__init__()
 
         self.tex_shape = tex_shape
-        self.tex_fc_dec = nn.Sequential(
-            LinearWN( 1024 , 1024 ), nn.LeakyReLU( 0.2, inplace = True ),
-            LinearWN( 1024 , 2048 ), nn.LeakyReLU( 0.2, inplace = True ),
-            LinearWN( 2048 , 256*4*4 ), nn.LeakyReLU( 0.2, inplace = True )
-             )
+        # self.tex_fc_dec = nn.Sequential(
+        #     LinearWN( 1024 , 1024 ), nn.LeakyReLU( 0.2, inplace = True ),
+        #     LinearWN( 1024 , 2048 ), nn.LeakyReLU( 0.2, inplace = True ),
+        #     LinearWN( 2048 , 256*4*4 ), nn.LeakyReLU( 0.2, inplace = True )
+        #      )
         self.tex_decoder = nn.Sequential(
             ConvTranspose2dWNUB( 256, 256, 8, 8, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),
             ConvTranspose2dWNUB( 256, 128, 16, 16, 4, 2, 1 ), nn.LeakyReLU( 0.2, inplace = True ),
@@ -89,8 +89,8 @@ class TexDecoder2(nn.Module):
         self.apply( lambda x: glorot( x, 0.2 ) )
         glorot( self.tex_fc_dec[ -1 ], 1.0 )
     def forward(self, tex_code):
-        tex_code = self.tex_fc_dec(tex_code)
-        tex_dec = tex_code.view(tex_code.shape[0], 256, 4,4) # not sure 
+        # tex_code = self.tex_fc_dec(tex_code)
+        # tex_dec = tex_code.view(tex_code.shape[0], 256, 4,4) # not sure 
         decoded = self.tex_decoder(tex_dec)
         return decoded   
 
