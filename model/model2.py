@@ -862,7 +862,7 @@ class TexGANModule(pl.LightningModule):
         self.GANloss = nn.BCEWithLogitsLoss()
 
         self.visualizer = Visualizer(opt)
-      
+        self.ckpt_path = os.path.join(opt.checkpoints_dir, opt.name)
     def forward(self, A_tex):
         return self.generator(A_tex)
     
@@ -887,8 +887,6 @@ class TexGANModule(pl.LightningModule):
         fake_loss = self.GANloss(fake_logits, torch.zeros_like(fake_logits))
         real_loss = self.GANloss(real_logits, torch.ones_like(real_logits))
         return (real_loss + fake_loss) / 2
-
-
 
     def training_step(self, batch, batch_idx, optimizer_idx):
         self.batch = batch
