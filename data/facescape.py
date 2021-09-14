@@ -565,7 +565,7 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         # print ('===555==', tex.max(), tex.min())
         # tex_tensor = torch.FloatTensor(tex).permute(2,0,1)
         tex_tensor = self.transform(tex)
-        print (tex_tensor.max(), tex_tensor.min())
+        # print (tex_tensor.max(), tex_tensor.min())
         # print (tex_tensor.shape)
         input_dict = { 'Atex':tex_tensor, 'Aid': int(tmp[0]) - 1, 'Aexp': int(tmp[-1].split('_')[0] )- 1, 'A_path': self.data_list[index]}
        
