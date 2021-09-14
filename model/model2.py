@@ -898,7 +898,7 @@ class TexGANModule(pl.LightningModule):
         self(batch['Atex'])
 
         if optimizer_idx ==0:                  
-            loss_g, loss_pix = _gen_step(batch['Atex'], batch['Atex'])
+            loss_g, loss_pix = self._gen_step(batch['Atex'], batch['Atex'])
             loss = loss_g + 100 * loss_pix
             tqdm_dict = {'loss_pix': 100 * loss_pix, 'loss_g': loss_g }
             output = OrderedDict({
