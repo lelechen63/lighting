@@ -871,7 +871,7 @@ class TexGANModule(pl.LightningModule):
         # Pix2Pix has adversarial and a reconstruction loss
         # First calculate the adversarial loss
         fake_images = self(conditioned_images)
-        disc_logits = self.patch_gan(fake_images, conditioned_images)
+        disc_logits = self.discriminator(fake_images, conditioned_images)
         adversarial_loss = self.GANloss(disc_logits, torch.ones_like(disc_logits))
 
         # calculate reconstruction loss
@@ -880,9 +880,9 @@ class TexGANModule(pl.LightningModule):
     
     def _disc_step(self, real_images, conditioned_images):
         fake_images = self(conditioned_images).detach()
-        fake_logits = self.patch_gan(fake_images, conditioned_images)
+        fake_logits = self.discriminator(fake_images, conditioned_images)
 
-        real_logits = self.patch_gan(real_images, conditioned_images)
+        real_logits = self.discriminator(real_images, conditioned_images)
 
         fake_loss = self.GANloss(fake_logits, torch.zeros_like(fake_logits))
         real_loss = self.GANloss(real_logits, torch.ones_like(real_logits))
