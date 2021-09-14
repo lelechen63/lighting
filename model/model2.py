@@ -35,6 +35,13 @@ def get_norm_layer(norm_type='instance'):
     return norm_layer
 
 
+def _weights_init(m):
+    if isinstance(m, (nn.Conv2d, nn.ConvTranspose2d)):
+        torch.nn.init.normal_(m.weight, 0.0, 0.02)
+    if isinstance(m, nn.BatchNorm2d):
+        torch.nn.init.normal_(m.weight, 0.0, 0.02)
+        torch.nn.init.constant_(m.bias, 0)
+        
 class TexEncoder2(nn.Module):
     def __init__(self,  tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
                 ngf=64, n_downsampling=5, n_blocks=4, norm_layer= nn.BatchNorm2d, \
@@ -726,52 +733,163 @@ class DisGraphConvMeshModule2(pl.LightningModule):
             self.trainer.save_checkpoint( os.path.join( self.ckpt_path, 'latest.ckpt') )
   
 
-class TexGenerator(nn.Module):
-    def __init__(self, tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
-                ngf=64, n_downsampling=5, n_blocks=4, norm_layer='batch', \
-                padding_type='reflect'):
-        super().__init__()
-        norm_layer = get_norm_layer(norm_type=norm_layer)  
+# class TexGenerator(nn.Module):
+#     def __init__(self, tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+#                 ngf=64, n_downsampling=5, n_blocks=4, norm_layer='batch', \
+#                 padding_type='reflect'):
+#         super().__init__()
+#         norm_layer = get_norm_layer(norm_type=norm_layer)  
 
-        self.texEnc = TexEncoder2(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
-                ngf, n_downsampling, n_blocks, norm_layer, padding_type)
+#         self.texEnc = TexEncoder2(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+#                 ngf, n_downsampling, n_blocks, norm_layer, padding_type)
 
-        self.texDec = TexDecoder2(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
-                ngf, n_downsampling, n_blocks, norm_layer, padding_type)
-    def forward(self, A_tex ):
+#         self.texDec = TexDecoder2(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
+#                 ngf, n_downsampling, n_blocks, norm_layer, padding_type)
+#     def forward(self, A_tex ):
         
-        tex_code = self.texEnc(A_tex)
+#         tex_code = self.texEnc(A_tex)
 
-        # reconstruction
-        rec_tex_A = self.texDec(tex_code)
-        return rec_tex_A
+#         # reconstruction
+#         rec_tex_A = self.texDec(tex_code)
+#         return rec_tex_A
 
+
+class TexGenerator(nn.Module):
+
+    def __init__(self, in_channels, out_channels):
+        """
+        Paper details:
+        - Encoder: C64-C128-C256-C512-C512-C512-C512-C512
+        - All convolutions are 4×4 spatial filters applied with stride 2
+        - Convolutions in the encoder downsample by a factor of 2
+        - Decoder: CD512-CD1024-CD1024-C1024-C1024-C512 -C256-C128
+        """
+        super().__init__()
+
+        # encoder/donwsample convs
+        self.encoders = [
+            DownSampleConv(in_channels, 64, batchnorm=False),  # bs x 64 x 128 x 128
+            DownSampleConv(64, 128),  # bs x 128 x 64 x 64
+            DownSampleConv(128, 256),  # bs x 256 x 32 x 32
+            DownSampleConv(256, 512),  # bs x 512 x 16 x 16
+            DownSampleConv(512, 512),  # bs x 512 x 8 x 8
+            DownSampleConv(512, 512),  # bs x 512 x 4 x 4
+            DownSampleConv(512, 512),  # bs x 512 x 2 x 2
+            DownSampleConv(512, 512, batchnorm=False),  # bs x 512 x 1 x 1
+        ]
+
+        # decoder/upsample convs
+        self.decoders = [
+            UpSampleConv(512, 512, dropout=True),  # bs x 512 x 2 x 2
+            UpSampleConv(512, 512, dropout=True),  # bs x 512 x 4 x 4
+            UpSampleConv(512, 512, dropout=True),  # bs x 512 x 8 x 8
+            UpSampleConv(512, 512),  # bs x 512 x 16 x 16
+            UpSampleConv(512, 256),  # bs x 256 x 32 x 32
+            UpSampleConv(256, 128),  # bs x 128 x 64 x 64
+            UpSampleConv(128, 64),  # bs x 64 x 128 x 128
+        ]
+        # self.decoder_channels = [512, 512, 512, 512, 256, 128, 64]
+        self.final_conv = nn.ConvTranspose2d(64, out_channels, kernel_size=4, stride=2, padding=1)
+        self.tanh = nn.Tanh()
+
+        self.encoders = nn.ModuleList(self.encoders)
+        self.decoders = nn.ModuleList(self.decoders)
+    def forward(self, x):
+        for encoder in self.encoders:
+            x = encoder(x)
+
+        decoders = self.decoders[:-1]
+
+        for decoder in decoders:
+            x = decoder(x)
+        x = self.decoders[-1](x)
+        x = self.final_conv(x)
+        return self.tanh(x)
+    # def forward(self, x):
+    #     skips_cons = []
+    #     for encoder in self.encoders:
+    #         x = encoder(x)
+
+    #         skips_cons.append(x)
+
+    #     skips_cons = list(reversed(skips_cons[:-1]))
+    #     decoders = self.decoders[:-1]
+
+    #     for decoder, skip in zip(decoders, skips_cons):
+    #         x = decoder(x)
+    #         # print(x.shape, skip.shape)
+    #         x = torch.cat((x, skip), axis=1)
+
+    #     x = self.decoders[-1](x)
+    #     # print(x.shape)
+    #     x = self.final_conv(x)
+    #     return self.tanh(x)
+
+
+class PatchGAN(nn.Module):
+
+    def __init__(self, input_channels):
+        super().__init__()
+        self.d1 = DownSampleConv(input_channels, 64, batchnorm=False)
+        self.d2 = DownSampleConv(64, 128)
+        self.d3 = DownSampleConv(128, 256)
+        self.d4 = DownSampleConv(256, 512)
+        self.final = nn.Conv2d(512, 1, kernel_size=1)
+
+    def forward(self, x, y):
+        x = torch.cat([x, y], axis=1)
+        x0 = self.d1(x)
+        x1 = self.d2(x0)
+        x2 = self.d3(x1)
+        x3 = self.d4(x2)
+        xn = self.final(x3)
+        return xn
 
 class TexGANModule(pl.LightningModule):
     def __init__(self, opt ):
         super().__init__()
+        self.save_hyperparameters()
         self.opt = opt
         input_nc = 3
         # networks
-        self.generator = TexGenerator(opt.loadSize, not opt.no_linearity, 
-            input_nc, opt.code_n,opt.encoder_fc_n, opt.ngf, 
-            opt.n_downsample_global, opt.n_blocks_global,opt.norm)
-
-        self.discriminator = MultiscaleDiscriminator(input_nc = 3)   
+        self.generator = TexGenerator(3,3)
+        self.generator = self.generator.apply(_weights_init)
+        self.discriminator = PatchGAN(3 + 3)   
+        self.discriminator = self.discriminator.apply(_weights_init)
 
         self.l1loss = torch.nn.L1Loss()
         self.l2loss = torch.nn.MSELoss()
-       
-        self.GANloss = lossNet.GANLoss()
+        self.GANloss = nn.BCEWithLogitsLoss()
+
         self.visualizer = Visualizer(opt)
-        self.meantex = np.load('./predef/meantex.npy')
-        self.stdtex = np.load('./predef/stdtex.npy')
-        self.meantex = torch.FloatTensor(self.meantex).permute(2, 0,1)
-        self.stdtex = torch.FloatTensor(self.stdtex).permute(2,0,1)
-        self.ckpt_path = os.path.join(opt.checkpoints_dir, opt.name)
+      
     def forward(self, A_tex):
         return self.generator(A_tex)
     
+
+    def _gen_step(self, real_images, conditioned_images):
+        # Pix2Pix has adversarial and a reconstruction loss
+        # First calculate the adversarial loss
+        fake_images = self(conditioned_images)
+        disc_logits = self.patch_gan(fake_images, conditioned_images)
+        adversarial_loss = self.GANloss(disc_logits, torch.ones_like(disc_logits))
+
+        # calculate reconstruction loss
+        recon_loss = self.l1loss(fake_images, real_images)
+        return adversarial_loss , 200 * recon_loss
+    
+    def _disc_step(self, real_images, conditioned_images):
+        fake_images = self(conditioned_images).detach()
+        fake_logits = self.patch_gan(fake_images, conditioned_images)
+
+        real_logits = self.patch_gan(real_images, conditioned_images)
+
+        fake_loss = self.GANloss(fake_logits, torch.zeros_like(fake_logits))
+        real_loss = self.GANloss(real_logits, torch.ones_like(real_logits))
+        return (real_loss + fake_loss) / 2
+
+
+
     def training_step(self, batch, batch_idx, optimizer_idx):
         self.batch = batch
         # train generator
@@ -780,18 +898,9 @@ class TexGANModule(pl.LightningModule):
         self(batch['Atex'])
 
         if optimizer_idx ==0:                  
-          
-            # pix loss
-            loss_G_pix = 0
-            # reconstruction loss
-            if not self.opt.no_pix_loss:
-                loss_G_pix += self.l1loss(rec_tex_A, batch['Atex']) * self.opt.lambda_pix
-
-            loss_mesh = 0 
-            g_loss = self.GANloss(self.discriminator(   rec_tex_A), True)
-
-            loss = loss_G_pix    + loss_mesh + g_loss
-            tqdm_dict = {'loss_pix': loss_G_pix, 'loss_mesh': loss_mesh, 'loss_GAN': g_loss }
+            loss_g, loss_pix = _gen_step(batch['Atex'], batch['Atex'])
+            loss = loss_g + 100 * loss_pix
+            tqdm_dict = {'loss_pix': 100 * loss_pix, 'loss_g': loss_g }
             output = OrderedDict({
                 'loss': loss,
                 'progress_bar': tqdm_dict,
@@ -804,11 +913,8 @@ class TexGANModule(pl.LightningModule):
             return output
         if optimizer_idx == 1:
 
-            real_loss = self.GANloss(self.discriminator(  batch['Atex']), True)
-            fake_loss = self.GANloss( self.discriminator( rec_tex_A.detach()) , False)
+            d_loss = self._disc_step(batch['Atex'], batch['Atex'])
 
-            # discriminator loss is the average of these
-            d_loss = (real_loss + fake_loss) / 2
             tqdm_dict = {'d_loss': d_loss}
             output = OrderedDict({
                 'loss': d_loss,
@@ -839,15 +945,15 @@ class TexGANModule(pl.LightningModule):
             
             # Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
            
-            Atex = batch['Atex'].data[0].cpu()  * self.stdtex + self.meantex 
-            Atex = util.tensor2im(Atex  , normalize = False)
+            Atex = batch['Atex'].data[0].cpu() #  * self.stdtex + self.meantex 
+            Atex = util.tensor2im(Atex  , normalize = True)
             Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
             Atex = util.writeText(Atex, batch['A_path'][0])
             Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
             Atex = np.clip(Atex, 0, 255)
 
-            rec_tex_A_vis =rec_tex_A.data[0].cpu() * self.stdtex + self.meantex  
-            rec_tex_A_vis = util.tensor2im(rec_tex_A_vis, normalize = False)            
+            rec_tex_A_vis =rec_tex_A.data[0].cpu() # * self.stdtex + self.meantex  
+            rec_tex_A_vis = util.tensor2im(rec_tex_A_vis, normalize = True)            
             rec_tex_A_vis = np.ascontiguousarray(rec_tex_A_vis, dtype=np.uint8)
             rec_tex_A_vis = np.clip(rec_tex_A_vis, 0, 255)
             visuals = OrderedDict([
