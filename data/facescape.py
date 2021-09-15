@@ -512,8 +512,8 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         self.total_t = np.load(total_t)
         self.total_m = np.load(total_m)
         transform_list = [transforms.ToTensor()]
-        # transform_list += [transforms.Normalize((0.5, 0.5, 0.5),
-        #                                         (0.5, 0.5, 0.5))]
+        transform_list += [transforms.Normalize((0.5, 0.5, 0.5),
+                                                (0.5, 0.5, 0.5))]
         self.transform = transforms.Compose(transform_list)
 
         
