@@ -103,9 +103,7 @@ else:
         
         from model.model2 import TexGenerator as module
 
-        module = module(opt.loadSize, not opt.no_linearity,
-            3, opt.code_n,opt.encoder_fc_n, opt.ngf, 
-            opt.n_downsample_global, opt.n_blocks_global,opt.norm)
+        module = module(3,3)
     
         checkpoint = torch.load(checkpoint_path)
         module.load_state_dict(pl2normal(checkpoint['state_dict']))
@@ -119,7 +117,7 @@ else:
         for num,batch in enumerate(testdata):
             rec_tex_A= \
             module(  batch['Atex'])
-            Atex = batch['Atex'].data[0].cpu()  * stdtex + meantex 
+            Atex = batch['Atex'].data[0].cpu()  #* stdtex + meantex 
             Atex = util.tensor2im(Atex  , normalize = False)
             Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
             Atex = util.writeText(Atex, batch['A_path'][0])
@@ -127,7 +125,7 @@ else:
             Atex = np.clip(Atex, 0, 255)
 
 
-            rec_tex_A_vis =rec_tex_A.data[0].cpu() * stdtex + meantex  
+            rec_tex_A_vis =rec_tex_A.data[0].cpu()# * stdtex + meantex  
             rec_tex_A_vis = util.tensor2im(rec_tex_A_vis, normalize = False)
             rec_tex_A_vis = np.ascontiguousarray(rec_tex_A_vis, dtype=np.uint8)
             rec_tex_A_vis = np.clip(rec_tex_A_vis, 0, 255)
