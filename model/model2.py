@@ -970,9 +970,8 @@ class TexModule(pl.LightningModule):
         self.opt = opt
         input_nc = 3
         # networks
-        self.generator = TexGenerator(opt.loadSize, not opt.no_linearity, 
-            input_nc, opt.code_n,opt.encoder_fc_n, opt.ngf, 
-            opt.n_downsample_global, opt.n_blocks_global,opt.norm)
+        self.generator = TexGenerator(3,3)
+        self.generator = self.generator.apply(_weights_init)
 
         self.l1loss = torch.nn.L1Loss()
         self.l2loss = torch.nn.MSELoss()
