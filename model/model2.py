@@ -795,7 +795,7 @@ class TexGenerator(nn.Module):
         self.encoders = nn.ModuleList(self.encoders)
         self.decoders = nn.ModuleList(self.decoders)
     def forward(self, x):
-        print (type(x), '+++++')
+        # print (type(x), '+++++')
         for encoder in self.encoders:
             x = encoder(x)
 
