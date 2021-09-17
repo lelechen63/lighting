@@ -774,14 +774,14 @@ class TexGenerator(nn.Module):
             DownSampleConv(256, 512),  # bs x 512 x 16 x 16
             DownSampleConv(512, 512),  # bs x 512 x 8 x 8
             DownSampleConv(512, 512),  # bs x 512 x 4 x 4
-            DownSampleConv(512, 512),  # bs x 512 x 2 x 2
-            DownSampleConv(512, 512, batchnorm=False),  # bs x 512 x 1 x 1
+            # DownSampleConv(512, 512),  # bs x 512 x 2 x 2
+            # DownSampleConv(512, 512, batchnorm=False),  # bs x 512 x 1 x 1
         ]
 
         # decoder/upsample convs
         self.decoders = [
-            UpSampleConv(512, 512, dropout=True),  # bs x 512 x 2 x 2
-            UpSampleConv(512, 512, dropout=True),  # bs x 512 x 4 x 4
+            # UpSampleConv(512, 512, dropout=True),  # bs x 512 x 2 x 2
+            # UpSampleConv(512, 512, dropout=True),  # bs x 512 x 4 x 4
             UpSampleConv(512, 512, dropout=True),  # bs x 512 x 8 x 8
             UpSampleConv(512, 512),  # bs x 512 x 16 x 16
             UpSampleConv(512, 256),  # bs x 256 x 32 x 32
