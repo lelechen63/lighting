@@ -548,12 +548,12 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         # id_p , 'models_reg', motion_p
 
         # tex_path = os.path.join( self.dir_tex , tmp[0], tmp[-1] + '.png')
-        tex = self.total_tex[self.data_list[index]][0].astype(np.uint8)
+        tex = self.total_tex[self.data_list[index]][0]  # .astype(np.uint8)
         # print ('=11====', tex.max(), tex.min())
         
-        tex = adjust_contrast_linear(tex, random.uniform(0.75, 1.5))
+        # tex = adjust_contrast_linear(tex, random.uniform(0.75, 1.5))
         # print ('===222==', tex.max(), tex.min())
-        tex = multiply(tex, random.uniform(0.8, 1.2) )
+        # tex = multiply(tex, random.uniform(0.8, 1.2) )
         # print ('===333==', tex.max(), tex.min())
         
         # cv2.imwrite('./tmp/gg' + str(len(os.listdir('./tmp'))) +'.png', tex[:,:,::-1])
