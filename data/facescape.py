@@ -548,7 +548,7 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         # id_p , 'models_reg', motion_p
 
         # tex_path = os.path.join( self.dir_tex , tmp[0], tmp[-1] + '.png')
-        tex = self.total_tex[self.data_list[index]][0]#.astype(np.uint8)
+        tex = self.total_tex[self.data_list[index]][0].astype(np.uint8)
         # print ('=11====', tex.max(), tex.min())
         
         # tex = adjust_contrast_linear(tex, random.uniform(0.75, 1.5))
@@ -565,7 +565,7 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         # print ('===555==', tex.max(), tex.min())
         # tex_tensor = torch.FloatTensor(tex).permute(2,0,1)
         tex_tensor = self.transform(tex)
-        tex_tensor = torch.FloatTensor(tex_tensor)
+        # tex_tensor = torch.FloatTensor(tex_tensor)
         # print (tex_tensor.max(), tex_tensor.min())
         # print (tex_tensor.shape)
         input_dict = { 'Atex':tex_tensor, 'Aid': int(tmp[0]) - 1, 'Aexp': int(tmp[-1].split('_')[0] )- 1, 'A_path': self.data_list[index]}
