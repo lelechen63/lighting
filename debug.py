@@ -2,7 +2,7 @@ import os
 
 path = '/data/home/uss00022/lelechen/data/Facescape/textured_meshes'
 for id in os.listdir(path):
-    c = path +'/' id
+    c = path +'/' +  id
     command = 'rm -rf ' + dpmap + '/dpmap'
     os.system(command)
 # import numpy as np 
