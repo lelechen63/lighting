@@ -767,27 +767,27 @@ class TexGenerator(nn.Module):
         super().__init__()
 
         # encoder/donwsample convs
-        self.encoders = [
+        self.encoders = nn.Sequential([
             DownSampleConv(in_channels, 64, batchnorm=False),  # bs x 64 x 128 x 128
-            DownSampleConv(64, 128),  # bs x 128 x 64 x 64
-            DownSampleConv(128, 256),  # bs x 256 x 32 x 32
-            DownSampleConv(256, 512),  # bs x 512 x 16 x 16
-            DownSampleConv(512, 512),  # bs x 512 x 8 x 8
-            DownSampleConv(512, 512),  # bs x 512 x 4 x 4
+            DownSampleConv(64, 64),  # bs x 128 x 64 x 64
+            DownSampleConv(64, 128),  # bs x 256 x 32 x 32
+            DownSampleConv(128, 128),  # bs x 512 x 16 x 16
+            DownSampleConv(128, 256),  # bs x 512 x 8 x 8
+            DownSampleConv(256, 256),  # bs x 512 x 4 x 4
             # DownSampleConv(512, 512),  # bs x 512 x 2 x 2
             # DownSampleConv(512, 512, batchnorm=False),  # bs x 512 x 1 x 1
-        ]
+        ])
 
         # decoder/upsample convs
-        self.decoders = [
+        self.decoders = nn.Sequential([
             # UpSampleConv(512, 512, dropout=True),  # bs x 512 x 2 x 2
             # UpSampleConv(512, 512, dropout=True),  # bs x 512 x 4 x 4
-            UpSampleConv(512, 512, dropout=True),  # bs x 512 x 8 x 8
-            UpSampleConv(512, 512),  # bs x 512 x 16 x 16
-            UpSampleConv(512, 256),  # bs x 256 x 32 x 32
-            UpSampleConv(256, 128),  # bs x 128 x 64 x 64
-            UpSampleConv(128, 64),  # bs x 64 x 128 x 128
-        ]
+            UpSampleConv(256, 256, dropout=True),  # bs x 512 x 8 x 8
+            UpSampleConv(256, 128),  # bs x 512 x 16 x 16
+            UpSampleConv(128, 128),  # bs x 256 x 32 x 32
+            UpSampleConv(128, 64),  # bs x 128 x 64 x 64
+            UpSampleConv(64, 64),  # bs x 64 x 128 x 128
+        ])
         # self.decoder_channels = [512, 512, 512, 512, 256, 128, 64]
         self.final_conv = nn.ConvTranspose2d(64, out_channels, kernel_size=4, stride=2, padding=1)
         self.tanh = nn.Tanh()
@@ -796,14 +796,15 @@ class TexGenerator(nn.Module):
         self.decoders = nn.ModuleList(self.decoders)
     def forward(self, x):
         # print (type(x), '+++++')
-        for encoder in self.encoders:
-            x = encoder(x)
+        # for encoder in self.encoders:
+        #     x = encoder(x)
+        x = self.encoders(x)
+        x = self.decoders(x)
+        # decoders = self.decoders[:-1]
 
-        decoders = self.decoders[:-1]
-
-        for decoder in decoders:
-            x = decoder(x)
-        x = self.decoders[-1](x)
+        # for decoder in decoders:
+        #     x = decoder(x)
+        # x = self.decoders[-1](x)
         x = self.final_conv(x)
         return self.tanh(x)
     # def forward(self, x):
