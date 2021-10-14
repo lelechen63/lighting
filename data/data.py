@@ -43,12 +43,7 @@ class FacescapeDataModule(pl.LightningDataModule):
             from data.facescape import FacescapeDisMeshTexDataset
             dataset = FacescapeDisMeshTexDataset(self.opt)
 
-        # elif self.opt.datasetname == 'fs_texmesh':
-        #     from data.facescape import FacescapeMeshTexDataset
-        #     dataset = FacescapeMeshTexDataset(self.opt)
-        # elif self.opt.datasetname == 'fs_tex':
-        #     from data.facescape import FacescapeTexDataset
-        #     dataset = FacescapeTexDataset(self.opt)
+       
         print("dataset [%s] was created" % (dataset.name()))
         print ('=================================')
         # dataset.initialize(opt)
