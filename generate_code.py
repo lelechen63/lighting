@@ -79,7 +79,7 @@ def main():
 
     checkpoint = torch.load(checkpoint_path)
     module.load_state_dict(pl2normal(checkpoint['state_dict']))
-    
+
     dm = FacescapeDataModule(opt)
     dm.setup()
     testdata = dm.test_dataloader()
@@ -101,8 +101,8 @@ def main():
         gt_Amesh = np.ascontiguousarray(gt_Amesh, dtype=np.uint8)
         gt_Amesh = util.writeText(gt_Amesh, batch['A_path'][0], 100)
         print (batch['A_path'][0])
-
-        # np.savez( os.path.join(dic, id, 'models_reg', exp + '.npz'), w=projected_w.unsqueeze(0).cpu().numpy())
+        print (code.shape)
+        np.savez( os.path.join('/data/home/uss00022/lelechen/data/Facescape/textured_meshes/',  batch['A_path'][0] + '.npz'), w=code.cpu().numpy())
         
         visuals = OrderedDict([
             ('gt_Amesh', gt_Amesh),
