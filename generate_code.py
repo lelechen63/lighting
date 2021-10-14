@@ -102,7 +102,7 @@ def main():
         gt_Amesh = util.writeText(gt_Amesh, batch['A_path'][0], 100)
         print (batch['A_path'][0])
         print (code.shape)
-        np.savez( os.path.join('/data/home/uss00022/lelechen/data/Facescape/textured_meshes/',  batch['A_path'][0] + '.npz'), w=code.cpu().numpy())
+        np.savez( os.path.join('/data/home/uss00022/lelechen/data/Facescape/textured_meshes/',  batch['A_path'][0] + '.npz'), w=code.detach().cpu().numpy())
         
         visuals = OrderedDict([
             ('gt_Amesh', gt_Amesh),
