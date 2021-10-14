@@ -79,14 +79,15 @@ def main():
 
     checkpoint = torch.load(checkpoint_path)
     module.load_state_dict(pl2normal(checkpoint['state_dict']))
-
+    
+    dm = FacescapeDataModule(opt)
     dm.setup()
     testdata = dm.test_dataloader()
     opt.name = opt.name + '_test'
     visualizer = Visualizer(opt)
     l2loss = torch.nn.MSELoss()
+    module = module.to(device)
     for num,batch in enumerate(testdata):
-        module = module.to(device)
         rec_mesh_A, code = module( batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).to(device))
 
         tmp = batch['A_path'][0].split('/')
