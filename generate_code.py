@@ -93,7 +93,7 @@ def main():
             # save_p = os.path.join('/data/home/uss00022/lelechen/data/Facescape/textured_meshes/',  batch['A_path'][0] + '_mesh.npz')
             save_p = os.path.join('/mnt/Backup/lele/Facescape/meshcode/',  batch['A_path'][0] + '_mesh.npz')
             tmp =  batch['A_path'][0].split('/')
-            os.makedirs(  os.path.join('/mnt/Backup/lele/Facescape/meshcode/',  tmp[0], tmp[1]), exists_ok =True)
+            os.makedirs(  os.path.join('/mnt/Backup/lele/Facescape/meshcode/',  tmp[0], tmp[1]), exist_ok =True)
             print (save_p)
             np.savez( save_p, w=code.detach().cpu().numpy())
             
