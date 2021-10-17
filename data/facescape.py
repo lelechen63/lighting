@@ -600,10 +600,10 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
         if opt.isTrain:
 
             meshpkl = 'lists/mesh_train'
-            total_m  = '/data/home/uss00022/lelechen/data/Facescape/augmeshtrain'
+            total_m  = opt.dataroot + '/augmeshtrain'
         else:
             meshpkl = 'lists/mesh_test'
-            total_m  = '/data/home/uss00022/lelechen/data/Facescape/augmeshtest'
+            total_m  = opt.dataroot +  '/augmeshtest'
 
         if opt.debug:
             meshpkl +='_debug.pkl'
