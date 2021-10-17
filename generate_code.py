@@ -90,12 +90,12 @@ def main():
     with torch.no_grad():
         for num,batch in enumerate(testdata):
             rec_mesh_A, code = module( batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).to(device))
-            print (batch['A_path'][0], type(batch['A_path'][0]))
             # save_p = os.path.join('/data/home/uss00022/lelechen/data/Facescape/textured_meshes/',  batch['A_path'][0] + '_mesh.npz')
             save_p = os.path.join('/mnt/Backup/lele/Facescape/meshcode/',  batch['A_path'][0] + '_mesh.npz')
+            tmp =  batch['A_path'][0].split('/')
+            os.makedirs(  os.path.join('/mnt/Backup/lele/Facescape/meshcode/',  tmp[0], tmp[1]), exists_ok =True)
             print (save_p)
-            print(os.path.join('/mnt/Backup/lele/Facescape/meshcode/',  batch['A_path'][0].split('/'[0])))
-            # np.savez( save_p, w=code.detach().cpu().numpy())
+            np.savez( save_p, w=code.detach().cpu().numpy())
             
             # tmp = batch['A_path'][0].split('/')
             # gt_mesh = batch['Amesh'].data[0].cpu() * totalstdmesh + totalmeanmesh
@@ -127,8 +127,11 @@ def main():
             rec_mesh_A, code = module( batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).to(device))
             # save_p = os.path.join('/data/home/uss00022/lelechen/data/Facescape/textured_meshes/',  batch['A_path'][0] + '_mesh.npz')
             save_p = os.path.join('/mnt/Backup/lele/Facescape/meshcode/',  batch['A_path'][0] + '_mesh.npz')
-
+            tmp =  batch['A_path'][0].split('/')
+            os.makedirs(  os.path.join('/mnt/Backup/lele/Facescape/meshcode/',  tmp[0], tmp[1]), exists_ok =True)
+            print (save_p)
             np.savez( save_p, w=code.detach().cpu().numpy())
+            
             
             
             # tmp = batch['A_path'][0].split('/')
