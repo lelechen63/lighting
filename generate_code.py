@@ -94,7 +94,7 @@ def main():
             save_p = os.path.join('/mnt/Backup/lele/Facescape/meshcode/',  batch['A_path'][0] + '_mesh.npz')
             print (code.shape)
             print (save_p)
-            print(os.path.join('/mnt/Backup/lele/Facescape/meshcode/',  batch['A_path'][0].split('/'[0]))
+            print(os.path.join('/mnt/Backup/lele/Facescape/meshcode/',  batch['A_path'][0].split('/'[0])))
             # np.savez( save_p, w=code.detach().cpu().numpy())
             
             # tmp = batch['A_path'][0].split('/')
