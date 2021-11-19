@@ -2,7 +2,7 @@ import os
 import cv2
 root = '/data/home/uss00022/lelechen/github/lighting/checkpoints/gmesh_test/web/images'
 gt = []
-for i in os.listdir(''):
+for i in os.listdir(root):
     if 'gt' in i:
         gt.append(i)
 gt.sort()
