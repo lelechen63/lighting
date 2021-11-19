@@ -1,10 +1,28 @@
 import os
 
-path = '/data/home/uss00022/lelechen/data/Facescape/textured_meshes'
-for id in os.listdir(path):
-    c = path +'/' +  id
-    command = 'rm -rf ' + c + '/dpmap'
-    os.system(command)
+root = '/data/home/uss00022/lelechen/github/lighting/checkpoints/gmesh_test/web/images'
+gt = []
+for i in os.listdir(''):
+    if 'gt' in i:
+        gt.append(i)
+gt.sort()
+j = 0
+for i in gt:
+    gtp = root + '/' + i 
+    gti = cv2.imread(gtp)
+    recp = root + '/' + i.replace('gt','rec')
+    reci = cv2.imread(recp)
+    new  = np.concatenate((reci, gti), axis=1)
+    cv2.imwrite('/data/home/uss00022/lelechen/github/lighting/checkpoints/gmesh_test/tmp/%03d.png'%j, new)
+    j +=1
+
+
+
+# path = '/data/home/uss00022/lelechen/data/Facescape/textured_meshes'
+# for id in os.listdir(path):
+#     c = path +'/' +  id
+#     command = 'rm -rf ' + c + '/dpmap'
+#     os.system(command)
 # import numpy as np 
 # import cv2 
 # import torch 
