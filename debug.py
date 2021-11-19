@@ -1,22 +1,29 @@
 import os
 import cv2
 import numpy as np
-root = '/data/home/uss00022/lelechen/github/lighting/checkpoints/gmesh_test/web/images'
+import imageio
 
-gt = []
-for i in os.listdir(root):
-    if 'gt' in i:
-        gt.append(i)
-gt.sort()
-j = 0
-for i in gt:
-    gtp = root + '/' + i 
-    gti = cv2.imread(gtp)
-    recp = root + '/' + i.replace('gt','rec')
-    reci = cv2.imread(recp)
-    new  = np.concatenate((reci, gti), axis=1)
-    cv2.imwrite('/data/home/uss00022/lelechen/github/lighting/checkpoints/gmesh_test/tmp/%03d.png'%j, new)
-    j +=1
+root = '/data/home/uss00022/lelechen/github/lighting/checkpoints/gmesh_test/web/images'
+images = []
+for i in os.listdir('/data/home/uss00022/lelechen/github/lighting/checkpoints/gmesh_test/tmp'):
+    images.append(imageio.imread('/data/home/uss00022/lelechen/github/lighting/checkpoints/gmesh_test/tmp/' + i))
+    imageio.mimsave('/data/home/uss00022/lelechen/github/lighting/checkpoints/gmesh_test/tmp/movie.gif', images)
+
+
+# gt = []
+# for i in os.listdir(root):
+#     if 'gt' in i:
+#         gt.append(i)
+# gt.sort()
+# j = 0
+# for i in gt:
+#     gtp = root + '/' + i 
+#     gti = cv2.imread(gtp)
+#     recp = root + '/' + i.replace('gt','rec')
+#     reci = cv2.imread(recp)
+#     new  = np.concatenate((reci, gti), axis=1)
+#     cv2.imwrite('/data/home/uss00022/lelechen/github/lighting/checkpoints/gmesh_test/tmp/%03d.png'%j, new)
+#     j +=1
 
 
 
