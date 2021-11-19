@@ -1,6 +1,8 @@
 import os
 import cv2
+import numpy as np
 root = '/data/home/uss00022/lelechen/github/lighting/checkpoints/gmesh_test/web/images'
+
 gt = []
 for i in os.listdir(root):
     if 'gt' in i:
