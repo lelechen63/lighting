@@ -285,7 +285,7 @@ else:
             gt_mesh = batch['Amesh'].data[0].cpu() * totalstdmesh + totalmeanmesh
             rec_Amesh = rec_mesh_A.data[0].cpu().view(-1) * totalstdmesh + totalmeanmesh 
             
-            loss.append( ((rec_mesh_A -  gt_mesh )** 2).mean()
+            loss.append( ((rec_mesh_A -  gt_mesh )** 2).mean())
             print (loss)
             
             gt_mesh = gt_mesh.float()
