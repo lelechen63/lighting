@@ -588,12 +588,6 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
         ### input A (texture and mesh)   
         self.dir_A = os.path.join(opt.dataroot, "augmented_meshes")
 
-        ### input B (real images)
-        self.dir_B = os.path.join(opt.dataroot, "ffhq_aligned_img")
-
-        ### input C (eye parsing images)
-        self.dir_C = os.path.join(opt.dataroot, "fsmview_landmarks")
-
         ### json 
         self.dir_json = os.path.join(opt.dataroot, "fsmview_images")
 

@@ -278,13 +278,12 @@ else:
             module = module.to(device)
             rec_mesh_A, code = module( batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).to(device))
 
-            
-
 
             tmp = batch['A_path'][0].split('/')
             gt_mesh = batch['Amesh'].data[0].cpu() * totalstdmesh + totalmeanmesh
             rec_Amesh = rec_mesh_A.data[0].cpu().view(-1) * totalstdmesh + totalmeanmesh 
             
+            print (rec_Amesh_A.shape, gt_mesh.shape)
             loss.append( ((rec_mesh_A -  gt_mesh )** 2).mean())
             print (loss)
             
