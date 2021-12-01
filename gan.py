@@ -273,8 +273,8 @@ else:
         # l2loss = torch.nn.MSELoss()
         loss = []
         for num,batch in enumerate(testdata):
-            # if num == 3:
-            #     break
+            if num == 100:
+                break
             module = module.to(device)
             rec_mesh_A, code = module( batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).to(device))
 
@@ -285,7 +285,6 @@ else:
             
             print (rec_Amesh.shape, gt_mesh.shape)
             loss.append( ((rec_Amesh.view(-1) -  gt_mesh )** 2).mean())
-            print (loss)
             
             # gt_mesh = gt_mesh.float()
             # rec_Amesh = rec_Amesh.float()
