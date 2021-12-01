@@ -273,8 +273,8 @@ else:
         # l2loss = torch.nn.MSELoss()
         loss = []
         for num,batch in enumerate(testdata):
-            if num == 3:
-                break
+            # if num == 3:
+            #     break
             module = module.to(device)
             rec_mesh_A, code = module( batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).to(device))
 
@@ -287,20 +287,20 @@ else:
             loss.append( ((rec_Amesh.view(-1) -  gt_mesh )** 2).mean())
             print (loss)
             
-            gt_mesh = gt_mesh.float()
-            rec_Amesh = rec_Amesh.float()
-            gt_Amesh = meshrender( opt.dataroot, int(tmp[0]), int(tmp[-1].split('_')[0]),gt_mesh )
-            rec_Amesh = meshrender(opt.dataroot,int(tmp[0]), int(tmp[-1].split('_')[0]), rec_Amesh )
+            # gt_mesh = gt_mesh.float()
+            # rec_Amesh = rec_Amesh.float()
+            # gt_Amesh = meshrender( opt.dataroot, int(tmp[0]), int(tmp[-1].split('_')[0]),gt_mesh )
+            # rec_Amesh = meshrender(opt.dataroot,int(tmp[0]), int(tmp[-1].split('_')[0]), rec_Amesh )
 
 
-            gt_Amesh = np.ascontiguousarray(gt_Amesh, dtype=np.uint8)
-            gt_Amesh = util.writeText(gt_Amesh, batch['A_path'][0], 100)
+            # gt_Amesh = np.ascontiguousarray(gt_Amesh, dtype=np.uint8)
+            # gt_Amesh = util.writeText(gt_Amesh, batch['A_path'][0], 100)
 
-            visuals = OrderedDict([
-                ('gt_Amesh', gt_Amesh),
-                ('rec_Amesh', rec_Amesh),
+            # visuals = OrderedDict([
+            #     ('gt_Amesh', gt_Amesh),
+            #     ('rec_Amesh', rec_Amesh),
             
-                ])
-            visualizer.display_current_results(visuals, num, 1000000)
+            #     ])
+            # visualizer.display_current_results(visuals, num, 1000000)
     print (sum(loss)/len(loss))
 print ('++++++++++++ SUCCESS ++++++++++++++++!')
