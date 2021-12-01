@@ -270,19 +270,29 @@ else:
         testdata = dm.test_dataloader()
         opt.name = opt.name + '_test'
         visualizer = Visualizer(opt)
-        l2loss = torch.nn.MSELoss()
+        # l2loss = torch.nn.MSELoss()
+        loss = []
         for num,batch in enumerate(testdata):
+            if num == 3:
+                break
             module = module.to(device)
             rec_mesh_A, code = module( batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).to(device))
+
+            
 
 
             tmp = batch['A_path'][0].split('/')
             gt_mesh = batch['Amesh'].data[0].cpu() * totalstdmesh + totalmeanmesh
             rec_Amesh = rec_mesh_A.data[0].cpu().view(-1) * totalstdmesh + totalmeanmesh 
+            
+            loss.append( ((rec_mesh_A -  gt_mesh )** 2).mean()
+            print (loss)
+            
             gt_mesh = gt_mesh.float()
             rec_Amesh = rec_Amesh.float()
             gt_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gt_mesh )
             rec_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), rec_Amesh )
+
 
             gt_Amesh = np.ascontiguousarray(gt_Amesh, dtype=np.uint8)
             gt_Amesh = util.writeText(gt_Amesh, batch['A_path'][0], 100)
@@ -293,5 +303,5 @@ else:
             
                 ])
             visualizer.display_current_results(visuals, num, 1000000)
-    
+    print (loss.mean())
 print ('++++++++++++ SUCCESS ++++++++++++++++!')
