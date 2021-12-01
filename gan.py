@@ -289,8 +289,8 @@ else:
             
             gt_mesh = gt_mesh.float()
             rec_Amesh = rec_Amesh.float()
-            gt_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]),gt_mesh )
-            rec_Amesh = meshrender(int(tmp[0]), int(tmp[-1].split('_')[0]), rec_Amesh )
+            gt_Amesh = meshrender( opt.dataroot, int(tmp[0]), int(tmp[-1].split('_')[0]),gt_mesh )
+            rec_Amesh = meshrender(opt.dataroot,int(tmp[0]), int(tmp[-1].split('_')[0]), rec_Amesh )
 
 
             gt_Amesh = np.ascontiguousarray(gt_Amesh, dtype=np.uint8)
