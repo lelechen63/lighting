@@ -302,5 +302,5 @@ else:
             
                 ])
             visualizer.display_current_results(visuals, num, 1000000)
-    print (loss.mean())
+    print (sum(loss)/len(loss))
 print ('++++++++++++ SUCCESS ++++++++++++++++!')
