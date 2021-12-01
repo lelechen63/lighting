@@ -52,7 +52,6 @@ def shift(image, vector):
     shifted = warp(image, transform, mode='wrap', preserve_range=True)
     return shifted.astype(image.dtype)
 
-
 def meshrender(data_root, id_idx, exp_idx, vertices, cam_idx=1):
     """
     # id_idx: int
