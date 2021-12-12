@@ -24,7 +24,7 @@ class BaseOptions():
         self.parser.add_argument('--batchSize', type=int, default=1 , help='input batch size')
 
         # for setting inputs
-        self.parser.add_argument('--dataroot', type=str, default='/data/home/uss00022/lelechen/data/Facescape/') 
+        self.parser.add_argument('--dataroot', type=str, default='/nfs/STG/CodecAvatar/lelechen/Facescape/') 
         self.parser.add_argument('--nThreads', default=24, type=int, help='# threads for loading data') 
         self.parser.add_argument('--isTrain', action='store_false', help='isTrain is for testing')                
         self.parser.add_argument('--meannorm', action='store_true', help='weight for feature matching loss')          
