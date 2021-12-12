@@ -137,8 +137,8 @@ class MeshEncodeDecodeModule(pl.LightningModule):
         if self.current_epoch % 5 == 0:
             # print ('!!!!!save model')
             # self.trainer.save_checkpoint( os.path.join( self.ckpt_path, '%05d.ckpt'%self.current_epoch) )
-            self.Encoder.save_checkpoint( os.path.join( self.ckpt_path, 'encoder.ckpt') )
-            self.Decoder.save_checkpoint( os.path.join( self.ckpt_path, 'decoder.ckpt') )
+            torch.save(self.Encoder, os.path.join( self.ckpt_path, 'encoder.ckpt'))
+            torch.save(self.Decoder, os.path.join( self.ckpt_path, 'decoder.ckpt'))
 
 
 class Img2MeshCodeModule(pl.LightningModule):
@@ -237,3 +237,4 @@ class Img2MeshCodeModule(pl.LightningModule):
             # print ('!!!!!save model')
             # self.trainer.save_checkpoint( os.path.join( self.ckpt_path, '%05d.ckpt'%self.current_epoch) )
             self.trainer.save_checkpoint( os.path.join( self.ckpt_path, 'latest.ckpt') )
+            
