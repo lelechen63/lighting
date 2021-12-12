@@ -77,29 +77,29 @@ else:
     if opt.name == 'MeshEncoderDecoder':
         
         from model.img2codeModel import MeshEncodeDecodeModule as module
-        homepath = './predef'
-        device = torch.device('cuda', 0)
-        transform_fp = osp.join(homepath, 'transform.pkl')
-        with open(transform_fp, 'rb') as f:
-            tmp = pickle.load(f, encoding='latin1')
+        # homepath = './predef'
+        # device = torch.device('cuda', 0)
+        # transform_fp = osp.join(homepath, 'transform.pkl')
+        # with open(transform_fp, 'rb') as f:
+        #     tmp = pickle.load(f, encoding='latin1')
 
-        edge_index_list = [util.to_edge_index(adj).to(device) for adj in tmp['adj']]
+        # edge_index_list = [util.to_edge_index(adj).to(device) for adj in tmp['adj']]
 
-        down_transform_list = [
-            util.to_sparse(down_transform).to(device)
-            for down_transform in tmp['down_transform']
-        ]
-        up_transform_list = [
-            util.to_sparse(up_transform).to(device)
-            for up_transform in tmp['up_transform']
-        ]
-        module =  module(3,
-                [16, 16, 16, 32],
-                256,
-                edge_index_list,
-                down_transform_list,
-                up_transform_list,
-                K=6)
+        # down_transform_list = [
+        #     util.to_sparse(down_transform).to(device)
+        #     for down_transform in tmp['down_transform']
+        # ]
+        # up_transform_list = [
+        #     util.to_sparse(up_transform).to(device)
+        #     for up_transform in tmp['up_transform']
+        # ]
+        # module =  module(3,
+        #         [16, 16, 16, 32],
+        #         256,
+        #         edge_index_list,
+        #         down_transform_list,
+        #         up_transform_list,
+        #         K=6)
 
         module.Encoder.load('./checkpoints/MeshEncoderDecoder/encoder.ckpt')
         module.Decoder.load('./checkpoints/MeshEncoderDecoder/decoder.ckpt')
