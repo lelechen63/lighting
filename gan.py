@@ -238,8 +238,6 @@ else:
         checkpoint_path = './checkpoints/gmesh/latest.ckpt'
         homepath = './predef'
         device = torch.device('cuda', 0)
-
-
         transform_fp = osp.join(homepath, 'transform.pkl')
         with open(transform_fp, 'rb') as f:
             tmp = pickle.load(f, encoding='latin1')

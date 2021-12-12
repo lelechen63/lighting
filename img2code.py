@@ -74,6 +74,66 @@ if opt.isTrain:
 
 else:
     print ('!!!!!!' + opt.name +'!!!!!!!!')
+    if opt.name == 'MeshEncoderDecoder':
+        
+        from model.img2codeModel import MeshEncodeDecodeModule as module
+        homepath = './predef'
+        device = torch.device('cuda', 0)
+        transform_fp = osp.join(homepath, 'transform.pkl')
+        with open(transform_fp, 'rb') as f:
+            tmp = pickle.load(f, encoding='latin1')
+
+        edge_index_list = [util.to_edge_index(adj).to(device) for adj in tmp['adj']]
+
+        down_transform_list = [
+            util.to_sparse(down_transform).to(device)
+            for down_transform in tmp['down_transform']
+        ]
+        up_transform_list = [
+            util.to_sparse(up_transform).to(device)
+            for up_transform in tmp['up_transform']
+        ]
+        module =  module(3,
+                [16, 16, 16, 32],
+                256,
+                edge_index_list,
+                down_transform_list,
+                up_transform_list,
+                K=6)
+
+        module.Encoder.load('./checkpoints/MeshEncoderDecoder/encoder.ckpt')
+        module.Decoder.load('./checkpoints/MeshEncoderDecoder/decoder.ckpt')
+
+        dm.setup()
+        testdata = dm.test_dataloader()
+        opt.name = opt.name + '_test'
+        visualizer = Visualizer(opt)
+        loss = []
+        for num,batch in enumerate(testdata):
+            if num == 100:
+                break
+            module = module.to(device)
+            rec_mesh_A, code = module( batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).to(device))
+            tmp = batch['A_path'][0].split('/')
+            gt_mesh = batch['Amesh'].data[0].cpu() * totalstdmesh + totalmeanmesh
+            rec_Amesh = rec_mesh_A.data[0].cpu().view(-1) * totalstdmesh + totalmeanmesh 
+            
+            loss.append( ((rec_Amesh.view(-1) -  gt_mesh )** 2).mean())
+            
+            gt_mesh = gt_mesh.float()
+            rec_Amesh = rec_Amesh.float()
+            gt_Amesh = meshrender( opt.dataroot, int(tmp[0]), int(tmp[-1].split('_')[0]),gt_mesh )
+            rec_Amesh = meshrender(opt.dataroot,int(tmp[0]), int(tmp[-1].split('_')[0]), rec_Amesh )
+            gt_Amesh = np.ascontiguousarray(gt_Amesh, dtype=np.uint8)
+            gt_Amesh = util.writeText(gt_Amesh, batch['A_path'][0], 100)
+            visuals = OrderedDict([
+                ('gt_Amesh', gt_Amesh),
+                ('rec_Amesh', rec_Amesh),
+            
+                ])
+            visualizer.display_current_results(visuals, num, 1000000)
+        print (sum(loss)/len(loss))
+
     if opt.name == 'img2meshcode' :
         checkpoint_path = './checkpoints/img2meshcode/latest.ckpt'
         
