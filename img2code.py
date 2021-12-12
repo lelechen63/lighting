@@ -8,12 +8,6 @@ import torch.nn as nn
 import random
 from os import path as osp
 import pickle
-# import torch.nn.functional as F
-# import torchvision
-# import torchvision.transforms as transforms
-# from torch.utils.data import DataLoader, random_split
-# from torchvision.datasets import MNIST
-
 import pytorch_lightning as pl
 from data.data import FacescapeDataModule
 from options.img2code_train_options import TrainOptions
@@ -39,7 +33,6 @@ def pl2normal(checkpoint):
         name = k[10:]
         new_state_dict[name] = v
     return new_state_dict
-
 
 opt = TrainOptions().parse()
 if opt.debug:
