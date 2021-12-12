@@ -82,7 +82,7 @@ else:
         
         # from model.img2codeModel import MeshEncodeDecodeModule as module
         # homepath = './predef'
-        # device = torch.device('cuda', 0)
+        device = torch.device('cuda', 0)
 
         # template_fp = osp.join(homepath, 'meshmean.obj')
         # transform_fp = osp.join(homepath, 'transform.pkl')
