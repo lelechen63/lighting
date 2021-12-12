@@ -613,12 +613,10 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
         
         ids = open(os.path.join(opt.dataroot, "lists/ids.pkl"), "rb")
         self.id_set = set(pickle.load(ids))
-        # self.meanmesh = get_meanmesh()
         print ('===========================')
         print ('id_set:',self.id_set)
         print('+++++++++++++++++++++++++++')
        
-
         self.totalmeanmesh = np.load( "./predef/meshmean.npy" )
         self.totalstdmesh = np.load( "./predef/meshstd.npy" )
        
@@ -630,7 +628,6 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
             
             tmp = data.split('/')
             self.total_tex[data] = []
-            # self.total_tex[data].append(self.total_m[cc])
             A_vertices = self.total_m[cc]  - self.totalmeanmesh
             self.total_tex[data].append(A_vertices  / self.totalstdmesh)
             cc += 1
@@ -654,10 +651,8 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
         t = time.time()
         tmp = self.data_list[index].split('/')
         A_id = int(tmp[0])
-        A_exp = int(tmp[-1].split('_')[0])
-      
-        A_vertices = self.total_tex[self.data_list[index]][0] 
-
+        A_exp = int(tmp[-1].split('_')[0])      
+        A_vertices = self.total_tex[self.data_list[index]][0]
         input_dict = { 'Amesh': torch.FloatTensor(A_vertices),
                 'A_path': self.data_list[index], 
                 'map_type':0, 'Aid': int(A_id) - 1, 'Aexp': int(A_exp) -1}

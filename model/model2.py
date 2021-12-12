@@ -546,7 +546,6 @@ class DisGraphConvMeshModule(pl.LightningModule):
         return self.generator(A_mesh, B_mesh)
     
     def training_step(self, batch, batch_idx):
-        # self.batch = batch
         # train generator
         # generate images
         rec_mesh_A, rec_mesh_B, rec_mesh_AB, rec_mesh_BA, Aexp,Aid, Bexp, Bid = \
@@ -611,147 +610,7 @@ class DisGraphConvMeshModule(pl.LightningModule):
             # self.trainer.save_checkpoint( os.path.join( self.ckpt_path, '%05d.ckpt'%self.current_epoch) )
             self.trainer.save_checkpoint( os.path.join( self.ckpt_path, 'latest.ckpt') )
 
-class DisGraphConvMeshModule2(pl.LightningModule):
-    def __init__(self, opt ):
-        super().__init__()
-        self.save_hyperparameters()
-        self.opt = opt
-        input_nc = 3
-        homepath = './predef'
-        device = torch.device('cuda', 0)
 
-        template_fp = osp.join(homepath, 'meshmean.obj')
-
-        transform_fp = osp.join(homepath, 'transform.pkl')
-        if not osp.exists(transform_fp):
-            print('Generating transform matrices...')
-            mesh = Mesh(filename=template_fp)
-            ds_factors = [4, 4, 4, 4]
-            _, A, D, U, F = mesh_sampling.generate_transform_matrices(mesh, ds_factors)
-            tmp = {'face': F, 'adj': A, 'down_transform': D, 'up_transform': U}
-
-            with open(transform_fp, 'wb') as fp:
-                pickle.dump(tmp, fp)
-            print('Done!')
-            print('Transform matrices are saved in \'{}\''.format(transform_fp))
-        else:
-            with open(transform_fp, 'rb') as f:
-                tmp = pickle.load(f, encoding='latin1')
-
-        edge_index_list = [util.to_edge_index(adj).to(device) for adj in tmp['adj']]
-
-        down_transform_list = [
-            util.to_sparse(down_transform).to(device)
-            for down_transform in tmp['down_transform']
-        ]
-        up_transform_list = [
-            util.to_sparse(up_transform).to(device)
-            for up_transform in tmp['up_transform']
-        ]
-
-        self.generator = DisAE2(3,
-                [16, 16, 16, 32],
-                256,
-                edge_index_list,
-                down_transform_list,
-                up_transform_list,
-                K=6)
-        
-        land_tex = './predef/landmark_indices.txt'
-        land_tex = open(land_tex, 'r')
-        Lines = land_tex.readlines()
-        self.land_inx = []
-        for line in Lines:
-            self.land_inx.append(int(line))
-        print(self.land_inx)
-        self.l1loss = torch.nn.L1Loss()
-        self.l2loss = torch.nn.MSELoss()
-        if not opt.no_cls_loss:
-            self.CLSloss = lossNet.CLSLoss(opt)
-
-        self.visualizer = Visualizer(opt)
-        self.ckpt_path = os.path.join(opt.checkpoints_dir, opt.name)
-    
-
-    def forward(self, A_mesh):
-        
-        return self.generator(A_mesh)
-    
-    def training_step(self, batch, batch_idx):
-        # self.batch = batch
-        # train generator
-        # generate images
-        rec_mesh_A, idA, Aexpcode, Aidcode = \
-        self(batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3)) 
-        map_type = batch['map_type']
-
-        loss_code = 0
-
-        # regularization
-        loss_code += ( Aexpcode ** 2  ).mean() +(Aidcode ** 2).mean()
-        
-   
-        # mesh loss
-        loss_mesh = 0
-        loss_mesh += self.l2loss(rec_mesh_A, batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).detach() )
-        
-        loss_mesh += self.l2loss(idA, batch['Aidmesh'].view(batch['Aidmesh'].shape[0], -1, 3).detach() )
-
-        loss = loss_mesh + loss_code* 0.1 
-        tqdm_dict = {'loss_mesh': loss_mesh, "loss_code" :loss_code }
-
-        output = OrderedDict({
-            'loss': loss,
-            'progress_bar': tqdm_dict,
-            'log': tqdm_dict
-        })
-
-        errors = {k: v.data.item() if not isinstance(v, int) else v for k, v in tqdm_dict.items()}            
-        self.visualizer.print_current_errors(self.current_epoch, batch_idx, errors, 0)
-        self.visualizer.plot_current_errors(errors, batch_idx)
-        return output
-          
-    def configure_optimizers(self):
-        lr = self.opt.lr
-        opt_g = torch.optim.Adam(self.generator.parameters(), lr=lr, betas=(self.opt.beta1, 0.999))
-        # return [opt_g]
-        def lr_foo(epoch):
-            # if epoch < 10:
-            #     lr_scale = 0.8 ** (10 - epoch)
-            # else:
-            lr_scale = 0.95 ** int(epoch/10)
-            if lr_scale < 0.08:
-                lr_scale = 0.08
-            return lr_scale
-        scheduler = torch.optim.lr_scheduler.LambdaLR(opt_g, lr_lambda=lr_foo )
-        return [opt_g], [scheduler]
-    
-
-
-    def on_epoch_end(self):
-        if self.current_epoch % 5 == 0:
-            self.trainer.save_checkpoint( os.path.join( self.ckpt_path, 'latest.ckpt') )
-  
-
-# class TexGenerator(nn.Module):
-#     def __init__(self, tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
-#                 ngf=64, n_downsampling=5, n_blocks=4, norm_layer='batch', \
-#                 padding_type='reflect'):
-#         super().__init__()
-#         norm_layer = get_norm_layer(norm_type=norm_layer)  
-
-#         self.texEnc = TexEncoder2(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
-#                 ngf, n_downsampling, n_blocks, norm_layer, padding_type)
-
-#         self.texDec = TexDecoder2(tex_shape, linearity, input_nc, code_n, encoder_fc_n, \
-#                 ngf, n_downsampling, n_blocks, norm_layer, padding_type)
-#     def forward(self, A_tex ):
-        
-#         tex_code = self.texEnc(A_tex)
-
-#         # reconstruction
-#         rec_tex_A = self.texDec(tex_code)
-#         return rec_tex_A
 
 
 class TexGenerator(nn.Module):
@@ -795,37 +654,13 @@ class TexGenerator(nn.Module):
         self.encoders = nn.ModuleList(self.encoders)
         self.decoders = nn.ModuleList(self.decoders)
     def forward(self, x):
-        # print (type(x), '+++++')
-        # for encoder in self.encoders:
-        #     x = encoder(x)
+
         x = self.encoders(x)
         x = self.decoders(x)
-        # decoders = self.decoders[:-1]
-
-        # for decoder in decoders:
-        #     x = decoder(x)
-        # x = self.decoders[-1](x)
+      
         x = self.final_conv(x)
         return self.tanh(x)
-    # def forward(self, x):
-    #     skips_cons = []
-    #     for encoder in self.encoders:
-    #         x = encoder(x)
 
-    #         skips_cons.append(x)
-
-    #     skips_cons = list(reversed(skips_cons[:-1]))
-    #     decoders = self.decoders[:-1]
-
-    #     for decoder, skip in zip(decoders, skips_cons):
-    #         x = decoder(x)
-    #         # print(x.shape, skip.shape)
-    #         x = torch.cat((x, skip), axis=1)
-
-    #     x = self.decoders[-1](x)
-    #     # print(x.shape)
-    #     x = self.final_conv(x)
-    #     return self.tanh(x)
 
 
 class PatchGAN(nn.Module):
@@ -1040,9 +875,6 @@ class TexModule(pl.LightningModule):
             rec_tex_A = \
             self(batch['Atex'])
 
-            
-            # Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
-           
             Atex = batch['Atex'].data[0].cpu()  # * self.stdtex + self.meantex 
             Atex = util.tensor2im(Atex  , normalize = True)
             Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
