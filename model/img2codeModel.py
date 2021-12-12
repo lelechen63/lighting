@@ -123,7 +123,7 @@ class MeshEncodeDecodeModule(pl.LightningModule):
           
     def configure_optimizers(self):
         lr = self.opt.lr
-        opt_g = torch.optim.Adam((list(self.Encoder.parameters()) + list(self.Decoder.parameters()), lr=lr, betas=(self.opt.beta1, 0.999))
+        opt_g = torch.optim.Adam((list(self.Encoder.parameters()) + list(self.Decoder.parameters())), lr=lr, betas=(self.opt.beta1, 0.999))
         def lr_foo(epoch):
             lr_scale = 0.95 ** int(epoch/10)
             if lr_scale < 0.08:
