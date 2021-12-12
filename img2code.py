@@ -35,6 +35,7 @@ def pl2normal(checkpoint):
     return new_state_dict
 
 opt = TrainOptions().parse()
+print ('+++++++++', opt.dataroot)
 if opt.debug:
     opt.nThreads = 1
 dm = FacescapeDataModule(opt)
