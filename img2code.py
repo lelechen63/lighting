@@ -49,7 +49,7 @@ if  opt.name == 'img2meshcode':
     from model.img2codeModel import Image2MeshcodeModule as module
     opt.datasetname = 'XXXXXX'
 elif opt.name == 'MeshEncoderDecoder':
-    from model.Image2Code import MeshEncodeDecodeModule as module
+    from model.img2codeModel import MeshEncodeDecodeModule as module
     opt.datasetname = 'fs_mesh'
 
 totalmeanmesh = torch.FloatTensor( np.load( "./predef/meanmesh.npy" ) )#.view(-1,3) 
