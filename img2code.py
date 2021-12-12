@@ -128,8 +128,8 @@ else:
         #         up_transform_list,
         #         K=6)
 
-        Encoder = torch.load('./checkpoints/MeshEncoderDecoder/encoder.ckpt')
-        Decoder = torch.load('./checkpoints/MeshEncoderDecoder/decoder.ckpt')
+        Encoder = torch.load('./checkpoints/MeshEncoderDecoder/encoder.pth')
+        Decoder = torch.load('./checkpoints/MeshEncoderDecoder/decoder.pth')
 
         dm.setup()
         testdata = dm.test_dataloader()
