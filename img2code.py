@@ -46,7 +46,7 @@ if opt.debug:
     opt.nThreads = 1
 dm = FacescapeDataModule(opt)
 if  opt.name == 'img2meshcode':
-    from model.Image2Code import Image2MeshcodeModule as module
+    from model.img2codeModel import Image2MeshcodeModule as module
     opt.datasetname = 'XXXXXX'
 elif opt.name == 'MeshEncoderDecoder':
     from model.Image2Code import MeshEncodeDecodeModule as module
