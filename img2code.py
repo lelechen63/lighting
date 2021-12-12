@@ -17,8 +17,11 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 import util.util as util
 import os
 from util.visualizer import Visualizer
-from util.render_class import meshrender
 
+from util.render_class import meshrender
+import numpy as np
+from model.meshnetwork import *
+from util import mesh_sampling
 
 def pl2normal(checkpoint):
     state_dict = checkpoint
@@ -36,6 +39,7 @@ def pl2normal(checkpoint):
 
 opt = TrainOptions().parse()
 print ('+++++++++', opt.dataroot)
+
 if opt.debug:
     opt.nThreads = 1
 dm = FacescapeDataModule(opt)
@@ -77,43 +81,69 @@ else:
     if opt.name == 'MeshEncoderDecoder':
         
         from model.img2codeModel import MeshEncodeDecodeModule as module
-        # homepath = './predef'
-        # device = torch.device('cuda', 0)
-        # transform_fp = osp.join(homepath, 'transform.pkl')
-        # with open(transform_fp, 'rb') as f:
-        #     tmp = pickle.load(f, encoding='latin1')
+        homepath = './predef'
+        device = torch.device('cuda', 0)
 
-        # edge_index_list = [util.to_edge_index(adj).to(device) for adj in tmp['adj']]
+        template_fp = osp.join(homepath, 'meshmean.obj')
+        transform_fp = osp.join(homepath, 'transform.pkl')
+        if not osp.exists(transform_fp):
+            print('Generating transform matrices...')
+            mesh = Mesh(filename=template_fp)
+            ds_factors = [4, 4, 4, 4]
+            _, A, D, U, F = mesh_sampling.generate_transform_matrices(mesh, ds_factors)
+            tmp = {'face': F, 'adj': A, 'down_transform': D, 'up_transform': U}
 
-        # down_transform_list = [
-        #     util.to_sparse(down_transform).to(device)
-        #     for down_transform in tmp['down_transform']
-        # ]
-        # up_transform_list = [
-        #     util.to_sparse(up_transform).to(device)
-        #     for up_transform in tmp['up_transform']
-        # ]
-        # module =  module(3,
-        #         [16, 16, 16, 32],
-        #         256,
-        #         edge_index_list,
-        #         down_transform_list,
-        #         up_transform_list,
-        #         K=6)
+            with open(transform_fp, 'wb') as fp:
+                pickle.dump(tmp, fp)
+            print('Done!')
+            print('Transform matrices are saved in \'{}\''.format(transform_fp))
+        else:
+            with open(transform_fp, 'rb') as f:
+                tmp = pickle.load(f, encoding='latin1')
 
-        module.Encoder.load('./checkpoints/MeshEncoderDecoder/encoder.ckpt')
-        module.Decoder.load('./checkpoints/MeshEncoderDecoder/decoder.ckpt')
+        edge_index_list = [util.to_edge_index(adj).to(device) for adj in tmp['adj']]
+
+        down_transform_list = [
+            util.to_sparse(down_transform).to(device)
+            for down_transform in tmp['down_transform']
+        ]
+        up_transform_list = [
+            util.to_sparse(up_transform).to(device)
+            for up_transform in tmp['up_transform']
+        ]
+
+        Encoder = MeshEncoder(3,
+                [16, 16, 16, 32],
+                256,
+                edge_index_list,
+                down_transform_list,
+                up_transform_list,
+                K=6)
+
+        Decoder = MeshDecoder(3,
+                [16, 16, 16, 32],
+                256,
+                edge_index_list,
+                down_transform_list,
+                up_transform_list,
+                K=6)
+
+        Encoder.load('./checkpoints/MeshEncoderDecoder/encoder.ckpt')
+        Decoder.load('./checkpoints/MeshEncoderDecoder/decoder.ckpt')
 
         dm.setup()
         testdata = dm.test_dataloader()
         opt.name = opt.name + '_test'
         visualizer = Visualizer(opt)
         loss = []
+        Encoder = Encoder.to(device)
+        Decoder = Decoder.to(device)
         for num,batch in enumerate(testdata):
             if num == 100:
                 break
-            module = module.to(device)
-            rec_mesh_A, code = module( batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).to(device))
+            
+            code = Encoder( batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).to(device))
+            rec_mesh_A = Decoder(code)
             tmp = batch['A_path'][0].split('/')
             gt_mesh = batch['Amesh'].data[0].cpu() * totalstdmesh + totalmeanmesh
             rec_Amesh = rec_mesh_A.data[0].cpu().view(-1) * totalstdmesh + totalmeanmesh 

@@ -17,12 +17,13 @@ from util.render_class import meshrender
 import numpy as np
 from model.meshnetwork import *
 from util import mesh_sampling
-import pickle
+
 from model.conv import ChebConv
 from .inits import reset
 from torch_scatter import scatter_add
 from PIL import Image
 import cv2
+import pickle
 
 def get_norm_layer(norm_type='instance'):
     if norm_type == 'batch':
