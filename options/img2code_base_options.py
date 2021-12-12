@@ -19,6 +19,8 @@ class BaseOptions():
         self.parser.add_argument('--verbose', action='store_true', default=False, help='toggles verbose')
         self.parser.add_argument('--fp16', action='store_true', default=False, help='train with AMP')
         self.parser.add_argument('--local_rank', type=int, default=0, help='local rank for distributed training')
+        self.parser.add_argument('--tf_log', action='store_true', help='if specified, use tensorboard logging. Requires tensorflow installed')
+
 
         # input/output sizes       
         self.parser.add_argument('--batchSize', type=int, default=1 , help='input batch size')
