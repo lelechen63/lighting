@@ -443,8 +443,7 @@ def get_code( tt = 'train'):
     _file = open(os.path.join(dataroot, meshpkl), "rb")
     data_list = pickle.load(_file)
     _file.close()
-    # print (data_list)
-    for item in tqdm(data_list):
+     for item in tqdm(data_list):
         print (item)
         expid = int(item.split('/')[-1].split('_')[0])
         mcode_p = os.path.join( dataroot, 'meshcode', item + '_mesh.npy' ) # mesh code path
@@ -454,8 +453,19 @@ def get_code( tt = 'train'):
             continue
         print (mcode_p)
         print (tcode_p)
+        if not os.path.exists(tcode_p):
+            continue
 
-        break
+        texcode = np.load(tcode_p)['w']
+        print (texcode.shape)
+        for r in range(13):
+            if texcode[0,r] != texcode[0,r + 1]:
+                print (item)
+            else:
+                continue
+        
+
+        # break
 
 
 

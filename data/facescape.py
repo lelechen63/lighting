@@ -621,27 +621,27 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
         self.total_m = np.load(total_m)
         bk = get_blacklist()
         cc = 0
-        self.total_tex = {}
+        self.total_mesh = {}
         for data in tqdm(self.data_list):
             
             tmp = data.split('/')
-            self.total_tex[data] = []
+            self.total_mesh[data] = []
             A_vertices = self.total_m[cc]  - self.totalmeanmesh
-            self.total_tex[data].append(A_vertices  / self.totalstdmesh)
+            self.total_mesh[data].append(A_vertices  / self.totalstdmesh)
             cc += 1
             if opt.debug:
-                if len(self.total_tex) == 13:
+                if len(self.total_mesh) == 13:
                     break
 
         # remove blacklisted item
         for element in bk:
             try:
-                del self.total_tex[element]
+                del self.total_mesh[element]
                 self.data_list.remove(element)
             except:
                 print(element)
                 
-        print ('******************', len(self.data_list), len(self.total_tex))
+        print ('******************', len(self.data_list), len(self.total_mesh))
         # free the memory
         self.total_t = []
         self.total_m = []
@@ -650,7 +650,7 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
         tmp = self.data_list[index].split('/')
         A_id = int(tmp[0])
         A_exp = int(tmp[-1].split('_')[0])      
-        A_vertices = self.total_tex[self.data_list[index]][0]
+        A_vertices = self.total_mesh[self.data_list[index]][0]
         input_dict = { 'Amesh': torch.FloatTensor(A_vertices),
                 'A_path': self.data_list[index], 
                 'map_type':0, 'Aid': int(A_id) - 1, 'Aexp': int(A_exp) -1}
@@ -658,7 +658,7 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
         return input_dict
 
     def __len__(self):
-        return len(self.total_tex) // self.opt.batchSize * self.opt.batchSize
+        return len(self.total_mesh) // self.opt.batchSize * self.opt.batchSize
 
     def name(self):
         return 'FacescapeMeshDataset'
@@ -668,9 +668,9 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
     def __init__(self, opt):
         self.opt = opt
         print (self.opt.dataroot, '!!!!!!!!!!!!!')
+        
         ### input A (texture and mesh)   
         self.dir_A = os.path.join(opt.dataroot, "augmented_meshes")
-
         self.dir_B = os.path.join(opt.dataroot, "ffhq_aligned_img")
 
         ### json 
@@ -691,7 +691,7 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
             total_m += '.npy'
             
         _file = open(os.path.join(opt.dataroot, meshpkl), "rb")
-        self.data_list = pickle.load(_file)#[:1]
+        self.data_list = pickle.load(_file)
         _file.close()
         
         ids = open(os.path.join(opt.dataroot, "lists/ids.pkl"), "rb")
@@ -708,7 +708,6 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
         cc = 0
         self.total_mesh = {}
         for data in tqdm(self.data_list):
-            
             tmp = data.split('/')
             self.total_mesh[data] = []
             A_vertices = self.total_m[cc]  - self.totalmeanmesh
