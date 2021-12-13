@@ -668,7 +668,7 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
         self.opt = opt
         print (self.opt.dataroot, '!!!!!!!!!!!!!')
         
-        ### input A (texture and mesh)   
+        ### input A: texture, mesh, and texture code
         self.dir_A = os.path.join(opt.dataroot, "textured_meshes")
 
         # dir B: ffhq aligned image
