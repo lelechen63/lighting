@@ -465,6 +465,7 @@ def get_code( tt = 'test'):
             continue
         # if len(texmeshlist) == 100:
         #     break
+    print (len(texmeshlist))
     with open( dataroot +   '/lists/codepkl_{}.pkl'.format(tt), 'wb') as handle:
         pickle.dump(codepkl, handle, protocol=pickle.HIGHEST_PROTOCOL)
     with open( dataroot +   '/lists/texmesh_{}list.pkl'.format(tt), 'wb') as handle:
