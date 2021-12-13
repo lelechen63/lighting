@@ -35,7 +35,7 @@ def pl2normal(checkpoint):
     return new_state_dict
 
 opt = TrainOptions().parse()
-
+opt.datasetname = 'fs_mesh'
 def main():
     device = torch.device('cuda', 0)
     Encoder = torch.load('./checkpoints/MeshEncoderDecoder/encoder.pth')
