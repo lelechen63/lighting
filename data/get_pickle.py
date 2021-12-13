@@ -216,11 +216,7 @@ def get_mesh_pickle(debug = False):
 def get_paired_texmesh_pickle():
     base_p = '/raid/celong/FaceScape/textured_meshes'
     ids = []
-    # ids =  os.listdir(base_p)
-    # ids.sort()
-    # id_list = []
-    # ids = ids[:300]
-    # print(ids)
+
     for i in range(300):
         ids.append(str(i + 1))
     with open('/raid/celong/FaceScape/lists/ids.pkl', 'wb') as handle:
@@ -354,12 +350,7 @@ def get_mesh_augment(debug =False, type ='train'):
     np.save( npsave, big )
 
 def getmeshnorm():
-    # dataroot = '/data/home/uss00022/lelechen/data/Facescape/'
-    # _file = open(os.path.join(dataroot, "lists/texmesh_train.pkl"), "rb")
-    # data_list = pickle.load(_file)
-    # _file = open(os.path.join(dataroot, "lists/texmesh_test.pkl"), "rb")
-    # data_list.extend(pickle.load(_file))
-
+    
     big = np.load( '/data/home/uss00022/lelechen/data/Facescape/bigmeshtrain.npy' )
     print (big.shape)
     trainmean = np.mean(big, axis = 0)
@@ -444,12 +435,25 @@ def get_texnorm():
     np.save( '/data/home/uss00022/lelechen/github/lighting/predef/originalmeantex.npy', meantex)
     np.save( '/data/home/uss00022/lelechen/github/lighting/predef/originalstdtex.npy', stdtex)
     cv2.imwrite('./gg.png', meantex)
+
+def get_code( tt = 'train'):
+
+    dataroot = '/nfs/STG/CodecAvatar/lelechen/Facescape'
+    meshpkl = 'lists/mesh_train'
+    _file = open(os.path.join(dataroot, meshpkl), "rb")
+    data_list = pickle.load(_file)
+    _file.close()
+    print (data_list)
+
+
+
+get_code()
 # get_mesh_pickle(True)
 # get_mesh_augment(True,'test')
 # get_mesh_augment()
 # get_tex_total()
 # get_tex_total('test')
-get_texnorm()
+# get_texnorm()
 # get_mesh_total()
 # get_canonical_mesh()
 # tmp()

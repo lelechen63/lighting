@@ -182,15 +182,96 @@ class Img2MeshCodeModule(pl.LightningModule):
         ]
 
         self.l2loss = torch.nn.MSELoss()
-        self.generator = MeshDecoder(3,
+        self.meshdecoder = MeshDecoder(3,
                 [16, 16, 16, 32],
                 256,
                 edge_index_list,
                 down_transform_list,
                 up_transform_list,
                 K=6)
+        
+        ngf = 64
+
+        self.ImageEncoder = nn.Sequential(
+            nn.ReflectionPad2d(3), nn.Conv2d(3, ngf, kernel_size=7, padding=0),
+            norm_layer(ngf), 
+            nn.ReLU(True),  
+            nn.Conv2d(ngf , ngf  * 2, kernel_size=3, stride=2, padding=1),
+            norm_layer(ngf  * 2),
+            nn.ReLU(True),  # 2
+
+            nn.Conv2d( ngf * 2, ngf  * 2, kernel_size=3, stride=2, padding=1),
+            norm_layer(ngf  * 2),
+            nn.ReLU(True),  #4
+
+            nn.Conv2d(ngf*2 , ngf  * 4, kernel_size=3, stride=2, padding=1),
+            norm_layer(ngf  * 4),
+            nn.ReLU(True), # 8
+
+            nn.Conv2d(ngf*4 , ngf  * 4, kernel_size=3, stride=2, padding=1),
+            norm_layer(ngf  * 4),
+            nn.ReLU(True), # 16
+
+            nn.Conv2d(ngf*4 , ngf  * 8, kernel_size=3, stride=2, padding=1),
+            norm_layer(ngf  * 8),
+            nn.ReLU(True),  #32
+
+            nn.Conv2d(ngf*8 , ngf  * 8, kernel_size=3, stride=2, padding=1),
+            norm_layer(ngf  * 8),
+            nn.ReLU(True),  #64
+
+            nn.Conv2d(ngf*8 , ngf  * 16, kernel_size=3, stride=2, padding=1),
+            norm_layer(ngf  * 16),
+            nn.ReLU(True),  #128
+            # nn.Conv2d(ngf*16 , ngf  * 16, kernel_size=3, stride=2, padding=1),
+            # norm_layer(ngf  * 16),
+            # nn.ReLU(True),  #4
+        )
+        self.meshencoder = nn.Sequential(
+            nn.Linear( 78951, ngf*2),
+            nn.ReLU(True),
+            nn.Linear( ngf*2, ngf*2),
+            nn.ReLU(True),
+            nn.Linear( ngf*2, ngf*2),
+            nn.ReLU(True),
+            nn.Linear( ngf*2, ngf*2),
+            nn.ReLU(True),
+            nn.Linear( ngf*2, ngf*4),
+            nn.ReLU(True)
+            )
+
+        self.enc_input_size = int(ngf * 16 * self.tex_shape/128 * self.tex_shape/128  + ngf * 4)
+        self.identity_enc = nn.Sequential(
+            nn.Linear( self.enc_input_size, ngf*4),
+            nn.ReLU(True),
+            # nn.Linear( ngf*4, ngf*4),
+            # nn.ReLU(True),
+            # nn.Linear( ngf*4, ngf*4),
+            # nn.ReLU(True),
+            nn.Linear( ngf*4,code_n),
+            nn.ReLU(True),
+            )
+
+        self.expression_enc = nn.Sequential(
+            nn.Linear( self.enc_input_size, ngf*4),
+            nn.ReLU(True),
+            # nn.Linear( ngf*4, ngf*4),
+            # nn.ReLU(True),
+            # nn.Linear( ngf*4, ngf*4),
+            # nn.ReLU(True),
+            nn.Linear( ngf*4,code_n),
+            nn.ReLU(True),
+            )
+        model = []
+        for i in range(n_blocks):
+            model += [ResnetBlock(ngf * 16, padding_type=padding_type, activation=activation, norm_layer=norm_layer)]
+        self.resblocks = nn.Sequential(*model)
+
+        
         self.visualizer = Visualizer(opt)
         self.ckpt_path = os.path.join(opt.checkpoints_dir, opt.name)
+
+
     def forward(self, A_mesh):
         return self.generator(A_mesh)
     
