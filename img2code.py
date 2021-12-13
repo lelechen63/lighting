@@ -89,7 +89,7 @@ else:
         testdata = dm.test_dataloader()
         opt.name = opt.name + '_test'
         visualizer = Visualizer(opt)
-        loss = []
+        l2loss = torch.nn.MSELoss()
         Encoder = Encoder.to(device)
         Decoder = Decoder.to(device)
         for num,batch in enumerate(testdata):
@@ -98,12 +98,12 @@ else:
             
             code = Encoder( batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).to(device))
             rec_mesh_A = Decoder(code)
+            loss_mesh = l2loss(rec_mesh_A, batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).detach() )
+            print (loss_mesh)
+            loss.append(loss_mesh)
             tmp = batch['A_path'][0].split('/')
             gt_mesh = batch['Amesh'].data[0].cpu() * totalstdmesh + totalmeanmesh
-            rec_Amesh = rec_mesh_A.data[0].cpu().view(-1) * totalstdmesh + totalmeanmesh 
-            
-            loss.append( ((rec_Amesh.view(-1) -  gt_mesh )** 2).mean())
-            
+            rec_Amesh = rec_mesh_A.data[0].cpu().view(-1) * totalstdmesh + totalmeanmesh
             gt_mesh = gt_mesh.float()
             rec_Amesh = rec_Amesh.float()
             gt_Amesh = meshrender( opt.dataroot, int(tmp[0]), int(tmp[-1].split('_')[0]),gt_mesh )
@@ -135,8 +135,7 @@ else:
         l2loss = torch.nn.MSELoss()
         print ('***********', len(testdata),'*************')
         for num,batch in enumerate(testdata):
-            rec_tex_A= \
-            module(  batch['Atex'])
+            rec_tex_A= module(  batch['Atex'])
             Atex = batch['Atex'].data[0].cpu()  #* stdtex + meantex 
             Atex = util.tensor2im(Atex  , normalize = False)
             Atex = np.ascontiguousarray(Atex, dtype=np.uint8)

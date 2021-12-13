@@ -138,7 +138,7 @@ class MeshEncodeDecodeModule(pl.LightningModule):
         return [opt_g], [scheduler]
     
     def on_epoch_end(self):
-        if self.current_epoch % 5 == 0:
+        if self.current_epoch % 10 == 0:
             # print ('!!!!!save model')
             # self.trainer.save_checkpoint( os.path.join( self.ckpt_path, '%05d.ckpt'%self.current_epoch) )
             torch.save(self.Encoder, os.path.join( self.ckpt_path, 'encoder.pth'))
