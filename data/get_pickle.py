@@ -448,7 +448,7 @@ def get_code( tt = 'test'):
     for item in tqdm(data_list):
         
         expid = int(item.split('/')[-1].split('_')[0])
-        mcode_p = os.path.join( dataroot, 'old_meshcode', item + '_mesh.npy' ) # mesh code path
+        mcode_p = os.path.join( dataroot, 'meshcode_old', item + '_mesh.npy' ) # mesh code path
         tcode_p = os.path.join( dataroot, 'textured_meshes', item + '.npz' ) # texture code path
         
         if expid > 19:
