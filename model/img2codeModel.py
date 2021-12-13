@@ -48,7 +48,7 @@ class MeshEncodeDecodeModule(pl.LightningModule):
         self.save_hyperparameters()
         self.opt = opt
         homepath = './predef'
-        device = torch.device('cuda')
+        device = torch.device('cuda', int(opt.gpu_ids))
 
         template_fp = osp.join(homepath, 'meshmean.obj')
         transform_fp = osp.join(homepath, 'transform.pkl')
