@@ -447,7 +447,7 @@ def get_code( tt = 'train'):
     for item in tqdm(data_list):
         print (item)
         mcode_p = os.path.join( dataroot, 'meshcode', item + '_mesh.npy' ) # mesh code path
-        tcode_p = os.path.join( dataroot, item + '.npz' ) # texture code path
+        tcode_p = os.path.join( dataroot, 'textured_meshes', item + '.npz' ) # texture code path
 
         print (mcode_p)
         print (tcode_p)
