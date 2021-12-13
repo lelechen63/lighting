@@ -446,9 +446,12 @@ def get_code( tt = 'train'):
     # print (data_list)
     for item in tqdm(data_list):
         print (item)
+        expid = int(item.split('/')[-1].split('_')[0])
         mcode_p = os.path.join( dataroot, 'meshcode', item + '_mesh.npy' ) # mesh code path
         tcode_p = os.path.join( dataroot, 'textured_meshes', item + '.npz' ) # texture code path
-
+        
+        if expid > 19:
+            continue
         print (mcode_p)
         print (tcode_p)
 
