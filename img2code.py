@@ -92,6 +92,7 @@ else:
         l2loss = torch.nn.MSELoss()
         Encoder = Encoder.to(device)
         Decoder = Decoder.to(device)
+        loss = []
         for num,batch in enumerate(testdata):
             if num == 100:
                 break
