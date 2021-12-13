@@ -623,7 +623,6 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
         cc = 0
         self.total_mesh = {}
         for data in tqdm(self.data_list):
-            
             tmp = data.split('/')
             self.total_mesh[data] = []
             A_vertices = self.total_m[cc]  - self.totalmeanmesh
@@ -670,8 +669,13 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
         print (self.opt.dataroot, '!!!!!!!!!!!!!')
         
         ### input A (texture and mesh)   
-        self.dir_A = os.path.join(opt.dataroot, "augmented_meshes")
+        self.dir_A = os.path.join(opt.dataroot, "textured_meshes")
+
+        # dir B: ffhq aligned image
         self.dir_B = os.path.join(opt.dataroot, "ffhq_aligned_img")
+
+        # dir C: mesh code:
+        self.dir_C = os.path.join(opt.dataroot, "meshcode")
 
         ### json 
         self.dir_json = os.path.join(opt.dataroot, "fsmview_images")

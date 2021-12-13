@@ -436,10 +436,10 @@ def get_texnorm():
     np.save( '/data/home/uss00022/lelechen/github/lighting/predef/originalstdtex.npy', stdtex)
     cv2.imwrite('./gg.png', meantex)
 
-def get_code( tt = 'train'):
+def get_code( tt = 'test'):
 
     dataroot = '/nfs/STG/CodecAvatar/lelechen/Facescape'
-    meshpkl = 'lists/mesh_train.pkl'
+    meshpkl = 'lists/mesh_{}.pkl'.format(tt)
     _file = open(os.path.join(dataroot, meshpkl), "rb")
     data_list = pickle.load(_file)
     _file.close()
@@ -451,23 +451,21 @@ def get_code( tt = 'train'):
         mcode_p = os.path.join( dataroot, 'meshcode', item + '_mesh.npy' ) # mesh code path
         tcode_p = os.path.join( dataroot, 'textured_meshes', item + '.npz' ) # texture code path
         
-        if expid > 20:
+        if expid > 19:
             continue
         
         if not os.path.exists(tcode_p):
             continue
 
-        try:
-            codepkl[item] = [np.load(mcode_p)] # 1st element: mesh code
-            codepkl[item].append(np.load(tcode_p)['w'][0][0])  # 2nd element: tex code
-            texmeshlist.append(item)
-        except:
-            print ('+++++++++')
-            continue
-       
-    with open( dataroot +   '/lists/codepkl.pkl', 'wb') as handle:
+        texcode = np.load(tcode_p)['w']
+        texmeshlist.append(item)
+        codepkl[item] = [np.load(mcode_p)] # 1st element: mesh code
+        codepkl[item].append(np.load(tcode_p)['w'][0][0])  # 2nd element: tex code
+        # if len(texmeshlist) == 100:
+        #     break
+    with open( dataroot +   '/lists/codepkl_{}.pkl'.format(tt), 'wb') as handle:
         pickle.dump(codepkl, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    with open( dataroot +   '/lists/texmeshlist.pkl', 'wb') as handle:
+    with open( dataroot +   '/lists/texmesh_{}list.pkl'.format(tt), 'wb') as handle:
         pickle.dump(texmeshlist, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
