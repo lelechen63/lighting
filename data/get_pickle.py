@@ -456,11 +456,13 @@ def get_code( tt = 'test'):
         
         if not os.path.exists(tcode_p):
             continue
-
-        texcode = np.load(tcode_p)['w']
-        texmeshlist.append(item)
-        codepkl[item] = [np.load(mcode_p)] # 1st element: mesh code
-        codepkl[item].append(np.load(tcode_p)['w'][0][0])  # 2nd element: tex code
+        try:
+            texmeshlist.append(item)
+            codepkl[item] = [np.load(mcode_p)] # 1st element: mesh code
+            codepkl[item].append(np.load(tcode_p)['w'][0][0])  # 2nd element: tex code
+        except:
+            print ('++++++')
+            continue
         # if len(texmeshlist) == 100:
         #     break
     with open( dataroot +   '/lists/codepkl_{}.pkl'.format(tt), 'wb') as handle:
