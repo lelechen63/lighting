@@ -443,6 +443,8 @@ def get_code( tt = 'train'):
     _file = open(os.path.join(dataroot, meshpkl), "rb")
     data_list = pickle.load(_file)
     _file.close()
+    codepkl = {}
+    texmeshlist = []
     for item in tqdm(data_list):
         
         expid = int(item.split('/')[-1].split('_')[0])
@@ -458,14 +460,16 @@ def get_code( tt = 'train'):
         texcode = np.load(tcode_p)['w']
         print (item)
         print (texcode.shape)
-        for r in range(13):
-            if not np.array_equal(texcode[0,r], texcode[0,r + 1]):
-            # if texcode[0,r] != texcode[0,r + 1]:
-                print (item,'++++++++++++')
-                break
-            else:
-                continue
-        
+        texmeshlist.append(item)
+        codepkl[item] = [np.load(mcode_p)] # 1st element: mesh code
+        codepkl[item].append(np.load(tcode_p)['w'][0][0])  # 2nd element: tex code
+        if len(texmeshlist) == 100:
+            break
+    with open( dataroot +   '/lists/codepkl_debug.pkl', 'wb') as handle:
+        pickle.dump(codepkl, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    with open( dataroot +   '/lists/texmeshlist_debug.pkl', 'wb') as handle:
+        pickle.dump(test_list, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
 
         # break
 
