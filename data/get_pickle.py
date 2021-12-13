@@ -459,7 +459,7 @@ def get_code( tt = 'train'):
         print (item)
         print (texcode.shape)
         for r in range(13):
-            if np.array_equal(texcode[0,r], texcode[0,r + 1]):
+            if not np.array_equal(texcode[0,r], texcode[0,r + 1]):
             # if texcode[0,r] != texcode[0,r + 1]:
                 print (item,'++++++++++++')
                 break
