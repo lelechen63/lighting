@@ -458,8 +458,6 @@ def get_code( tt = 'train'):
             continue
 
         texcode = np.load(tcode_p)['w']
-        print (item)
-        print (texcode.shape)
         texmeshlist.append(item)
         codepkl[item] = [np.load(mcode_p)] # 1st element: mesh code
         codepkl[item].append(np.load(tcode_p)['w'][0][0])  # 2nd element: tex code
@@ -468,7 +466,7 @@ def get_code( tt = 'train'):
     with open( dataroot +   '/lists/codepkl_debug.pkl', 'wb') as handle:
         pickle.dump(codepkl, handle, protocol=pickle.HIGHEST_PROTOCOL)
     with open( dataroot +   '/lists/texmeshlist_debug.pkl', 'wb') as handle:
-        pickle.dump(test_list, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        pickle.dump(texmeshlist, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
         # break
