@@ -44,7 +44,8 @@ def main():
 
     totalmeanmesh = torch.FloatTensor( np.load( "./predef/meanmesh.npy" ) )
     totalstdmesh = torch.FloatTensor(np.load( "./predef/meshstd.npy" ))
-
+    
+    opt.isTrain = True
     dm = FacescapeDataModule(opt)
     dm.setup()
     testdata = dm.test_dataloader()
@@ -55,7 +56,6 @@ def main():
     with torch.no_grad():
         for num,batch in enumerate(testdata):
             print (num, '/', len(testdata))
-            rec_mesh_A, code = module( batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).to(device))
 
             code = Encoder( batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).to(device))
             save_p = os.path.join(opt.dataroot +  '/meshcode/',  batch['A_path'][0] + '_mesh.npy')
@@ -63,14 +63,12 @@ def main():
             os.makedirs(  os.path.join(opt.dataroot + '/meshcode/',  tmp[0], tmp[1]), exist_ok =True)
             np.save( save_p, code.detach().cpu().numpy())
             
-    opt.isTrain = True
+    opt.isTrain = False
     dm.setup()
     testdata = dm.test_dataloader()
     with torch.no_grad():
         for num,batch in enumerate(testdata):
             print (num, '/', len(testdata))
-            rec_mesh_A, code = module( batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).to(device))
-
             code = Encoder( batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).to(device))
             save_p = os.path.join(opt.dataroot + '/meshcode/',  batch['A_path'][0] + '_mesh.npy')
             tmp =  batch['A_path'][0].split('/')
