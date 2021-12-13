@@ -443,7 +443,16 @@ def get_code( tt = 'train'):
     _file = open(os.path.join(dataroot, meshpkl), "rb")
     data_list = pickle.load(_file)
     _file.close()
-    print (data_list)
+    # print (data_list)
+    for item in tqdm(data_list):
+        print (item)
+        mcode_p = os.path.join( dataroot, 'meshcode', item + '_mesh.npy' ) # mesh code path
+        tcode_p = os.path.join( dataroot, item + '.npz' ) # texture code path
+
+        print (mcode_p)
+        print (tcode_p)
+
+        break
 
 
 
