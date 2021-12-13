@@ -443,7 +443,7 @@ def get_code( tt = 'train'):
     _file = open(os.path.join(dataroot, meshpkl), "rb")
     data_list = pickle.load(_file)
     _file.close()
-     for item in tqdm(data_list):
+    for item in tqdm(data_list):
         print (item)
         expid = int(item.split('/')[-1].split('_')[0])
         mcode_p = os.path.join( dataroot, 'meshcode', item + '_mesh.npy' ) # mesh code path
