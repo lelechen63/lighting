@@ -444,19 +444,19 @@ def get_code( tt = 'train'):
     data_list = pickle.load(_file)
     _file.close()
     for item in tqdm(data_list):
-        print (item)
+        
         expid = int(item.split('/')[-1].split('_')[0])
         mcode_p = os.path.join( dataroot, 'meshcode', item + '_mesh.npy' ) # mesh code path
         tcode_p = os.path.join( dataroot, 'textured_meshes', item + '.npz' ) # texture code path
         
         if expid > 19:
             continue
-        print (mcode_p)
-        print (tcode_p)
+        
         if not os.path.exists(tcode_p):
             continue
 
         texcode = np.load(tcode_p)['w']
+        print (item)
         print (texcode.shape)
         for r in range(13):
             if np.array_equal(texcode[0,r], texcode[0,r + 1]):
