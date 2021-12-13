@@ -73,7 +73,7 @@ class MeshEncodeDecodeModule(pl.LightningModule):
         down_transform_list = [
             util.to_sparse(down_transform).to(device)
             # util.to_sparse(down_transform)
-            for down_transform in tmp['down_transform']
+            for down_transform  in tmp['down_transform']
         ]
         up_transform_list = [
             util.to_sparse(up_transform).to(device)
@@ -196,6 +196,7 @@ class Img2MeshCodeModule(pl.LightningModule):
             nn.ReflectionPad2d(3), nn.Conv2d(3, ngf, kernel_size=7, padding=0),
             norm_layer(ngf), 
             nn.ReLU(True),  
+
             nn.Conv2d(ngf , ngf  * 2, kernel_size=3, stride=2, padding=1),
             norm_layer(ngf  * 2),
             nn.ReLU(True),  # 2
