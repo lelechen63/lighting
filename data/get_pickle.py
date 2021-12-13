@@ -439,7 +439,7 @@ def get_texnorm():
 def get_code( tt = 'train'):
 
     dataroot = '/nfs/STG/CodecAvatar/lelechen/Facescape'
-    meshpkl = 'lists/mesh_train'
+    meshpkl = 'lists/mesh_train.pkl'
     _file = open(os.path.join(dataroot, meshpkl), "rb")
     data_list = pickle.load(_file)
     _file.close()
