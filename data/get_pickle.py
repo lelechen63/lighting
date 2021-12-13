@@ -451,7 +451,7 @@ def get_code( tt = 'train'):
         mcode_p = os.path.join( dataroot, 'meshcode', item + '_mesh.npy' ) # mesh code path
         tcode_p = os.path.join( dataroot, 'textured_meshes', item + '.npz' ) # texture code path
         
-        if expid > 19:
+        if expid > 20:
             continue
         
         if not os.path.exists(tcode_p):
@@ -464,8 +464,7 @@ def get_code( tt = 'train'):
         except:
             print ('+++++++++')
             continue
-        # if len(texmeshlist) == 100:
-        #     break
+       
     with open( dataroot +   '/lists/codepkl.pkl', 'wb') as handle:
         pickle.dump(codepkl, handle, protocol=pickle.HIGHEST_PROTOCOL)
     with open( dataroot +   '/lists/texmeshlist.pkl', 'wb') as handle:
