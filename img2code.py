@@ -83,51 +83,6 @@ else:
         # from model.img2codeModel import MeshEncodeDecodeModule as module
         # homepath = './predef'
         device = torch.device('cuda', 0)
-
-        # template_fp = osp.join(homepath, 'meshmean.obj')
-        # transform_fp = osp.join(homepath, 'transform.pkl')
-        # if not osp.exists(transform_fp):
-        #     print('Generating transform matrices...')
-        #     mesh = Mesh(filename=template_fp)
-        #     ds_factors = [4, 4, 4, 4]
-        #     _, A, D, U, F = mesh_sampling.generate_transform_matrices(mesh, ds_factors)
-        #     tmp = {'face': F, 'adj': A, 'down_transform': D, 'up_transform': U}
-
-        #     with open(transform_fp, 'wb') as fp:
-        #         pickle.dump(tmp, fp)
-        #     print('Done!')
-        #     print('Transform matrices are saved in \'{}\''.format(transform_fp))
-        # else:
-        #     with open(transform_fp, 'rb') as f:
-        #         tmp = pickle.load(f, encoding='latin1')
-
-        # edge_index_list = [util.to_edge_index(adj).to(device) for adj in tmp['adj']]
-
-        # down_transform_list = [
-        #     util.to_sparse(down_transform).to(device)
-        #     for down_transform in tmp['down_transform']
-        # ]
-        # up_transform_list = [
-        #     util.to_sparse(up_transform).to(device)
-        #     for up_transform in tmp['up_transform']
-        # ]
-
-        # Encoder = MeshEncoder(3,
-        #         [16, 16, 16, 32],
-        #         256,
-        #         edge_index_list,
-        #         down_transform_list,
-        #         up_transform_list,
-        #         K=6)
-
-        # Decoder = MeshDecoder(3,
-        #         [16, 16, 16, 32],
-        #         256,
-        #         edge_index_list,
-        #         down_transform_list,
-        #         up_transform_list,
-        #         K=6)
-
         Encoder = torch.load('./checkpoints/MeshEncoderDecoder/encoder.pth')
         Decoder = torch.load('./checkpoints/MeshEncoderDecoder/decoder.pth')
 

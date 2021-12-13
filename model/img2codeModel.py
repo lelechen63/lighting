@@ -48,7 +48,7 @@ class MeshEncodeDecodeModule(pl.LightningModule):
         self.save_hyperparameters()
         self.opt = opt
         homepath = './predef'
-        device = torch.device('cuda', 0)
+        # device = torch.device('cuda', 0)
 
         template_fp = osp.join(homepath, 'meshmean.obj')
         transform_fp = osp.join(homepath, 'transform.pkl')
@@ -67,14 +67,18 @@ class MeshEncodeDecodeModule(pl.LightningModule):
             with open(transform_fp, 'rb') as f:
                 tmp = pickle.load(f, encoding='latin1')
 
-        edge_index_list = [util.to_edge_index(adj).to(device) for adj in tmp['adj']]
+        # edge_index_list = [util.to_edge_index(adj).to(device) for adj in tmp['adj']]
+        
+        edge_index_list = [util.to_edge_index(adj) for adj in tmp['adj']]
 
         down_transform_list = [
-            util.to_sparse(down_transform).to(device)
+            # util.to_sparse(down_transform).to(device)
+            util.to_sparse(down_transform)
             for down_transform in tmp['down_transform']
         ]
         up_transform_list = [
-            util.to_sparse(up_transform).to(device)
+            # util.to_sparse(up_transform).to(device)
+            util.to_sparse(up_transform)
             for up_transform in tmp['up_transform']
         ]
 
