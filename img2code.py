@@ -79,8 +79,6 @@ else:
     print ('!!!!!!' + opt.name +'!!!!!!!!')
     if opt.name == 'MeshEncoderDecoder':
         
-        # from model.img2codeModel import MeshEncodeDecodeModule as module
-        # homepath = './predef'
         device = torch.device('cuda', 0)
         Encoder = torch.load('./checkpoints/MeshEncoderDecoder/encoder.pth')
         Decoder = torch.load('./checkpoints/MeshEncoderDecoder/decoder.pth')
