@@ -98,7 +98,7 @@ else:
             
             code = Encoder( batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).to(device))
             rec_mesh_A = Decoder(code)
-            loss_mesh = l2loss(rec_mesh_A.to(device), batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).detach() )
+            loss_mesh = l2loss(rec_mesh_A.cpu(), batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).detach() )
             print (loss_mesh)
             loss.append(loss_mesh)
             tmp = batch['A_path'][0].split('/')
