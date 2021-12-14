@@ -474,7 +474,7 @@ def get_code( tt = 'test'):
         codepkl[item].append(np.load(tcode_p)['w'][0][0])  # 2nd element: tex code
 
         # get mesh
-        mesh_p = os.path.join(dataroot, 'textured_meshes', item + '.obj')
+        mesh_path = os.path.join(dataroot, 'textured_meshes', item + '.obj')
         om_mesh = openmesh.read_trimesh(mesh_path)
         A_vertices = np.array(om_mesh.points()).reshape(-1) 
         codepkl[item].append(A_vertices)
