@@ -150,6 +150,8 @@ class Image2MeshcodeModule(pl.LightningModule):
         super().__init__()
         self.save_hyperparameters()
         self.opt = opt
+        norm_layer = get_norm_layer(norm_type='batch')  
+
         ngf = 64
         code_n = 256
 
