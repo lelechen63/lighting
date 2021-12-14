@@ -671,7 +671,7 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
         self.dir_B = os.path.join(opt.dataroot, "ffhq_aligned_img")
 
         # dir C: mesh code:
-        self.dir_C = os.path.join(opt.dataroot, "meshcode_old")
+        self.dir_C = os.path.join(opt.dataroot, "meshcode")
 
         ### json 
         self.dir_json = os.path.join(opt.dataroot, "fsmview_images")
@@ -699,27 +699,26 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
         self.totalmeanmesh = np.load( "./predef/meshmean.npy" )
         self.totalstdmesh = np.load( "./predef/meshstd.npy" )
         cc = 0
-        for data in tqdm(self.data_list):
-            mesh_p = os.path.join(opt.dir_A, data + '.obj')
-            om_mesh = openmesh.read_trimesh(mesh_path)
-            A_vertices = (np.array(om_mesh.points()).reshape(-1) - self.totalmeanmesh) / self.totalstdmesh
-            self.allcode.append(A_vertices)
-            
+        # for data in tqdm(self.data_list):
+        #     self.allcode[data][2] = ( self.allcode[data][2] - self.totalmeanmesh) / self.totalstdmesh
 
         print ('******************', len(self.data_list), len(self.allcode))
        
     def __getitem__(self, index):
-        t = time.time()
-        tmp = self.data_list[index].split('/')
 
-        A_id = int(tmp[0])
-        A_exp = int(tmp[-1].split('_')[0])      
-        
         meshcode = self.allcode[self.data_list[index]][0]
+        texcode = self.allcode[self.data_list[index]][1]
+        mesh = self.allcode[self.data_list[index]][2]
+        tex = self.allcode[self.data_list[index]][3]
         
-        input_dict = { 'Amesh': torch.FloatTensor(A_vertices),
-                'A_path': self.data_list[index], 
-                'map_type':0, 'Aid': int(A_id) - 1, 'Aexp': int(A_exp) -1}
+        print ( meshcode.shape, texcode.shape, '++++++')
+        input_dict = { 
+            'meshcode': torch.FloatTensor(meshcode),
+            'texcode': torch.FloatTensor(texcode),
+            'mesh': torch.FloatTensor(mesh),
+            'tex': torch.FloatTensor(tex),
+            'A_path': self.data_list[index]
+            }
        
         return input_dict
 

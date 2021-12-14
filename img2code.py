@@ -23,29 +23,16 @@ import numpy as np
 from model.meshnetwork import *
 from util import mesh_sampling
 
-def pl2normal(checkpoint):
-    state_dict = checkpoint
-    new_state_dict = OrderedDict()
-    for k, v in state_dict.items():
-        if 'discriminator' in k:
-            continue
-        if 'vgg' in k :
-            continue 
-        if 'cls' in k :
-            continue 
-        name = k[10:]
-        new_state_dict[name] = v
-    return new_state_dict
-
 opt = TrainOptions().parse()
-print ('+++++++++', opt.dataroot)
 
 if opt.debug:
     opt.nThreads = 1
+
 dm = FacescapeDataModule(opt)
+
 if  opt.name == 'img2meshcode':
     from model.img2codeModel import Image2MeshcodeModule as module
-    opt.datasetname = 'XXXXXX'
+    opt.datasetname = 'fs_code'
 elif opt.name == 'MeshEncoderDecoder':
     from model.img2codeModel import MeshEncodeDecodeModule as module
     opt.datasetname = 'fs_mesh'
