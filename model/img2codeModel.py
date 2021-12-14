@@ -153,6 +153,7 @@ class Image2MeshcodeModule(pl.LightningModule):
         norm_layer = get_norm_layer(norm_type='batch')  
         self.tex_shape = 256
         ngf = 64
+        n_blocks = 4
         code_n = 256
 
         self.ImageEncoder = nn.Sequential(
