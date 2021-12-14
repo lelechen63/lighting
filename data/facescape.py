@@ -698,25 +698,10 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
 
         self.totalmeanmesh = np.load( "./predef/meshmean.npy" )
         self.totalstdmesh = np.load( "./predef/meshstd.npy" )
-       
-        self.total_mesh = {}
+        cc = 0
         for data in tqdm(self.data_list):
-            tmp = data.split('/')
-            self.total_mesh[data] = []
-            A_vertices = self.total_m[cc]  - self.totalmeanmesh
-            self.total_mesh[data].append(A_vertices  / self.totalstdmesh)
-            cc += 1
-            if opt.debug:
-                if len(self.total_mesh) == 13:
-                    break
+            self.allcode[data][0] = (self.allcode[data][0] - self.totalmeanmesh)/ self.totalstdmesh
 
-        # remove blacklisted item
-        for element in bk:
-            try:
-                del self.total_mesh[element]
-                self.data_list.remove(element)
-            except:
-                print(element)
                 
         print ('******************', len(self.data_list), len(self.total_mesh))
         # free the memory
