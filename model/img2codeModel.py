@@ -156,6 +156,7 @@ class Image2MeshcodeModule(pl.LightningModule):
         n_blocks = 4
         padding_type='reflect'
         code_n = 256
+        activation = nn.ReLU(True)
 
         self.ImageEncoder = nn.Sequential(
             nn.ReflectionPad2d(3), nn.Conv2d(3, ngf, kernel_size=7, padding=0),
