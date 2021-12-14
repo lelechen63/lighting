@@ -488,19 +488,17 @@ def get_code( tt = 'train'):
             tex = tex * facial_seg
             codepkl[item].append(tex)
 
+
         except:
             print (item, '++++++')
             continue
-        
+        if len(texmeshlist) == 100:
+            break
     print (len(texmeshlist))
-    with open( dataroot +   '/compressed/all320_{}.pkl'.format(tt), 'wb') as handle:
+    with open( dataroot +   '/compressed/all320_{}.pkl'.format('debug'), 'wb') as handle:
         pickle.dump(codepkl, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    with open( dataroot +   '/compressed/all320_{}list.pkl'.format(tt), 'wb') as handle:
+    with open( dataroot +   '/compressed/all320_{}list.pkl'.format('debug'), 'wb') as handle:
         pickle.dump(texmeshlist, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-
-        # break
-
 
 
 get_code()
