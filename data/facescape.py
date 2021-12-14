@@ -702,8 +702,10 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
         for data in tqdm(self.data_list):
             mesh_p = os.path.join(opt.dir_A, data + '.obj')
             om_mesh = openmesh.read_trimesh(mesh_path)
-            A_vertices = np.array(om_mesh.points()).reshape(-1)
-                
+            A_vertices = (np.array(om_mesh.points()).reshape(-1) - self.totalmeanmesh) / self.totalstdmesh
+            self.allcode.append(A_vertices)
+            
+
         print ('******************', len(self.data_list), len(self.allcode))
        
     def __getitem__(self, index):

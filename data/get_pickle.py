@@ -436,7 +436,7 @@ def get_texnorm():
     np.save( '/data/home/uss00022/lelechen/github/lighting/predef/originalstdtex.npy', stdtex)
     cv2.imwrite('./gg.png', meantex)
 
-def get_code( tt = 'train'):
+def get_code( tt = 'test'):
 
     dataroot = '/nfs/STG/CodecAvatar/lelechen/Facescape'
     meshpkl = 'lists/mesh_{}.pkl'.format(tt)
@@ -445,8 +445,20 @@ def get_code( tt = 'train'):
     _file.close()
     codepkl = {}
     texmeshlist = []
+    x = 1019
+    y =500
+    w =2000
+    h = 1334
+    l = max(w ,h)
+
+    facial_seg = Image.open("./predef/facial_mask_v10.png")
+    facial_seg  = np.array(facial_seg ) / 255.0
+    
+    facial_seg = facial_seg[y:y+l,x :x +l]
+    facial_seg = cv2.resize(facial_seg, (256,256), interpolation = cv2.INTER_AREA)
+    facial_seg = np.expand_dims(facial_seg, axis=2)
+    
     for item in tqdm(data_list):
-        
         expid = int(item.split('/')[-1].split('_')[0])
         mcode_p = os.path.join( dataroot, 'meshcode', item + '_mesh.npy' ) # mesh code path
         tcode_p = os.path.join( dataroot, 'textured_meshes', item + '.npz' ) # texture code path
@@ -460,15 +472,30 @@ def get_code( tt = 'train'):
             texmeshlist.append(item)
             codepkl[item] = [np.load(mcode_p)] # 1st element: mesh code
             codepkl[item].append(np.load(tcode_p)['w'][0][0])  # 2nd element: tex code
+
+            # get mesh
+            mesh_p = os.path.join(opt.dataroot, 'textured_meshes', item + '.obj')
+            om_mesh = openmesh.read_trimesh(mesh_path)
+            A_vertices = np.array(om_mesh.points()).reshape(-1) 
+            self.allcode.append(A_vertices)
+
+            #get texture
+            tex_path = os.path.join( opt.dataroot, 'textured_meshes' , item + '.jpg')
+            tex = Image.open(tex_path).convert('RGB')#.resize(img_size)
+            tex  = np.array(tex)
+            tex =  tex[y:y+l,x :x +l,:]
+            tex = cv2.resize(tex, (256,256), interpolation = cv2.INTER_AREA)
+            tex = tex * facial_seg
+            self.allcode.append(tex)
+
         except:
             print (item, '++++++')
             continue
-        # if len(texmeshlist) == 100:
-        #     break
+        
     print (len(texmeshlist))
-    with open( dataroot +   '/lists/codepkl_{}.pkl'.format(tt), 'wb') as handle:
+    with open( dataroot +   '/lists/all320_{}.pkl'.format(tt), 'wb') as handle:
         pickle.dump(codepkl, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    with open( dataroot +   '/lists/texmesh_{}list.pkl'.format(tt), 'wb') as handle:
+    with open( dataroot +   '/lists/all320_{}list.pkl'.format(tt), 'wb') as handle:
         pickle.dump(texmeshlist, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
