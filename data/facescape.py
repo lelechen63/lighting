@@ -677,14 +677,14 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
         self.dir_json = os.path.join(opt.dataroot, "fsmview_images")
 
         if opt.isTrain:
-            codelist = 'list/texmesh_trainlist.pkl'
+            codelist = 'lists/texmesh_trainlist.pkl'
             codepkl = 'lists/codepkl_train.pkl'
         else:
-            codelist = 'list/texmesh_testlist.pkl'
+            codelist = 'lists/texmesh_testlist.pkl'
             codepkl = 'lists/codepkl_test.pkl'
 
         if opt.debug:
-            codelist = 'list/texmeshlist_debug.pkl'
+            codelist = 'lists/texmeshlist_debug.pkl'
             codepkl = 'lists/codepkl_debug.pkl'
         
             
