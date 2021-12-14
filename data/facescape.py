@@ -591,7 +591,7 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
         self.dir_json = os.path.join(opt.dataroot, "fsmview_images")
 
         if opt.isTrain:
-            meshpkl = 'lists/augmeshtest'
+            meshpkl = 'lists/mesh_test'
             total_m  = opt.dataroot + '/augmeshtest'
         else:
             meshpkl = 'lists/mesh_test'
@@ -609,11 +609,7 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
         self.data_list = pickle.load(_file)#[:1]
         _file.close()
         
-        ids = open(os.path.join(opt.dataroot, "lists/ids.pkl"), "rb")
-        self.id_set = set(pickle.load(ids))
-        print ('===========================')
-        print ('id_set:',self.id_set)
-        print('+++++++++++++++++++++++++++')
+
        
         self.totalmeanmesh = np.load( "./predef/meshmean.npy" )
         self.totalstdmesh = np.load( "./predef/meshstd.npy" )
