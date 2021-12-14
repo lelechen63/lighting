@@ -468,34 +468,34 @@ def get_code( tt = 'test'):
         
         if not os.path.exists(tcode_p):
             continue
-        try:
-            texmeshlist.append(item)
-            codepkl[item] = [np.load(mcode_p)] # 1st element: mesh code
-            codepkl[item].append(np.load(tcode_p)['w'][0][0])  # 2nd element: tex code
+        # try:
+        texmeshlist.append(item)
+        codepkl[item] = [np.load(mcode_p)] # 1st element: mesh code
+        codepkl[item].append(np.load(tcode_p)['w'][0][0])  # 2nd element: tex code
 
-            # get mesh
-            mesh_p = os.path.join(opt.dataroot, 'textured_meshes', item + '.obj')
-            om_mesh = openmesh.read_trimesh(mesh_path)
-            A_vertices = np.array(om_mesh.points()).reshape(-1) 
-            self.allcode.append(A_vertices)
+        # get mesh
+        mesh_p = os.path.join(opt.dataroot, 'textured_meshes', item + '.obj')
+        om_mesh = openmesh.read_trimesh(mesh_path)
+        A_vertices = np.array(om_mesh.points()).reshape(-1) 
+        self.allcode.append(A_vertices)
 
-            #get texture
-            tex_path = os.path.join( opt.dataroot, 'textured_meshes' , item + '.jpg')
-            tex = Image.open(tex_path).convert('RGB')#.resize(img_size)
-            tex  = np.array(tex)
-            tex =  tex[y:y+l,x :x +l,:]
-            tex = cv2.resize(tex, (256,256), interpolation = cv2.INTER_AREA)
-            tex = tex * facial_seg
-            self.allcode.append(tex)
+        #get texture
+        tex_path = os.path.join( opt.dataroot, 'textured_meshes' , item + '.jpg')
+        tex = Image.open(tex_path).convert('RGB')#.resize(img_size)
+        tex  = np.array(tex)
+        tex =  tex[y:y+l,x :x +l,:]
+        tex = cv2.resize(tex, (256,256), interpolation = cv2.INTER_AREA)
+        tex = tex * facial_seg
+        self.allcode.append(tex)
 
-        except:
-            print (item, '++++++')
-            continue
+        # except:
+        #     print (item, '++++++')
+        #     continue
         
     print (len(texmeshlist))
-    with open( dataroot +   '/lists/all320_{}.pkl'.format(tt), 'wb') as handle:
+    with open( dataroot +   '/compressed/all320_{}.pkl'.format(tt), 'wb') as handle:
         pickle.dump(codepkl, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    with open( dataroot +   '/lists/all320_{}list.pkl'.format(tt), 'wb') as handle:
+    with open( dataroot +   '/compressed/all320_{}list.pkl'.format(tt), 'wb') as handle:
         pickle.dump(texmeshlist, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
