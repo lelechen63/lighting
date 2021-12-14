@@ -677,15 +677,15 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
         self.dir_json = os.path.join(opt.dataroot, "fsmview_images")
 
         if opt.isTrain:
-            codelist = 'lists/texmesh_trainlist.pkl'
-            codepkl = 'lists/codepkl_train.pkl'
+            codelist = 'lists/all320_trainlist.pkl'
+            codepkl = 'lists/all320_train.pkl'
         else:
-            codelist = 'lists/texmesh_testlist.pkl'
-            codepkl = 'lists/codepkl_test.pkl'
+            codelist = 'lists/all320_testlist.pkl'
+            codepkl = 'lists/all320_test.pkl'
 
         if opt.debug:
-            codelist = 'lists/texmeshlist_debug.pkl'
-            codepkl = 'lists/codepkl_debug.pkl'
+            codelist = 'lists/all320_debuglist.pkl'
+            codepkl = 'lists/all320_debug.pkl'
         
             
         _file = open(os.path.join(opt.dataroot, codelist), "rb")
@@ -703,7 +703,7 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
         print ('******************', len(self.data_list), len(self.allcode))
        
     def __getitem__(self, index):
-        print (len( self.allcode[self.data_list[index]]))
+        print (len( self.allcode[self.data_list[index]]), '!!!!!!!!!!!!')
         meshcode = self.allcode[self.data_list[index]][0]
         texcode = self.allcode[self.data_list[index]][1]
         mesh = self.allcode[self.data_list[index]][2]
