@@ -154,6 +154,7 @@ class Image2MeshcodeModule(pl.LightningModule):
         self.tex_shape = 256
         ngf = 64
         n_blocks = 4
+        padding_type='reflect'
         code_n = 256
 
         self.ImageEncoder = nn.Sequential(
