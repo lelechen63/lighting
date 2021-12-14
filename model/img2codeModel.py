@@ -244,8 +244,8 @@ class Image2MeshcodeModule(pl.LightningModule):
         return output
           
     def configure_optimizers(self):
-        lr = self.opt.lr
-        opt_g = torch.optim.Adam(self.generator.parameters(), lr=lr, betas=(self.opt.beta1, 0.999))
+        lr = self.opt.lr   
+        opt_g = torch.optim.Adam((list(self.ImageEncoder.parameters()) + list(self.resblocks.parameters() + list(self.meshcode_dec.parameters()), lr=lr, betas=(self.opt.beta1, 0.999))
         def lr_foo(epoch):
             lr_scale = 0.95 ** int(epoch/10)
             if lr_scale < 0.08:
