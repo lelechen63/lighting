@@ -677,8 +677,8 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
         self.dir_json = os.path.join(opt.dataroot, "fsmview_images")
 
         if opt.isTrain:
-            codelist = 'lists/all320_trainlist.pkl'
-            codepkl = 'lists/all320_train.pkl'
+            codelist = 'lists/all320_testlist.pkl'
+            codepkl = 'lists/all320_test.pkl'
         else:
             codelist = 'lists/all320_testlist.pkl'
             codepkl = 'lists/all320_test.pkl'
