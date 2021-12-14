@@ -699,8 +699,6 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
         self.totalmeanmesh = np.load( "./predef/meshmean.npy" )
         self.totalstdmesh = np.load( "./predef/meshstd.npy" )
        
-    
-    
         self.total_mesh = {}
         for data in tqdm(self.data_list):
             tmp = data.split('/')

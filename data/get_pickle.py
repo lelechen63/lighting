@@ -436,7 +436,7 @@ def get_texnorm():
     np.save( '/data/home/uss00022/lelechen/github/lighting/predef/originalstdtex.npy', stdtex)
     cv2.imwrite('./gg.png', meantex)
 
-def get_code( tt = 'test'):
+def get_code( tt = 'train'):
 
     dataroot = '/nfs/STG/CodecAvatar/lelechen/Facescape'
     meshpkl = 'lists/mesh_{}.pkl'.format(tt)
@@ -451,7 +451,7 @@ def get_code( tt = 'test'):
         mcode_p = os.path.join( dataroot, 'meshcode_old', item + '_mesh.npy' ) # mesh code path
         tcode_p = os.path.join( dataroot, 'textured_meshes', item + '.npz' ) # texture code path
         
-        if expid > 19:
+        if expid > 20:
             continue
         
         if not os.path.exists(tcode_p):
