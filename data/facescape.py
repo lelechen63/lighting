@@ -591,8 +591,8 @@ class FacescapeMeshDataset(torch.utils.data.Dataset):
         self.dir_json = os.path.join(opt.dataroot, "fsmview_images")
 
         if opt.isTrain:
-            meshpkl = 'lists/mesh_train'
-            total_m  = opt.dataroot + '/augmeshtrain'
+            meshpkl = 'lists/augmeshtest'
+            total_m  = opt.dataroot + '/augmeshtest'
         else:
             meshpkl = 'lists/mesh_test'
             total_m  = opt.dataroot +  '/augmeshtest'
@@ -675,41 +675,36 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
         self.dir_B = os.path.join(opt.dataroot, "ffhq_aligned_img")
 
         # dir C: mesh code:
-        self.dir_C = os.path.join(opt.dataroot, "meshcode")
+        self.dir_C = os.path.join(opt.dataroot, "meshcode_old")
 
         ### json 
         self.dir_json = os.path.join(opt.dataroot, "fsmview_images")
 
         if opt.isTrain:
-            meshpkl = 'lists/mesh_train'
-            total_m  = opt.dataroot + '/augmeshtrain'
+            codelist = 'list/texmesh_trainlist.pkl'
+            codepkl = 'lists/codepkl_train.pkl'
         else:
-            meshpkl = 'lists/mesh_test'
-            total_m  = opt.dataroot +  '/augmeshtest'
+            codelist = 'list/texmesh_testlist.pkl'
+            codepkl = 'lists/codepkl_test.pkl'
 
         if opt.debug:
-            meshpkl +='_debug.pkl'
-            total_m += '_debug.npy'
-        else:
-            meshpkl +='.pkl'
-            total_m += '.npy'
+            codelist = 'list/texmeshlist_debug.pkl'
+            codepkl = 'lists/codepkl_debug.pkl'
+        
             
-        _file = open(os.path.join(opt.dataroot, meshpkl), "rb")
+        _file = open(os.path.join(opt.dataroot, codelist), "rb")
         self.data_list = pickle.load(_file)
         _file.close()
         
-        ids = open(os.path.join(opt.dataroot, "lists/ids.pkl"), "rb")
-        self.id_set = set(pickle.load(ids))
-        print ('===========================')
-        print ('id_set:',self.id_set)
-        print('+++++++++++++++++++++++++++')
-       
+        _file = open(os.path.join(opt.dataroot, codepkl), "rb")
+        self.allcode = pickle.load(_file)
+        _file.close()
+
         self.totalmeanmesh = np.load( "./predef/meshmean.npy" )
         self.totalstdmesh = np.load( "./predef/meshstd.npy" )
        
-        self.total_m = np.load(total_m)
-        bk = get_blacklist()
-        cc = 0
+    
+    
         self.total_mesh = {}
         for data in tqdm(self.data_list):
             tmp = data.split('/')
