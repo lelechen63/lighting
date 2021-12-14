@@ -145,7 +145,7 @@ class MeshEncodeDecodeModule(pl.LightningModule):
             torch.save(self.Decoder, os.path.join( self.ckpt_path, 'decoder.pth'))
 
 
-class Img2MeshCodeModule(pl.LightningModule):
+class Image2MeshcodeModule(pl.LightningModule):
     def __init__(self, opt ):
         super().__init__()
         self.save_hyperparameters()
