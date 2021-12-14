@@ -723,7 +723,7 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
         return input_dict
 
     def __len__(self):
-        return len(self.total_mesh) // self.opt.batchSize * self.opt.batchSize
+        return len(self.data_list) // self.opt.batchSize * self.opt.batchSize
 
     def name(self):
-        return 'FacescapeMeshDataset'
+        return 'FacescapeImg2CodeDataset'
