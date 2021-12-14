@@ -436,7 +436,7 @@ def get_texnorm():
     np.save( '/data/home/uss00022/lelechen/github/lighting/predef/originalstdtex.npy', stdtex)
     cv2.imwrite('./gg.png', meantex)
 
-def get_code( tt = 'train'):
+def get_code( tt = 'test'):
 
     dataroot = '/nfs/STG/CodecAvatar/lelechen/Facescape'
     meshpkl = 'lists/mesh_{}.pkl'.format(tt)
