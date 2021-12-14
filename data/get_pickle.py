@@ -470,14 +470,14 @@ def get_code( tt = 'train'):
             continue
         try:
             texmeshlist.append(item)
-            codepkl[item] = [np.load(mcode_p)] # 1st element: mesh code
-            codepkl[item].append(np.load(tcode_p)['w'][0][0])  # 2nd element: tex code
+            codepkl[item] = [np.load(mcode_p)]                  # 1st element: mesh code
+            codepkl[item].append(np.load(tcode_p)['w'][0][0])   # 2nd element: tex code
 
             # get mesh
             mesh_path = os.path.join(dataroot, 'textured_meshes', item + '.obj')
             om_mesh = openmesh.read_trimesh(mesh_path)
             A_vertices = np.array(om_mesh.points()).reshape(-1) 
-            codepkl[item].append(A_vertices)
+            codepkl[item].append(A_vertices)                     # 3rd element: mesh 
 
             #get texture
             tex_path = os.path.join( dataroot, 'textured_meshes' , item + '.jpg')
@@ -486,7 +486,7 @@ def get_code( tt = 'train'):
             tex =  tex[y:y+l,x :x +l,:]
             tex = cv2.resize(tex, (256,256), interpolation = cv2.INTER_AREA)
             tex = tex * facial_seg
-            codepkl[item].append(tex)
+            codepkl[item].append(tex)                            # 4th element: texture 
 
 
         except:
