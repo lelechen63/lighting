@@ -700,19 +700,19 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
         self.totalstdmesh = np.load( "./predef/meshstd.npy" )
         cc = 0
         for data in tqdm(self.data_list):
-            self.allcode[data][0] = (self.allcode[data][0] - self.totalmeanmesh)/ self.totalstdmesh
-
+            mesh_p = os.path.join(opt.dir_A, data + '.obj')
                 
-        print ('******************', len(self.data_list), len(self.total_mesh))
-        # free the memory
-        self.total_t = []
-        self.total_m = []
+        print ('******************', len(self.data_list), len(self.allcode))
+       
     def __getitem__(self, index):
         t = time.time()
         tmp = self.data_list[index].split('/')
+
         A_id = int(tmp[0])
         A_exp = int(tmp[-1].split('_')[0])      
-        A_vertices = self.total_mesh[self.data_list[index]][0]
+        
+        meshcode = self.allcode[self.data_list[index]][0]
+        
         input_dict = { 'Amesh': torch.FloatTensor(A_vertices),
                 'A_path': self.data_list[index], 
                 'map_type':0, 'Aid': int(A_id) - 1, 'Aexp': int(A_exp) -1}
