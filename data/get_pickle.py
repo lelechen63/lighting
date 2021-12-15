@@ -9,11 +9,14 @@ sys.path.append("/data/home/uss00022/lelechen/github/lighting")
 from util.render_class import meshrender
 from tqdm import tqdm
 import torch
-from util.mark_detector import MarkDetector 
-from util.pose_estimator import PoseEstimator
+from util  import hopenet 
 import util.util as util
 import matplotlib.pyplot as plt
 import cv2
+
+from torchvision import transforms
+import torch.backends.cudnn as cudnn
+import torchvision
 
 def get_image_pickle():
     
@@ -496,44 +499,50 @@ def get_code( tt = 'train'):
     with open( dataroot +   '/compressed/all320_{}list.pkl'.format(tt), 'wb') as handle:
         pickle.dump(texmeshlist, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-def get_front_list(tt):
-    dataroot = '/nfs/STG/CodecAvatar/lelechen/Facescape'
-    all_list =  'compressed/all320_{}list.pkl'.format(tt)
-    _file = open(os.path.join(dataroot, all_list), "rb")
-    data_list = pickle.load(_file)
-    mark_detector = MarkDetector()
-    pose_estimator = PoseEstimator(img_size=(1024, 1024))
-    _file.close()
-    for data in data_list:
-        print (data)
-        tmp = data.split('/')
-        print(tmp)
-        img_f = os.path.join( dataroot, 'ffhq_aligned_img', tmp[0],tmp[-1])
-        print (img_f)
-        for i in range(60):
-            img_p = os.path.join( img_f, '%d.jpg')
-            frame = cv2.imread(img_p)
-            facebox = mark_detector.extract_cnn_facebox(frame)
-            if facebox is not None:
-                x1, y1, x2, y2 = facebox
-                face_img = frame[y1: y2, x1: x2]
+# def get_front_list(tt):
+#     dataroot = '/nfs/STG/CodecAvatar/lelechen/Facescape'
+#     all_list =  'compressed/all320_{}list.pkl'.format(tt)
+#     _file = open(os.path.join(dataroot, all_list), "rb")
+#     data_list = pickle.load(_file)
+    
+#     # ResNet50 structure
+#     model = hopenet.Multinet(torchvision.models.resnet.Bottleneck, [3, 4, 6, 3], 198)
+#     print 'Loading snapshot.'
+#     # Load snapshot
+#     saved_state_dict = torch.load('/home/uss00022/lelechen/github/lighting/checkpoints/util_checkpoint/AFLW2000.pkl')
+#     model.load_state_dict(saved_state_dict)
 
-                # Run the detection.
-                tm.start()
-                marks = mark_detector.detect_marks(face_img)
-                tm.stop()
+#     _file.close()
+#     for data in data_list:
+#         print (data)
+#         tmp = data.split('/')
+#         print(tmp)
+#         img_f = os.path.join( dataroot, 'ffhq_aligned_img', tmp[0],tmp[-1])
+#         print (img_f)
+#         for i in range(60):
+#             img_p = os.path.join( img_f, '%d.jpg')
+#             frame = cv2.imread(img_p)
+#             facebox = mark_detector.extract_cnn_facebox(frame)
+#             if facebox is not None:
+#                 x1, y1, x2, y2 = facebox
+#                 face_img = frame[y1: y2, x1: x2]
 
-                # Convert the locations from local face area to the global image.
-                marks *= (x2 - x1)
-                marks[:, 0] += x1
-                marks[:, 1] += y1
+#                 # Run the detection.
+#                 tm.start()
+#                 marks = mark_detector.detect_marks(face_img)
+#                 tm.stop()
 
-                # Try pose estimation with 68 points.
-                pose = pose_estimator.solve_pose_by_68_points(marks)
-                print (img_p, pose, '++++++++++++++')
+#                 # Convert the locations from local face area to the global image.
+#                 marks *= (x2 - x1)
+#                 marks[:, 0] += x1
+#                 marks[:, 1] += y1
+
+#                 # Try pose estimation with 68 points.
+#                 pose = pose_estimator.solve_pose_by_68_points(marks)
+#                 print (img_p, pose, '++++++++++++++')
             
 
-get_front_list('test')
+# get_front_list('test')
 
 
 # get_code()

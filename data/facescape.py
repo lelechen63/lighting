@@ -697,7 +697,7 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
 
         f = open( os.path.join(opt.dataroot, 'lists'), "r")
         for x in f:
-        print(x)
+            print(x)
 
         self.totalmeanmesh = np.load( "./predef/meshmean.npy" )
         self.totalstdmesh = np.load( "./predef/meshstd.npy" )
