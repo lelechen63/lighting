@@ -535,7 +535,7 @@ def get_front_list(tt):
     exp = get_exp()
     f = open( os.path.join(dataroot, 'lists', 'frontlist.txt'), "r")
     flist = {}
-    for x in f:
+    for x in tqdm(f):
         tmp = x.split(',')
         for t in exp:
             img_f = os.path.join(dataroot,'ffhq_aligned_img', tmp[0], t, tmp[1] +'_front.png')
