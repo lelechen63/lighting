@@ -539,7 +539,9 @@ def get_front_list(tt):
         tmp = x.split(',')
         for t in exp:
             img_f = os.path.join(dataroot,'ffhq_aligned_img', tmp[0], t, tmp[1] +'_front.png')
+            print (img_f)
             img = cv2.imread(img_f)
+            print (img.shape)
             img = cv2.resize(img, (256,256))
             flist[tmp[0] +'/models_reg/' + t] = img 
     
