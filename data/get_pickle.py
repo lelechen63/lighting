@@ -538,7 +538,7 @@ def get_front_list(tt):
     for x in tqdm(f):
         tmp = x.split(',')
         for t in exp:
-            img_f = os.path.join(dataroot,'ffhq_aligned_img', tmp[0], t, tmp[1] +'_front.png')
+            img_f = os.path.join(dataroot,'ffhq_aligned_img', tmp[0], t, tmp[1][:-1] +'_front.png')
             print (img_f)
             img = cv2.imread(img_f)
             print (img.shape)
