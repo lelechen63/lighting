@@ -9,6 +9,7 @@ sys.path.append("/data/home/uss00022/lelechen/github/lighting")
 from util.render_class import meshrender
 from tqdm import tqdm
 import torch
+form util import mark_detector, pose_estimator
 import util.util as util
 import matplotlib.pyplot as plt
 import cv2
@@ -509,7 +510,7 @@ def get_front_list(tt):
         for i in range(60):
             img_p = os.path.join( img_f, '%d.jpg')
             frame = cv2.imread(img_p)
-            facebox = util.mark_detector.extract_cnn_facebox(frame)
+            facebox = mark_detector.extract_cnn_facebox(frame)
             if facebox is not None:
                 x1, y1, x2, y2 = facebox
                 face_img = frame[y1: y2, x1: x2]
