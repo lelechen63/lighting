@@ -9,7 +9,7 @@ sys.path.append("/data/home/uss00022/lelechen/github/lighting")
 from util.render_class import meshrender
 from tqdm import tqdm
 import torch
-form util import mark_detector, pose_estimator
+from util import mark_detector, pose_estimator
 import util.util as util
 import matplotlib.pyplot as plt
 import cv2
