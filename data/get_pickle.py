@@ -500,6 +500,8 @@ def get_front_list(tt):
     all_list =  'compressed/all320_{}list.pkl'.format(tt)
     _file = open(os.path.join(dataroot, all_list), "rb")
     data_list = pickle.load(_file)
+    mark_detector = mark_detector.MarkDetector()
+    pose_estimator = pose_estimator.PoseEstimator(img_size=(1024, 1024))
     _file.close()
     for data in data_list:
         print (data)
