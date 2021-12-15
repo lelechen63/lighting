@@ -534,12 +534,17 @@ def get_front_list(tt):
     dataroot = '/nfs/STG/CodecAvatar/lelechen/Facescape'
     exp = get_exp()
     f = open( os.path.join(dataroot, 'lists', 'frontlist.txt'), "r")
+    flist = {}
     for x in f:
         tmp = x.split(',')
         for t in exp:
             img_f = os.path.join(dataroot,'ffhq_aligned_img', tmp[0], t, tmp[1] +'_front.png')
-            print (img_f)
-            
+            img = cv2.imread(img_f)
+            img = cv2.resize(img, 256, interpolation = cv2.INTER_ARE)
+            flist[tmp[0] +'/models_reg/' + t] = img 
+    
+    with open( dataroot +   '/compressed/ffhq_aligned_list.pkl', 'wb') as handle:
+        pickle.dump(flist, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
    
 get_front_list('test')
