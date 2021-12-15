@@ -540,7 +540,7 @@ def get_front_list(tt):
         for t in exp:
             img_f = os.path.join(dataroot,'ffhq_aligned_img', tmp[0], t, tmp[1] +'_front.png')
             img = cv2.imread(img_f)
-            img = cv2.resize(img, 256, interpolation = cv2.INTER_ARE)
+            img = cv2.resize(img, 256)
             flist[tmp[0] +'/models_reg/' + t] = img 
     
     with open( dataroot +   '/compressed/ffhq_aligned_list.pkl', 'wb') as handle:
