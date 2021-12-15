@@ -506,7 +506,28 @@ def get_front_list(tt):
         print(tmp)
         img_f = os.path.join( dataroot, 'ffhq_aligned_img', tmp[0],tmp[-1])
         print (img_f)
+        for i in range(60):
+            img_p = os.path.join( img_f, '%d.jpg')
+            frame = cv2.imread(img_p)
+            facebox = util.mark_detector.extract_cnn_facebox(frame)
+            if facebox is not None:
+                x1, y1, x2, y2 = facebox
+                face_img = frame[y1: y2, x1: x2]
 
+                # Run the detection.
+                tm.start()
+                marks = mark_detector.detect_marks(face_img)
+                tm.stop()
+
+                # Convert the locations from local face area to the global image.
+                marks *= (x2 - x1)
+                marks[:, 0] += x1
+                marks[:, 1] += y1
+
+                # Try pose estimation with 68 points.
+                pose = pose_estimator.solve_pose_by_68_points(marks)
+                print (img_p, pose, '++++++++++++++')
+            
 
 get_front_list('test')
 
