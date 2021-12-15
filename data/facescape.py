@@ -703,13 +703,17 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
         print ('******************', len(self.data_list), len(self.allcode))
        
     def __getitem__(self, index):
-        print (len( self.allcode[self.data_list[index]]), '!!!!!!!!!!!!')
-        meshcode = self.allcode[self.data_list[index]][0]
-        texcode = self.allcode[self.data_list[index]][1]
+        
+        print (self.data_list[index])
+        tmp = self.data_list[index].split('/')
+        print (tmp)
+        print ('=========')
+        meshcode = self.allcode[self.data_list[index]][0].view(-1) # 256
+        texcode = self.allcode[self.data_list[index]][1] # 512
         mesh = self.allcode[self.data_list[index]][2]
         tex = self.allcode[self.data_list[index]][3]
         
-        print ( meshcode.shape, texcode.shape, '++++++')
+        print ( meshcode.shape, texcode.shape, '++++++') 
         input_dict = { 
             'meshcode': torch.FloatTensor(meshcode),
             'texcode': torch.FloatTensor(texcode),
