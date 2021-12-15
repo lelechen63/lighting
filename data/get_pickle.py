@@ -496,7 +496,7 @@ def get_code( tt = 'train'):
 
 def get_front_list(tt):
     dataroot = '/nfs/STG/CodecAvatar/lelechen/Facescape'
-    all_list =  '/compressed/all320_{}list.pkl'.format(tt)
+    all_list =  'compressed/all320_{}list.pkl'.format(tt)
     _file = open(os.path.join(dataroot, all_list), "rb")
     data_list = pickle.load(_file)
     _file.close()
