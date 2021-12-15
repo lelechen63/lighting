@@ -708,7 +708,7 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
         tmp = self.data_list[index].split('/')
         print (tmp)
         print ('=========')
-        meshcode = self.allcode[self.data_list[index]][0].view(-1) # 256
+        meshcode = self.allcode[self.data_list[index]][0].reshape(-1) # 256
         texcode = self.allcode[self.data_list[index]][1] # 512
         mesh = self.allcode[self.data_list[index]][2]
         tex = self.allcode[self.data_list[index]][3]
