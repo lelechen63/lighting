@@ -12,6 +12,7 @@ import torch
 import util.util as util
 import matplotlib.pyplot as plt
 import cv2
+
 def get_image_pickle():
     
     base_p = '/raid/celong/FaceScape/ffhq_aligned_img'
@@ -66,7 +67,6 @@ def get_image_pickle():
         pickle.dump(train_list, handle, protocol=pickle.HIGHEST_PROTOCOL)
     with open('/raid/celong/FaceScape/lists/img_alone_test.pkl', 'wb') as handle:
         pickle.dump(test_list, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
 
 def get_paired_image_pickle():
     _file = open(os.path.join('/raid/celong/FaceScape', "lists/img_alone_train.pkl"), "rb")
@@ -152,8 +152,6 @@ def get_texmesh_pickle():
         pickle.dump(train_list, handle, protocol=pickle.HIGHEST_PROTOCOL)
     with open('/raid/celong/FaceScape/lists/texmesh_test.pkl', 'wb') as handle:
         pickle.dump(test_list, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-
 
 
 def get_mesh_pickle(debug = False):
@@ -296,8 +294,6 @@ def get_meanmesh():
     save_p = '/data/home/uss00022/lelechen/github/lighting/predef/meanmesh.npy'
     np.save( save_p, meanmesh )
 
-
-
 def get_mesh_total():
     dataroot = '/data/home/uss00022/lelechen/data/Facescape/'
     _file = open(os.path.join(dataroot, "lists/texmesh_train.pkl"), "rb")
@@ -317,8 +313,6 @@ def get_mesh_total():
         big.append(A_vertices)
     big = np.asarray(big)
     np.save( '/data/home/uss00022/lelechen/data/Facescape/bigmeshtrain.npy', big )
-
-
 
 def get_mesh_augment(debug =False, type ='train'):
     dataroot = '/data/home/uss00022/lelechen/data/Facescape/'
@@ -428,6 +422,7 @@ def get_tex_total(mode = 'train'):
         np.save( '/data/home/uss00022/lelechen/data/Facescape/originalbigtex256{}.npy'.format(mode), big )
     else:
         np.save( '/data/home/uss00022/lelechen/data/Facescape/originalbigtex256{}.npy'.format(mode), big )
+
 def get_texnorm():
     big = np.load( '/data/home/uss00022/lelechen/data/Facescape/bigtex256train.npy' )
     meantex = np.mean(big, axis=0)
@@ -488,20 +483,35 @@ def get_code( tt = 'train'):
             tex = tex * facial_seg
             codepkl[item].append(tex)                            # 4th element: texture 
 
-
         except:
             print (item, '++++++')
             continue
         if len(texmeshlist) == 100:
             break
     print (len(texmeshlist))
-    with open( dataroot +   '/compressed/all320_{}.pkl'.format('debug'), 'wb') as handle:
+    with open( dataroot +   '/compressed/all320_{}.pkl'.format(tt), 'wb') as handle:
         pickle.dump(codepkl, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    with open( dataroot +   '/compressed/all320_{}list.pkl'.format('debug'), 'wb') as handle:
+    with open( dataroot +   '/compressed/all320_{}list.pkl'.format(tt), 'wb') as handle:
         pickle.dump(texmeshlist, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
+def get_front_list(tt):
+    dataroot = '/nfs/STG/CodecAvatar/lelechen/Facescape'
+    all_list =  '/compressed/all320_{}list.pkl'.format(tt)
+    _file = open(os.path.join(dataroot, all_list), "rb")
+    data_list = pickle.load(_file)
+    _file.close()
+    for data in data_list:
+        print (data)
+        tmp = data.split('/')
+        print(tmp)
+        img_f = os.path.join( dataroot, 'ffhq_aligned_img', tmp[0],tmp[-1])
+        print (img_f)
 
-get_code()
+
+get_front_list('test')
+
+
+# get_code()
 # get_mesh_pickle(True)
 # get_mesh_augment(True,'test')
 # get_mesh_augment()

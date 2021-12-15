@@ -687,7 +687,6 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
             codelist = 'compressed/all320_debuglist.pkl'
             codepkl = 'compressed/all320_debug.pkl'
         
-            
         _file = open(os.path.join(opt.dataroot, codelist), "rb")
         self.data_list = pickle.load(_file)
         _file.close()
@@ -696,9 +695,12 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
         self.allcode = pickle.load(_file)
         _file.close()
 
+        f = open( os.path.join(opt.dataroot, 'lists'), "r")
+        for x in f:
+        print(x)
+
         self.totalmeanmesh = np.load( "./predef/meshmean.npy" )
         self.totalstdmesh = np.load( "./predef/meshstd.npy" )
-        cc = 0
 
         print ('******************', len(self.data_list), len(self.allcode))
        
