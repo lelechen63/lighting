@@ -695,7 +695,7 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
         self.allcode = pickle.load(_file)
         _file.close()
 
-        f = open( os.path.join(opt.dataroot, 'lists'), "r")
+        f = open( os.path.join(opt.dataroot, 'lists', 'frontlist.txt'), "r")
         for x in f:
             print(x)
 
