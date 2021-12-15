@@ -18,6 +18,36 @@ from torchvision import transforms
 import torch.backends.cudnn as cudnn
 import torchvision
 
+
+
+def get_exp():
+    expressions = {
+        1: "1_neutral",
+        2: "2_smile",
+        3: "3_mouth_stretch",
+        4: "4_anger",
+        5: "5_jaw_left",
+        6: "6_jaw_right",
+        7: "7_jaw_forward",
+        8: "8_mouth_left",
+        9: "9_mouth_right",
+        10: "10_dimpler",
+        11: "11_chin_raiser",
+        12: "12_lip_puckerer",
+        13: "13_lip_funneler",
+        14: "14_sadness",
+        15: "15_lip_roll",
+        16: "16_grin",
+        17: "17_cheek_blowing",
+        18: "18_eye_closed",
+        19: "19_brow_raiser",
+        20: "20_brow_lower"
+    }
+    exps = []
+    for i in range(1,21):
+        exps.append(expressions[i])
+    return set(exps)
+
 def get_image_pickle():
     
     base_p = '/raid/celong/FaceScape/ffhq_aligned_img'
@@ -499,50 +529,20 @@ def get_code( tt = 'train'):
     with open( dataroot +   '/compressed/all320_{}list.pkl'.format(tt), 'wb') as handle:
         pickle.dump(texmeshlist, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-# def get_front_list(tt):
-#     dataroot = '/nfs/STG/CodecAvatar/lelechen/Facescape'
-#     all_list =  'compressed/all320_{}list.pkl'.format(tt)
-#     _file = open(os.path.join(dataroot, all_list), "rb")
-#     data_list = pickle.load(_file)
-    
-#     # ResNet50 structure
-#     model = hopenet.Multinet(torchvision.models.resnet.Bottleneck, [3, 4, 6, 3], 198)
-#     print 'Loading snapshot.'
-#     # Load snapshot
-#     saved_state_dict = torch.load('/home/uss00022/lelechen/github/lighting/checkpoints/util_checkpoint/AFLW2000.pkl')
-#     model.load_state_dict(saved_state_dict)
+def get_front_list(tt):
 
-#     _file.close()
-#     for data in data_list:
-#         print (data)
-#         tmp = data.split('/')
-#         print(tmp)
-#         img_f = os.path.join( dataroot, 'ffhq_aligned_img', tmp[0],tmp[-1])
-#         print (img_f)
-#         for i in range(60):
-#             img_p = os.path.join( img_f, '%d.jpg')
-#             frame = cv2.imread(img_p)
-#             facebox = mark_detector.extract_cnn_facebox(frame)
-#             if facebox is not None:
-#                 x1, y1, x2, y2 = facebox
-#                 face_img = frame[y1: y2, x1: x2]
-
-#                 # Run the detection.
-#                 tm.start()
-#                 marks = mark_detector.detect_marks(face_img)
-#                 tm.stop()
-
-#                 # Convert the locations from local face area to the global image.
-#                 marks *= (x2 - x1)
-#                 marks[:, 0] += x1
-#                 marks[:, 1] += y1
-
-#                 # Try pose estimation with 68 points.
-#                 pose = pose_estimator.solve_pose_by_68_points(marks)
-#                 print (img_p, pose, '++++++++++++++')
+    dataroot = '/nfs/STG/CodecAvatar/lelechen/Facescape'
+    exp = get_exp()
+    f = open( os.path.join(dataroot, 'lists', 'frontlist.txt'), "r")
+    for x in f:
+        tmp = x.split(',')
+        for t in exp:
+            img_f = os.path.join(dataroot,'ffhq_aligned_img', tmp[0], t, tmp[1] +'_front.png')
+            print (img_f)
             
 
-# get_front_list('test')
+   
+get_front_list('test')
 
 
 # get_code()
