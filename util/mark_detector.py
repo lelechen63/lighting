@@ -63,7 +63,7 @@ class FaceDetector:
 class MarkDetector:
     """Facial landmark detector by Convolutional Neural Network"""
 
-    def __init__(self, saved_model='util/pose_estimate_assets/pose_model'):
+    def __init__(self, saved_model='util/pose_estimate_assets/pose_model/saved_model.pb'):
         """Initialization"""
         # A face detector is required for mark detection.
         self.face_detector = FaceDetector()
