@@ -530,30 +530,23 @@ def get_front(tt):
 
     dataroot = '/nfs/STG/CodecAvatar/lelechen/Facescape'
     exp = get_exp()
-    f = open( os.path.join(dataroot, 'lists', 'frontlist.txt'), "r")
-    flist = {}
-    for x in tqdm(f):
-        tmp = x.split(',')
-        for t in exp:
-            flage = False
-            try:
-                img_f = os.path.join(dataroot,'ffhq_aligned_img', tmp[0], t, tmp[1][:-1] +'_front.png')
-                img = cv2.imread(img_f)
-                img = cv2.resize(img, (256,256))
-                flist[tmp[0] +'/models_reg/' + t] = img 
-                flage = True
-            except:
-                for j in os.listdir( os.path.join(dataroot,'ffhq_aligned_img', tmp[0], t) ):
-                    if 'front' in j:
-                        img_f = os.path.join(dataroot,'ffhq_aligned_img', tmp[0], t, j)
-                        img = cv2.imread(img_f)
-                        img = cv2.resize(img, (256,256))
-                        flist[tmp[0] +'/models_reg/' + t] = img
-                        flage = True 
-            if not  flage :
-                print (tmp[0] +'/models_reg/' + t)
-            
 
+    _file = open( os.path.join( dataroot, '/compressed/frontlist.pkl') , "rb")
+    front_indx = pickle.load(_file)
+
+    flist = {}
+    for x in tqdm(front_indx.keys()):
+        tmp = x.split('/')
+        img_p =  os.path.join( dataroot,'ffhq_aligned_img', tmp[0], tmp[-1], front_indx[x] + '.png' )
+        mask_p =  os.path.join( dataroot,'ffhq_aligned_img', tmp[0], tmp[-1], front_indx[x] + '_mask.png' )
+        img = cv2.imread(img_p)
+        img = cv2.resize(img, (256,256))
+        mask = cv2.imread(mask_p)
+        mask = cv2.resize(mask, (256,256))
+        img = img * mask
+
+        flist[x] = img 
+        
     with open( dataroot +   '/compressed/ffhq_aligned_list.pkl', 'wb') as handle:
         pickle.dump(flist, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
