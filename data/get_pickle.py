@@ -538,11 +538,13 @@ def get_front_list(tt):
     for x in tqdm(f):
         tmp = x.split(',')
         for t in exp:
+            flage = False
             try:
                 img_f = os.path.join(dataroot,'ffhq_aligned_img', tmp[0], t, tmp[1][:-1] +'_front.png')
                 img = cv2.imread(img_f)
                 img = cv2.resize(img, (256,256))
                 flist[tmp[0] +'/models_reg/' + t] = img 
+                flage = True
             except:
                 for j in os.listdir( os.path.join(dataroot,'ffhq_aligned_img', tmp[0], t) ):
                     if 'front' in j:
@@ -550,6 +552,10 @@ def get_front_list(tt):
                         img = cv2.imread(img_f)
                         img = cv2.resize(img, (256,256))
                         flist[tmp[0] +'/models_reg/' + t] = img
+                        flage = True 
+            if not  flage :
+                print (tmp[0] +'/models_reg/' + t)
+            
 
     with open( dataroot +   '/compressed/ffhq_aligned_list.pkl', 'wb') as handle:
         pickle.dump(flist, handle, protocol=pickle.HIGHEST_PROTOCOL)
