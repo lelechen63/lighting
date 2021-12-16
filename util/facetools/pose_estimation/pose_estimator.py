@@ -90,5 +90,4 @@ def get_front_list(tt):
         pickle.dump(frontlist, handle, protocol=pickle.HIGHEST_PROTOCOL)
         
 
-
 get_front_list('test')
