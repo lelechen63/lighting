@@ -55,7 +55,7 @@ def get_front_list(tt):
                 
                 yaw.append(pose[0][0][0])
 
-                print (i, ':    ', yaw)
+                print (i, ':    ', pose[0][0][0])
 
                 cv2.imwrite("./tmp/%d.png"%i, img)
         
