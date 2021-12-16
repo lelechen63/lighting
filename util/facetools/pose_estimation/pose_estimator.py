@@ -52,9 +52,8 @@ def get_front_list(tt):
                 pp = new_p[i][k]
                 pp = np.asarray(pp)
                 pose = solve_pose_by_68_points(pp, imgsize, model_points_68)
-                print (pose[0])
-                print (pose[0].shape)
-                yaw.append(pose[0,0,0])
+                
+                yaw.append(pose[0][0][0])
                 cv2.putText(img, str(yaw), (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 0.5 )
 
                 cv2.imwrite("./tmp/%d.png"%i, img)
