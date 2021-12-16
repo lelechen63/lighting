@@ -51,7 +51,7 @@ def get_front_list(tt):
     for pid in tqdm(os.listdir(  '/nfs/STG/CodecAvatar/lelechen/Facescape/ffhq_aligned_img' )):
         for exp in exps:
             img_f = os.path.join( dataroot, 'ffhq_aligned_img', pid, exp )
-            frames = []
+            # frames = []
             new_p = []
             # try:
             for i in range(60):
@@ -60,14 +60,14 @@ def get_front_list(tt):
                     image = cv2.imread(img_p)
                     image = cv2.resize(image, imgsize)
                     preds = detector.get_landmarks(image)
-                    preds = np.asarray(preds)
-                    print (preds.shape)
                     if len(preds) >= 1:
+                        
                         new_p.append(preds[0])
                     else:
                         new_p.append([])
-                    frames.append(image)
+                    # frames.append(image)
                 except:
+                    print (img_p,'====')
                     continue
             # batch  = np.stack(frames)
             # batch = torch.Tensor(batch.transpose(0, 3, 1, 2))
@@ -88,6 +88,7 @@ def get_front_list(tt):
                 if pp == []:
                     continue
                 else:
+                    pp = np.asarray(pp)
                     pose = solve_pose_by_68_points(pp, imgsize, model_points_68)
                     yaw = abs(pose[0][0][0])
                     if yaw < smallyaw:
