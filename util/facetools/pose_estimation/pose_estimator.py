@@ -37,7 +37,7 @@ def get_front_list(tt):
                 continue
         batch  = np.stack(frames)
         batch = torch.Tensor(batch.transpose(0, 3, 1, 2))
-        points = self.detector.get_landmarks_from_batch(batch)
+        points = detector.get_landmarks_from_batch(batch)
         new_p = []
         for k in range(len(points)):
             tmp = []
