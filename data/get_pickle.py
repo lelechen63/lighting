@@ -537,8 +537,8 @@ def get_front():
     flist = {}
     for x in tqdm(front_indx.keys()):
         tmp = x.split('/')
-        img_p =  os.path.join( dataroot,'ffhq_aligned_img', tmp[0], tmp[-1], front_indx[x] + '.png' )
-        mask_p =  os.path.join( dataroot,'ffhq_aligned_img', tmp[0], tmp[-1], front_indx[x] + '_mask.png' )
+        img_p =  os.path.join( dataroot,'ffhq_aligned_img', tmp[0], tmp[-1], str(front_indx[x]) + '.png' )
+        mask_p =  os.path.join( dataroot,'ffhq_aligned_img', tmp[0], tmp[-1], str(front_indx[x]) + '_mask.png' )
         img = cv2.imread(img_p)
         img = cv2.resize(img, (256,256))
         mask = cv2.imread(mask_p)
