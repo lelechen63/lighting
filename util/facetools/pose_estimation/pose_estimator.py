@@ -22,7 +22,8 @@ def get_front_list(tt):
     _file.close()
     for data in data_list:
         tmp = data.split('/')
-        img_f = os.path.join( dataroot, 'ffhq_aligned_img', tmp[0],tmp[-1])
+        # img_f = os.path.join( dataroot, 'ffhq_aligned_img', tmp[0],tmp[-1])
+        img_f = os.path.join( dataroot, 'ffhq_aligned_img', '233',tmp[-1])
         frames = []
         for i in range(60):
             try:
