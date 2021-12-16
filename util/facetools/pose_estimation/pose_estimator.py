@@ -67,14 +67,15 @@ def get_front_list(tt):
             batch  = np.stack(frames)
             batch = torch.Tensor(batch.transpose(0, 3, 1, 2))
             points = detector.get_landmarks_from_batch(batch)
-            print (np.asarray(points).shape, '++++++')
+            print (len(points))
+            print (np.asarray(points[0]).shape, '++++++')
             new_p = []
             for k in range(len(points)):
                 tmp = []
                 for j in range(int(len(points[k])/68)):
                     tmp.append(points[k][68 * j : 68 * (j +1)].tolist())
                 new_p.append(tmp)
-            print (np.asarray(new_p).shape, '+++----+++')
+            print (np.asarray(new_p[0]).shape, '+++----+++')
             smallyaw = 100
             smallidx = -1
             for i in range(len(new_p)):
