@@ -14,9 +14,6 @@ import util.util as util
 import matplotlib.pyplot as plt
 import cv2
 
-from torchvision import transforms
-import torch.backends.cudnn as cudnn
-import torchvision
 
 
 
@@ -529,7 +526,7 @@ def get_code( tt = 'train'):
     with open( dataroot +   '/compressed/all320_{}list.pkl'.format(tt), 'wb') as handle:
         pickle.dump(texmeshlist, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-def get_front_list(tt):
+def get_front(tt):
 
     dataroot = '/nfs/STG/CodecAvatar/lelechen/Facescape'
     exp = get_exp()
@@ -560,8 +557,9 @@ def get_front_list(tt):
     with open( dataroot +   '/compressed/ffhq_aligned_list.pkl', 'wb') as handle:
         pickle.dump(flist, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-   
-get_front_list('test')
+
+
+# get_front_list('test')
 
 
 # get_code()
