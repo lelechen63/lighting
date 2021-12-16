@@ -83,7 +83,7 @@ def get_front_list(tt):
                 print (img_f, '!!!!!!!')
                 continue
         #     break
-        break
+        # break
     print (frontlist)
     print (len(frontlist))
     with open( dataroot +   '/compressed/frontlist.pkl', 'wb') as handle:
