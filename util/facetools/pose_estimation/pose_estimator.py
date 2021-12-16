@@ -47,7 +47,7 @@ def get_front_list(tt):
     imgsize = (256,256)
     frontlist = {}
     exps = get_exp()
-    for pid in os.listdir(  '/nfs/STG/CodecAvatar/lelechen/Facescape/ffhq_aligned_img' ):
+    for pid in tqdm(os.listdir(  '/nfs/STG/CodecAvatar/lelechen/Facescape/ffhq_aligned_img' )):
         for exp in exps:
             img_f = os.path.join( dataroot, 'ffhq_aligned_img', pid, exp )
             frames = []
@@ -83,6 +83,7 @@ def get_front_list(tt):
                         smallyaw = yaw
                         smallidx = i
             frontlist[ pid+ '/models_reg/' + exp] = smallidx
+        break
     print (frontlist)
     with open( dataroot +   '/compressed/frontlist.pkl', 'wb') as handle:
         pickle.dump(frontlist, handle, protocol=pickle.HIGHEST_PROTOCOL)
