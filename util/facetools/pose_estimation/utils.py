@@ -92,13 +92,9 @@ def HPS(image, shape_array):
     print("Rotation Vector:\n {0}".format(rotation_vector))
     print("Translation Vector:\n {0}".format(translation_vector))
      
-     
     # Project a 3D point (0, 0, 1000.0) onto the image plane.
     # We use this to draw a line sticking out of the nose   
     (nose_end_point2D, jacobian) = cv2.projectPoints(np.array([(0.0, 0.0, 1000.0)]), rotation_vector, translation_vector, camera_matrix, dist_coeffs)
-     
-    # for p in image_points:
-    #     cv2.circle(image, (int(p[0]), int(p[1])), 3, (0,0,255), -1)  
      
     p1 = ( int(image_points[0][0]), int(image_points[0][1]))
     p2 = ( int(nose_end_point2D[0][0][0]), int(nose_end_point2D[0][0][1]))

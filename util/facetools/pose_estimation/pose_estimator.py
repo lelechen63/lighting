@@ -25,6 +25,7 @@ def get_front_list(tt):
         for i in range(60):
             img_p = os.path.join( img_f, '%d.jpg'%i)
             print (img_p)
+            img_p = '/nfs/STG/CodecAvatar/lelechen/Facescape/ffhq_aligned_img/1/1_neutral/1.jpg'
             image = cv2.imread(img_p)
             image = cv2.resize(image, (256,256))
             
@@ -49,10 +50,6 @@ def get_front_list(tt):
                 # show the face number
                 cv2.putText(image, "Face #{}".format(i + 1), (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
                 
-                # loop over the (x, y)-coordinates for the facial landmarks and draw them on the image
-                #for (x, y) in shape_array:
-                    #cv2.circle(image, (x, y), 1, (0, 0, 255), -1)   # Negative thickness means that a filled circle is to be drawn.
-            
                 cv2.imwrite("./Result.png", image)
                 print (ggggg)
 
