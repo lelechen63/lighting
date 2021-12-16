@@ -80,7 +80,7 @@ def get_front_list(tt):
                 else:
                     pp = np.asarray(pp)
                     pose = solve_pose_by_68_points(pp, imgsize, model_points_68)
-                    print (i, pose[0][0])
+                    print (i, pose)
                     yaw = abs(pose[0][0][0])
                     if yaw < smallyaw:
                         smallyaw = yaw
