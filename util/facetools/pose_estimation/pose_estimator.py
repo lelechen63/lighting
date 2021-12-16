@@ -24,7 +24,7 @@ def get_front_list(tt):
         tmp = data.split('/')
         img_f = os.path.join( dataroot, 'ffhq_aligned_img', tmp[0],tmp[-1])
         frames = []
-        for i in range(60):
+        for i in range(4):
             try:
                 img_p = os.path.join( img_f, '%d.jpg'%i)
                 print (img_p)
@@ -39,6 +39,8 @@ def get_front_list(tt):
         batch = torch.Tensor(batch.transpose(0, 3, 1, 2))
         points = detector.get_landmarks_from_batch(batch)
         new_p = []
+        print (len(points))
+        print (len(points[0]))
         for k in range(len(points)):
             tmp = []
             for j in range(int(points[k].shape[0]/68)):
