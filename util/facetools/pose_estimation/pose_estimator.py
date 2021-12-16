@@ -9,6 +9,7 @@ import pickle
 # dlib’s pre-trained facial landmark detector
 import face_alignment
 import torch
+from tqdm import tqdm 
 
 def get_exp():
     expressions = {
@@ -83,8 +84,9 @@ def get_front_list(tt):
                         smallyaw = yaw
                         smallidx = i
             frontlist[ pid+ '/models_reg/' + exp] = smallidx
+            print (frontlist)
         break
-    print (frontlist)
+    
     with open( dataroot +   '/compressed/frontlist.pkl', 'wb') as handle:
         pickle.dump(frontlist, handle, protocol=pickle.HIGHEST_PROTOCOL)
         
