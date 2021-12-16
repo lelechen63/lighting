@@ -526,7 +526,7 @@ def get_code( tt = 'train'):
     with open( dataroot +   '/compressed/all320_{}list.pkl'.format(tt), 'wb') as handle:
         pickle.dump(texmeshlist, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-def get_front(tt):
+def get_front():
 
     dataroot = '/nfs/STG/CodecAvatar/lelechen/Facescape'
     exp = get_exp()
@@ -552,7 +552,7 @@ def get_front(tt):
 
 
 
-# get_front_list('test')
+get_front()
 
 
 # get_code()
