@@ -10,7 +10,7 @@ import numpy as np
 # *****************************************************************************
 
 
-def _get_full_model_points( filename='predf/model.txt'):
+def _get_full_model_points( filename='./dlib.txt'):
         """Get all 68 3D model points from file"""
         raw_value = []
         with open(filename) as file:
