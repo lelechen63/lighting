@@ -9,99 +9,66 @@ import numpy as np
 # Parameters, Input Data
 # *****************************************************************************
 
-# Data required for HPE
 
-# Camera internals
-image_size = [256,256]
-focal_length = image_size[1]   # image width
-center = (image_size[1]/2, image_size[0]/2)
-camera_matrix = np.array(
-                         [[focal_length, 0, center[0]],
-                         [0, focal_length, center[1]],
-                         [0, 0, 1]], dtype = "double"
-                         )
- 
-print("Camera Matrix :\n {0}".format(camera_matrix))  
+def _get_full_model_points( filename='predf/model.txt'):
+        """Get all 68 3D model points from file"""
+        raw_value = []
+        with open(filename) as file:
+            for line in file:
+                raw_value.append(line)
+        model_points = np.array(raw_value, dtype=np.float32)
+        model_points = np.reshape(model_points, (3, -1)).T
 
-# 3D model points.
-model_points = np.array([   (0.0, 0.0, 0.0),             # Nose tip
-                            (0.0, -330.0, -65.0),        # Chin
-                            (-225.0, 170.0, -135.0),     # Left eye left corner
-                            (225.0, 170.0, -135.0),      # Right eye right corne
-                            (-150.0, -150.0, -125.0),    # Left Mouth corner
-                            (150.0, -150.0, -125.0)      # Right mouth corner
-                         
-                        ])
+        # Transform the model into a front view.
+        model_points[:, 2] *= -1
 
+        return model_points
 
-# Input vector of distortion coefficients, Assuming no lens distortion
-dist_coeffs = np.zeros((4,1))   
+def solve_pose_by_68_points( image_points, size = (480, 640), model_points_68=None):
+        """
+        Solve pose from all the 68 image points
+        Return (rotation_vector, translation_vector) as pose.
+        """
+        model_points = np.array([
+            (0.0, 0.0, 0.0),             # Nose tip
+            (0.0, -330.0, -65.0),        # Chin
+            (-225.0, 170.0, -135.0),     # Left eye left corner
+            (225.0, 170.0, -135.0),      # Right eye right corner
+            (-150.0, -150.0, -125.0),    # Mouth left corner
+            (150.0, -150.0, -125.0)      # Mouth right corner
+        ]) / 4.5
 
+        # model_points_68 = _get_full_model_points()
 
-# *****************************************************************************
-# Functions
-# *****************************************************************************
+        # Camera internals
+        focal_length = size[1]
+        camera_center = (size[1] / 2, size[0] / 2)
+        camera_matrix = np.array(
+            [[focal_length, 0, camera_center[0]],
+             [0, focal_length, camera_center[1]],
+             [0, 0, 1]], dtype="double")
 
-# rectangle to bounding box
-def rect_to_bb(rect):
-	
-    # take a bounding predicted by dlib face detector and convert it
-    # to the format (x, y, w, h) as we would normally do with OpenCV
-    # The "rect" object includes the (x, y)-coordinates of the detection.
-        
-    x = rect.left()
-    y = rect.top()
-    w = rect.right() - x
-    h = rect.bottom() - y
-     
-    # return a tuple of (x, y, w, h)
-    return (x, y, w, h)
+        # Assuming no lens distortion
+        dist_coeefs = np.zeros((4, 1))
 
+        # Rotation vector and translation vector
+        r_vec = np.array([[0.01891013], [0.08560084], [-3.14392813]])
+        t_vec = np.array(
+            [[-14.97821226], [-10.62040383], [-2053.03596872]])
 
-# dlib face landmark detector returns a shape object containing the 68 (x, y)-coordinates 
-# of the facial landmark regions. We convert this object to a NumPy array. 
-# shape is a dlib object, containing 68 landmark points (shape.part)
-def shape_to_np(shape, dtype="int"):
-	
-    # initialize the list of (x, y)-coordinates
-    coords = np.zeros((68, 2), dtype=dtype)
-     
-    # loop over the 68 facial landmarks and convert them to a 2-tuple of (x, y)-coordinates
-    for i in range(0, 68):
-        coords[i] = (shape.part(i).x, shape.part(i).y)
-     
-    # return the list of (x, y)-coordinates, data-type is numpy array
-    return coords
+        if r_vec is None:
+            (_, rotation_vector, translation_vector) = cv2.solvePnP(
+                model_points_68, image_points, camera_matrix, dist_coeefs)
+            r_vec = rotation_vector
+            t_vec = translation_vector
 
+        (_, rotation_vector, translation_vector) = cv2.solvePnP(
+            model_points_68,
+            image_points,
+            camera_matrix,
+            dist_coeefs,
+            rvec=r_vec,
+            tvec=t_vec,
+            useExtrinsicGuess=True)
 
-# Head Pose Estimation function
-def HPS(image, shape_array):
-    
-    #2D image points. 
-    image_points = np.array([   shape_array[30],     # Nose tip
-                                shape_array[8],      # Chin
-                                shape_array[36],     # Left eye left corner
-                                shape_array[45],     # Right eye right corne
-                                shape_array[48],     # Left Mouth corner
-                                shape_array[54]      # Right mouth corner
-                            ], dtype="double")
-     
-  
-    (success, rotation_vector, translation_vector) = cv2.solvePnP(model_points, image_points, camera_matrix, dist_coeffs) #, flags=SOLVEPNP_ITERATIVE)
-     
-    print("Rotation Vector:\n {0}".format(rotation_vector))
-    print("Translation Vector:\n {0}".format(translation_vector))
-     
-    # Project a 3D point (0, 0, 1000.0) onto the image plane.
-    # We use this to draw a line sticking out of the nose   
-    (nose_end_point2D, jacobian) = cv2.projectPoints(np.array([(0.0, 0.0, 1000.0)]), rotation_vector, translation_vector, camera_matrix, dist_coeffs)
-     
-    p1 = ( int(image_points[0][0]), int(image_points[0][1]))
-    p2 = ( int(nose_end_point2D[0][0][0]), int(nose_end_point2D[0][0][1]))
-     
-    cv2.line(image, p1, p2, (255,0,0), 2)
-    return image
-
-# *****************************************************************************
-# Face Detection , Facial Landmark Predictor , Head Pose Estimation
-# *****************************************************************************
+        return (rotation_vector, translation_vector)
