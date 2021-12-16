@@ -55,43 +55,33 @@ def get_front_list(tt):
             img_f = os.path.join( dataroot, 'ffhq_aligned_img', pid, exp )
             # frames = []
             new_p = []
-            # try:
-            for i in range(60):
-                try:
-                    img_p = os.path.join( img_f, '%d.jpg'%i)
-                    image = cv2.imread(img_p)
-                    image = cv2.resize(image, imgsize)
-                    input_img = io.imread(img_p)
-                    preds = detector.get_landmarks(image)
-                    if preds is None:
-                        new_p.append([])
-                    else:
-                        new_p.append(preds[0])
-                    
-                except:
-                    print (img_p,'====')
-                    continue
             smallyaw = 100
-            smallidx = -1
-            for i in range(len(new_p)):
-                pp = new_p[i]
-                if pp == []:
-                    continue
-                else:
-                    pp = np.asarray(pp)
-                    pose = solve_pose_by_68_points(pp, imgsize, model_points_68)
-                    print (i, pose[0].shape)
-                    print (pose[0])
-                    print (pose[0][0][0], pose[0][1][0])
-                    yaw = abs(pose[0][0][0]) + abs(pose[0][1][0])
-                    if yaw < smallyaw:
-                        smallyaw = yaw
-                        smallidx = i
-            frontlist[ pid+ '/models_reg/' + exp] = smallidx
-            # except:
-            #     print (img_f, '!!!!!!!')
-            #     continue
-            break
+            try:
+                for i in range(60):
+                    try:
+                        img_p = os.path.join( img_f, '%d.jpg'%i)
+                        image = cv2.imread(img_p)
+                        image = cv2.resize(image, imgsize)
+                        input_img = io.imread(img_p)
+                        preds = detector.get_landmarks(image)
+                        if preds is None:
+                            continue 
+                        else:
+                            pp = np.asarray(preds[0])
+                            pose = solve_pose_by_68_points(pp, imgsize, model_points_68)
+                            yaw = abs(pose[0][0][0]) + abs(pose[0][1][0])
+                            if yaw < smallyaw:
+                                smallyaw = yaw
+                                smallidx = i
+                            
+                    except:
+                        continue
+            
+                frontlist[ pid+ '/models_reg/' + exp] = smallidx
+            except:
+                print (img_f, '!!!!!!!')
+                continue
+        #     break
         break
     print (frontlist)
     print (len(frontlist))
