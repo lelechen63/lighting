@@ -10,7 +10,7 @@ import pickle
 import face_alignment
 import torch
 from tqdm import tqdm 
-
+from skimage import io
 def get_exp():
     expressions = {
         1: "1_neutral",
