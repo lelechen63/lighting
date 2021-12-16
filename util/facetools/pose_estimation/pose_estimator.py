@@ -52,43 +52,44 @@ def get_front_list(tt):
         for exp in exps:
             img_f = os.path.join( dataroot, 'ffhq_aligned_img', pid, exp )
             frames = []
-            try:
-                for i in range(60):
-                    # try:
-                        img_p = os.path.join( img_f, '%d.jpg'%i)
-                        image = cv2.imread(img_p)
-                        image = cv2.resize(image, imgsize)
-                        preds = detector.get_landmarks(image)
-                        print (preds.shape)
-                        frames.append(image)
-                    # except:
-                    #     continue
-                batch  = np.stack(frames)
-                batch = torch.Tensor(batch.transpose(0, 3, 1, 2))
-                points = detector.get_landmarks_from_batch(batch)
-                new_p = []
-                for k in range(len(points)):
-                    tmp = []
-                    for j in range(int(len(points[k])/68)):
-                        tmp.append(points[k][68 * j : 68 * (j +1)].tolist())
-                    new_p.append(tmp)
-                
-                smallyaw = 100
-                smallidx = -1
-                for i in range(len(new_p)):
-                    img = frames[i]
-                    for k in range(len(new_p[i])): 
-                        pp = new_p[i][k]
-                        pp = np.asarray(pp)
-                        pose = solve_pose_by_68_points(pp, imgsize, model_points_68)
-                        yaw = abs(pose[0][0][0])
-                        if yaw < smallyaw:
-                            smallyaw = yaw
-                            smallidx = i
-                frontlist[ pid+ '/models_reg/' + exp] = smallidx
-            except:
-                print (img_f, '!!!!!!!')
-                continue
+            # try:
+            for i in range(60):
+                # try:
+                    img_p = os.path.join( img_f, '%d.jpg'%i)
+                    image = cv2.imread(img_p)
+                    image = cv2.resize(image, imgsize)
+                    preds = detector.get_landmarks(image)
+                    preds = np.asarray(preds)
+                    print (preds.shape)
+                    frames.append(image)
+                # except:
+                #     continue
+            batch  = np.stack(frames)
+            batch = torch.Tensor(batch.transpose(0, 3, 1, 2))
+            points = detector.get_landmarks_from_batch(batch)
+            new_p = []
+            for k in range(len(points)):
+                tmp = []
+                for j in range(int(len(points[k])/68)):
+                    tmp.append(points[k][68 * j : 68 * (j +1)].tolist())
+                new_p.append(tmp)
+            
+            smallyaw = 100
+            smallidx = -1
+            for i in range(len(new_p)):
+                img = frames[i]
+                for k in range(len(new_p[i])): 
+                    pp = new_p[i][k]
+                    pp = np.asarray(pp)
+                    pose = solve_pose_by_68_points(pp, imgsize, model_points_68)
+                    yaw = abs(pose[0][0][0])
+                    if yaw < smallyaw:
+                        smallyaw = yaw
+                        smallidx = i
+            frontlist[ pid+ '/models_reg/' + exp] = smallidx
+            # except:
+            #     print (img_f, '!!!!!!!')
+            #     continue
         break
     print (frontlist)
     print (len(frontlist))
