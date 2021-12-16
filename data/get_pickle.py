@@ -545,12 +545,11 @@ def get_front():
             mask = cv2.imread(mask_p)
             mask = cv2.resize(mask, (256,256))
             img = img * mask
-            cv2.imwrite('./tmp.png', img)
+            cv2.imwrite('./tmp/{}_{}.png'.format(tmp[0], tmp[-1]), img)
             flist[x] = img 
         except:
             print ('+++++')
             continue
-        break
         
     with open( dataroot +   '/compressed/ffhq_aligned_list.pkl', 'wb') as handle:
         pickle.dump(flist, handle, protocol=pickle.HIGHEST_PROTOCOL)

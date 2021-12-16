@@ -80,7 +80,7 @@ def get_front_list(tt):
                         pp = new_p[i][k]
                         pp = np.asarray(pp)
                         pose = solve_pose_by_68_points(pp, imgsize, model_points_68)
-                        yaw = pose[0][0][0]
+                        yaw = abs(pose[0][0][0])
                         if yaw < smallyaw:
                             smallyaw = yaw
                             smallidx = i
@@ -88,6 +88,7 @@ def get_front_list(tt):
             except:
                 print (img_f, '!!!!!!!')
                 continue
+        break
     print (frontlist)
     print (len(frontlist))
     with open( dataroot +   '/compressed/frontlist.pkl', 'wb') as handle:
