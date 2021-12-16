@@ -3,7 +3,7 @@
 import dlib 
 import cv2
 import numpy as np
-from utils import *
+from utils import _get_full_model_points, solve_pose_by_68_points
 import os
 import pickle
 # dlib’s pre-trained facial landmark detector
