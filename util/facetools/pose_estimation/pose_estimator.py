@@ -55,35 +55,20 @@ def get_front_list(tt):
             new_p = []
             # try:
             for i in range(60):
-                # try:
+                try:
                     img_p = os.path.join( img_f, '%d.jpg'%i)
                     image = cv2.imread(img_p)
                     image = cv2.resize(image, imgsize)
                     input_img = io.imread(img_p)
-                    print (input_img.shape, image.shape)
                     preds = detector.get_landmarks(image)
                     if preds is None:
                         new_p.append([])
-                        print (img_p)
                     else:
                         new_p.append(preds[0])
                     
-                    # frames.append(image)
-                # except:
-                #     print (img_p,'====')
-                #     continue
-            # batch  = np.stack(frames)
-            # batch = torch.Tensor(batch.transpose(0, 3, 1, 2))
-            # points = detector.get_landmarks_from_batch(batch)
-            # print (len(points))
-            # print (np.asarray(points[0]).shape, '++++++')
-            # new_p = []
-            # for k in range(len(points)):
-            #     tmp = []
-            #     for j in range(int(len(points[k])/68)):
-            #         tmp.append(points[k][68 * j : 68 * (j +1)].tolist())
-            #     new_p.append(tmp)
-            # print (np.asarray(new_p[0]).shape, '+++----+++')
+                except:
+                    print (img_p,'====')
+                    continue
             smallyaw = 100
             smallidx = -1
             for i in range(len(new_p)):
