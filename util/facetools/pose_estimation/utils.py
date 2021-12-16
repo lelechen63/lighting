@@ -12,6 +12,7 @@ import numpy as np
 # Data required for HPE
 
 # Camera internals
+image_size = [256,256]
 focal_length = image_size[1]   # image width
 center = (image_size[1]/2, image_size[0]/2)
 camera_matrix = np.array(
