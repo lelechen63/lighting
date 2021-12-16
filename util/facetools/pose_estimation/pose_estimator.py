@@ -28,7 +28,7 @@ def get_front_list(tt):
             try:
                 img_p = os.path.join( img_f, '%d.jpg'%i)
                 print (img_p)
-                img_p = '/nfs/STG/CodecAvatar/lelechen/Facescape/ffhq_aligned_img/1/1_neutral/1.jpg'
+                # img_p = '/nfs/STG/CodecAvatar/lelechen/Facescape/ffhq_aligned_img/1/1_neutral/1.jpg'
                 image = cv2.imread(img_p)
                 image = cv2.resize(image, imgsize)
                 frames.append(image)
