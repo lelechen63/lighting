@@ -38,10 +38,10 @@ def get_front_list(tt):
         batch  = np.stack(frames)
         batch = torch.Tensor(batch.transpose(0, 3, 1, 2))
         points = detector.get_landmarks_from_batch(batch)
+        points = np.asarray(points)
+        print (points.shape)
         new_p = []
-        print (len(points))
-        print (len(points[0]))
-        for k in range(len(points)):
+        for k in range(points.shape[0]):
             tmp = []
             for j in range(int(points[k].shape[0]/68)):
                 tmp.append(points[k][68 * j : 68 * (j +1)].tolist())
