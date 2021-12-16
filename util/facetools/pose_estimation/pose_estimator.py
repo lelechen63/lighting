@@ -23,7 +23,7 @@ def get_front_list(tt):
         tmp = data.split('/')
         img_f = os.path.join( dataroot, 'ffhq_aligned_img', tmp[0],tmp[-1])
         for i in range(60):
-            img_p = os.path.join( img_f, '%d.jpg')
+            img_p = os.path.join( img_f, '%d.jpg'%i)
             print (img_p)
             image = cv2.imread(img_p)
             image = cv2.resize(image, (256,256))
