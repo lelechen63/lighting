@@ -55,7 +55,7 @@ def get_front_list(tt):
             new_p = []
             # try:
             for i in range(60):
-                try:
+                # try:
                     img_p = os.path.join( img_f, '%d.jpg'%i)
                     image = cv2.imread(img_p)
                     image = cv2.resize(image, imgsize)
@@ -66,9 +66,9 @@ def get_front_list(tt):
                     else:
                         new_p.append([])
                     # frames.append(image)
-                except:
-                    print (img_p,'====')
-                    continue
+                # except:
+                #     print (img_p,'====')
+                #     continue
             # batch  = np.stack(frames)
             # batch = torch.Tensor(batch.transpose(0, 3, 1, 2))
             # points = detector.get_landmarks_from_batch(batch)
