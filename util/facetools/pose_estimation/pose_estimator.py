@@ -89,6 +89,7 @@ def get_front_list(tt):
             # except:
             #     print (img_f, '!!!!!!!')
             #     continue
+            break
         break
     print (frontlist)
     print (len(frontlist))
