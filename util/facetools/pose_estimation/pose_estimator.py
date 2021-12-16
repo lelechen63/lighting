@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 from utils import *
 import os
+import pickle
 # dlib’s pre-trained facial landmark detector
 predictorPath = "/home/uss00022/lelechen/basic/shape_predictor_68_face_landmarks.dat"
 
