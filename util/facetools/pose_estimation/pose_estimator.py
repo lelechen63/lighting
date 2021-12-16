@@ -59,12 +59,15 @@ def get_front_list(tt):
                     img_p = os.path.join( img_f, '%d.jpg'%i)
                     image = cv2.imread(img_p)
                     image = cv2.resize(image, imgsize)
+                    input_img = io.imread(img_p)
+                    print (input_img.shape, image.shape)
                     preds = detector.get_landmarks(image)
-                    if len(preds) >= 1:
-                        
-                        new_p.append(preds[0])
-                    else:
+                    if preds is None:
                         new_p.append([])
+                        print (img_p)
+                    else:
+                        new_p.append(preds[0])
+                    
                     # frames.append(image)
                 # except:
                 #     print (img_p,'====')
