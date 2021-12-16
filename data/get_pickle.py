@@ -531,7 +531,7 @@ def get_front():
     dataroot = '/nfs/STG/CodecAvatar/lelechen/Facescape'
     exp = get_exp()
 
-    _file = open( os.path.join( dataroot, '/compressed/frontlist.pkl') , "rb")
+    _file = open( os.path.join( dataroot, 'compressed/frontlist.pkl') , "rb")
     front_indx = pickle.load(_file)
 
     flist = {}
