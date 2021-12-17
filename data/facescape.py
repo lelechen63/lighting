@@ -706,6 +706,15 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
         tmp = self.data_list[index].split('/')
         print (tmp)
         print ('=========')
+        img_p = os.path.join( self.dir_B , tmp[0], tmp[-1], '1.jpg' )
+        mask_p =  os.path.join(  self.dir_B , tmp[0], tmp[-1],  '1_mask.png' )
+        img = cv2.imread(img_p)
+        img = cv2.resize(img, (256,256))
+        mask = cv2.imread(mask_p)
+        mask = cv2.resize(mask, (256,256))
+        img = img * mask
+        
+
         meshcode = self.allcode[self.data_list[index]][0].reshape(-1) # 256
         texcode = self.allcode[self.data_list[index]][1] # 512
         mesh = self.allcode[self.data_list[index]][2]
@@ -717,7 +726,8 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
             'texcode': torch.FloatTensor(texcode),
             'mesh': torch.FloatTensor(mesh),
             'tex': torch.FloatTensor(tex),
-            'A_path': self.data_list[index]
+            'A_path': self.data_list[index],
+            'image': torch.FloatTensor(img)
             }
        
         return input_dict

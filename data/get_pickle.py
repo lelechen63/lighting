@@ -536,7 +536,7 @@ def get_front():
 
     flist = {}
     for x in tqdm(front_indx.keys()):
-        try:
+        # try:
             tmp = x.split('/')
             img_p =  os.path.join( dataroot,'ffhq_aligned_img', tmp[0], tmp[-1], str(front_indx[x]) + '.jpg' )
             mask_p =  os.path.join( dataroot,'ffhq_aligned_img', tmp[0], tmp[-1], str(front_indx[x]) + '_mask.png' )
@@ -545,11 +545,11 @@ def get_front():
             mask = cv2.imread(mask_p)
             mask = cv2.resize(mask, (256,256))
             img = img * mask
-            cv2.imwrite('./tmp/{}_{}.png'.format(tmp[0], tmp[-1]), img)
+            # cv2.imwrite('./tmp/{}_{}.png'.format(tmp[0], tmp[-1]), img)
             flist[x] = img 
-        except:
-            print ('+++++')
-            continue
+        # except:
+        #     print ('+++++')
+        #     continue
         
     with open( dataroot +   '/compressed/ffhq_aligned_list.pkl', 'wb') as handle:
         pickle.dump(flist, handle, protocol=pickle.HIGHEST_PROTOCOL)
