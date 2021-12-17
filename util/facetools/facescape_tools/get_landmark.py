@@ -3,6 +3,7 @@ import numpy as np
 import src.renderer as renderer
 import src.camera as camera
 import src.utility as util
+os.environ["PYOPENGL_PLATFORM"] = "osmesa"
 
 # read model 
 model = trimesh.load_mesh("/nfs/STG/CodecAvatar/lelechen/Facescape/textured_meshes/1/models_reg/1_neutral.obj", process=False)
