@@ -22,7 +22,7 @@ import glob
 import scipy
 import scipy.ndimage
 import dlib
-
+import time
 
 # download model from: http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2
 predictor = dlib.shape_predictor('/home/uss00022/lelechen/basic/shape_predictor_68_face_landmarks.dat')
@@ -99,6 +99,7 @@ def align_face(filepath):
     transform_size=4096
     enable_padding=True
 
+    t1 = time.time()
     # Shrink.
     shrink = int(np.floor(qsize / output_size * 0.5))
     if shrink > 1:
@@ -106,6 +107,8 @@ def align_face(filepath):
         img = img.resize(rsize, PIL.Image.ANTIALIAS)
         quad /= shrink
         qsize /= shrink
+    
+    t2 = time.time()
 
     # Crop.
     border = max(int(np.rint(qsize * 0.1)), 3)
@@ -114,6 +117,8 @@ def align_face(filepath):
     if crop[2] - crop[0] < img.size[0] or crop[3] - crop[1] < img.size[1]:
         img = img.crop(crop)
         quad -= crop[0:2]
+
+    t3 = time.time()
 
     # Pad.
     pad = (int(np.floor(min(quad[:,0]))), int(np.floor(min(quad[:,1]))), int(np.ceil(max(quad[:,0]))), int(np.ceil(max(quad[:,1]))))
@@ -130,6 +135,8 @@ def align_face(filepath):
         img = PIL.Image.fromarray(np.uint8(np.clip(np.rint(img), 0, 255)), 'RGB')
         quad += pad[:2]
 
+    t4 = time.time()
+    print (t2-t1, t3-t2, t4-t3,'+++')
     # Transform.
     img = img.transform((transform_size, transform_size), PIL.Image.QUAD, (quad + 0.5).flatten(), PIL.Image.BILINEAR)
     if output_size < transform_size:
