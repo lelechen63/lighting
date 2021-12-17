@@ -140,7 +140,7 @@ def align_face(filepath):
 
 def main():
     # landmarks_detector = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, flip_input=False)
-    img_p = '/nfs/STG/CodecAvatar/lelechen/Facescape/fsmview_images/307/1_neutral/1.jpg'
+    img_p = '/nfs/STG/CodecAvatar/lelechen/Facescape/fsmview_images/1/1_neutral/1.jpg'
     # face_landmarks  = landmarks_detector.get_landmarks(img_p)[0]
     # output_size = 1024
     # transform_size = 4096
