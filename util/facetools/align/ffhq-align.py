@@ -27,6 +27,37 @@ import time
 # download model from: http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2
 predictor = dlib.shape_predictor('/home/uss00022/lelechen/basic/shape_predictor_68_face_landmarks.dat')
 
+
+
+
+def get_exp():
+    expressions = {
+        1: "1_neutral",
+        2: "2_smile",
+        3: "3_mouth_stretch",
+        4: "4_anger",
+        5: "5_jaw_left",
+        6: "6_jaw_right",
+        7: "7_jaw_forward",
+        8: "8_mouth_left",
+        9: "9_mouth_right",
+        10: "10_dimpler",
+        11: "11_chin_raiser",
+        12: "12_lip_puckerer",
+        13: "13_lip_funneler",
+        14: "14_sadness",
+        15: "15_lip_roll",
+        16: "16_grin",
+        17: "17_cheek_blowing",
+        18: "18_eye_closed",
+        19: "19_brow_raiser",
+        20: "20_brow_lower"
+    }
+    exps = []
+    for i in range(1,21):
+        exps.append(expressions[i])
+    return set(exps)
+
 def get_landmark(filepath):
     """get landmark with dlib
     :return: np.array shape=(68, 2)
@@ -116,8 +147,6 @@ def align_face(filepath):
         img = img.crop(crop)
         quad -= crop[0:2]
 
-    t3 = time.time()
-
     # Pad.
     pad = (int(np.floor(min(quad[:,0]))), int(np.floor(min(quad[:,1]))), int(np.ceil(max(quad[:,0]))), int(np.ceil(max(quad[:,1]))))
     pad = (max(-pad[0] + border, 0), max(-pad[1] + border, 0), max(pad[2] - img.size[0] + border, 0), max(pad[3] - img.size[1] + border, 0))
@@ -133,8 +162,6 @@ def align_face(filepath):
         img = PIL.Image.fromarray(np.uint8(np.clip(np.rint(img), 0, 255)), 'RGB')
         quad += pad[:2]
 
-    t4 = time.time()
-    print ( t4-t3,'+++')
     # Transform.
     img = img.transform((transform_size, transform_size), PIL.Image.QUAD, (quad + 0.5).flatten(), PIL.Image.BILINEAR)
     if output_size < transform_size:
@@ -144,15 +171,25 @@ def align_face(filepath):
     return img
 
 def main():
+    original_p = '/nfs/STG/CodecAvatar/lelechen/Facescape/'
+    exps = get_exp()
+    for i in range( 1, 321):
+        print (i)
+        for exp in exps:
+            for j in range(60):
+                if os.path.exists( os.path.join( original_p, 'fsmview_images', str(i), exp, '%d.jpg'%j) ) and not  os.path.exists( os.path.join( original_p, 'ffhq_aligned_img', str(i), exp, '%d.jpg'%j) ):
+                    img = align_face(os.path.join( original_p, 'fsmview_images', str(i), exp, '%d.jpg'%j) )
+                    os.mkdirs( os.path.join( original_p, 'ffhq_aligned_img', str(i), exp), exists_ok = True )
+                    img.save(os.path.join( original_p, 'ffhq_aligned_img', str(i), exp, '%d.jpg'%j), 'PNG')
     # landmarks_detector = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, flip_input=False)
-    img_p = '/nfs/STG/CodecAvatar/lelechen/Facescape/fsmview_images/1/1_neutral/1.jpg'
+    # img_p = '/nfs/STG/CodecAvatar/lelechen/Facescape/fsmview_images/1/1_neutral/1.jpg'
     # face_landmarks  = landmarks_detector.get_landmarks(img_p)[0]
     # output_size = 1024
     # transform_size = 4096
     # no_padding = False
     # image_align(img_p, './tmp.png', face_landmarks, output_size, transform_size, no_padding)
-    img = align_face(img_p)
-    img.save('./tmp.png', 'PNG')
+    # img = align_face(img_p)
+    # img.save('./tmp.png', 'PNG')
 main()
 # if __name__ == '__main__':
  
