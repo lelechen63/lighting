@@ -97,9 +97,8 @@ def align_face(filepath):
 
     output_size=1024
     transform_size=4096
-    enable_padding=True
+    enable_padding=False
 
-    t1 = time.time()
     # Shrink.
     shrink = int(np.floor(qsize / output_size * 0.5))
     if shrink > 1:
@@ -108,7 +107,6 @@ def align_face(filepath):
         quad /= shrink
         qsize /= shrink
     
-    t2 = time.time()
 
     # Crop.
     border = max(int(np.rint(qsize * 0.1)), 3)
