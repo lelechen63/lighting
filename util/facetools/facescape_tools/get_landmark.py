@@ -47,5 +47,5 @@ for ind, lm_ind in enumerate(lm_list_v10):
 os.makedirs("./demo_output/", exist_ok = True)
 cv2.imwrite("./demo_output/lm_result.jpg", color_draw)
 
-util.show_img_arr(color_draw, bgr_mode = True)
-print("results saved to './demo_output/lm_result.jpg'")
+# util.show_img_arr(color_draw, bgr_mode = True)
+# print("results saved to './demo_output/lm_result.jpg'")
