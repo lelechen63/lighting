@@ -134,7 +134,7 @@ def align_face(filepath):
         quad += pad[:2]
 
     t4 = time.time()
-    print (t2-t1, t3-t2, t4-t3,'+++')
+    print ( t4-t3,'+++')
     # Transform.
     img = img.transform((transform_size, transform_size), PIL.Image.QUAD, (quad + 0.5).flatten(), PIL.Image.BILINEAR)
     if output_size < transform_size:
