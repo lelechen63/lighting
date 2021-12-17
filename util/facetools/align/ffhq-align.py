@@ -90,7 +90,7 @@ def image_align(src_file, dst_file, face_landmarks, output_size=256, transform_s
 def main():
     landmarks_detector = face_alignment.FaceAlignment(face_alignment.LandmarksType._3D, flip_input=False)
     img_p = '/nfs/STG/CodecAvatar/lelechen/Facescape/fsmview_images/307/1_neutral/1.jpg'
-    face_landmarks  = landmarks_detector.get_landmarks(img_p)
+    face_landmarks  = landmarks_detector.get_landmarks(img_p)[0]
     output_size = 1024
     transform_size = 1024
     no_padding = False
