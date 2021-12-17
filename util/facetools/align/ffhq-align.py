@@ -173,14 +173,15 @@ def align_face(filepath):
 def main():
     original_p = '/nfs/STG/CodecAvatar/lelechen/Facescape/'
     exps = get_exp()
-    for i in range( 1, 321):
-        print (i)
-        for exp in exps:
-            for j in range(60):
-                if os.path.exists( os.path.join( original_p, 'fsmview_images', str(i), exp, '%d.jpg'%j) ) and not  os.path.exists( os.path.join( original_p, 'ffhq_aligned_img', str(i), exp, '%d.jpg'%j) ):
-                    img = align_face(os.path.join( original_p, 'fsmview_images', str(i), exp, '%d.jpg'%j) )
-                    os.mkdirs( os.path.join( original_p, 'ffhq_aligned_img', str(i), exp), exists_ok = True )
-                    img.save(os.path.join( original_p, 'ffhq_aligned_img', str(i), exp, '%d.jpg'%j), 'PNG')
+    # for i in range( 1, 321):
+    #     print (i)
+    i  = 137
+    for exp in exps:
+        for j in range(60):
+            if os.path.exists( os.path.join( original_p, 'fsmview_images', str(i), exp, '%d.jpg'%j) ) and not  os.path.exists( os.path.join( original_p, 'ffhq_aligned_img', str(i), exp, '%d.jpg'%j) ):
+                img = align_face(os.path.join( original_p, 'fsmview_images', str(i), exp, '%d.jpg'%j) )
+                os.mkdirs( os.path.join( original_p, 'ffhq_aligned_img', str(i), exp), exists_ok = True )
+                img.save(os.path.join( original_p, 'ffhq_aligned_img', str(i), exp, '%d.jpg'%j), 'PNG')
     # landmarks_detector = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, flip_input=False)
     # img_p = '/nfs/STG/CodecAvatar/lelechen/Facescape/fsmview_images/1/1_neutral/1.jpg'
     # face_landmarks  = landmarks_detector.get_landmarks(img_p)[0]
