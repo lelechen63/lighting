@@ -540,6 +540,7 @@ def get_front():
             tmp = x.split('/')
             img_p =  os.path.join( dataroot,'ffhq_aligned_img', tmp[0], tmp[-1], str(front_indx[x]) + '.jpg' )
             mask_p =  os.path.join( dataroot,'ffhq_aligned_img', tmp[0], tmp[-1], str(front_indx[x]) + '_mask.png' )
+            print (img_p)
             img = cv2.imread(img_p)
             img = cv2.resize(img, (256,256))
             mask = cv2.imread(mask_p)
