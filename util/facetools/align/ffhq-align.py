@@ -175,9 +175,10 @@ def main():
     exps = get_exp()
     # for i in range( 1, 321):
     #     print (i)
-    i  = 137
+    i  = 307
     for exp in exps:
         for j in range(60):
+            print (os.path.join( original_p, 'fsmview_images', str(i), exp, '%d.jpg'%j))
             if os.path.exists( os.path.join( original_p, 'fsmview_images', str(i), exp, '%d.jpg'%j) ) and not  os.path.exists( os.path.join( original_p, 'ffhq_aligned_img', str(i), exp, '%d.jpg'%j) ):
                 img = align_face(os.path.join( original_p, 'fsmview_images', str(i), exp, '%d.jpg'%j) )
                 os.mkdirs( os.path.join( original_p, 'ffhq_aligned_img', str(i), exp), exists_ok = True )
