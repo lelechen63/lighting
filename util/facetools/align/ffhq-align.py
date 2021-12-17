@@ -88,17 +88,17 @@ def image_align(src_file, dst_file, face_landmarks, output_size=256, transform_s
         img.save(dst_file, 'PNG')
 
 def main():
-    landmarks_detector = face_alignment.FaceAlignment(face_alignment.LandmarksType._3D, flip_input=False)
+    landmarks_detector = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, flip_input=False)
     img_p = '/nfs/STG/CodecAvatar/lelechen/Facescape/fsmview_images/307/1_neutral/1.jpg'
     face_landmarks  = landmarks_detector.get_landmarks(img_p)[0]
     output_size = 1024
-    transform_size = 1024
+    transform_size = 4096
     no_padding = False
     image_align(img_p, './tmp.png', face_landmarks, output_size, transform_size, no_padding)
 
 main()
 # if __name__ == '__main__':
-
+ 
 #     parser = argparse.ArgumentParser(description='A simple script to extract eye and mouth coordinates from a face image.')
 #     parser.add_argument('-s', '--src', default='./raw_images', help='directory of raw images')
 #     parser.add_argument('-d', '--dst', default='./aligned_images', help='directory of aligned images')
