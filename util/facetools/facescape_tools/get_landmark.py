@@ -110,8 +110,11 @@ if __name__ == '__main__':
                 K = np.array(params['%d_K' % cam_idx])
                 Rt = np.array(params['%d_Rt' % cam_idx])
 
+                print (K)
+
+                print (Rt)
                 projcam = camera.CamPara(K = K, Rt = Rt)
-                
+
                 dist = np.array(params['%d_distortion' % cam_idx], dtype = float)
                 h_src = params['%d_height' % cam_idx]
                 w_src = params['%d_width' % cam_idx]
