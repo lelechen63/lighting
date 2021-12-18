@@ -54,12 +54,12 @@ def shift(image, vector):
     return shifted.astype(image.dtype)
 
 if __name__ == '__main__':
-    with open("./predef/front_indices.pkl", "rb") as f:
-        indices_front = pickle.load(f)
-    with open("./predef/predef_front_faces.pkl", 'rb') as f:
-        faces_front = pickle.load(f)
-    f_front = np.array([f for f,_,_,_ in faces_front]) - 1
-    f_front = torch.tensor(f_front, device=pyredner.get_device(), dtype=torch.int32)
+    # with open("./predef/front_indices.pkl", "rb") as f:
+    #     indices_front = pickle.load(f)
+    # with open("./predef/predef_front_faces.pkl", 'rb') as f:
+    #     faces_front = pickle.load(f)
+    # f_front = np.array([f for f,_,_,_ in faces_front]) - 1
+    # f_front = torch.tensor(f_front, device=pyredner.get_device(), dtype=torch.int32)
 
     for id_idx in range(1,400):
         for exp_idx in range(1,21):
