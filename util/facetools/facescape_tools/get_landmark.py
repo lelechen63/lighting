@@ -110,8 +110,8 @@ if __name__ == '__main__':
                 K = np.array(params['%d_K' % cam_idx])
                 Rt = np.array(params['%d_Rt' % cam_idx])
 
-                print (K)
 
+                print (K)
                 print (Rt)
                 projcam = camera.CamPara(K = K, Rt = Rt)
 
@@ -173,6 +173,7 @@ if __name__ == '__main__':
                 for ind, lm_ind in enumerate(lm_list_v10):
                     uv = projcam.project(verts[lm_ind])
                     u, v = np.round(uv).astype(np.int)
+                    print(u,v)
                     color_draw = cv2.circle(rendered_full_head, (u, v), 10, (100, 100, 100), -1)
                     color_draw = cv2.putText(color_draw, "%02d"%(ind), (u-8, v+4), 
                                             fontFace = cv2.FONT_HERSHEY_SIMPLEX,
