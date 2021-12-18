@@ -83,6 +83,10 @@ if __name__ == '__main__':
             if (verts.shape[0] == 0):
                 print(f"[WARN] {mesh_path} is empty!")
                 continue
+            # align multi-view model to TU model
+            verts *= scale
+            verts = np.tensordot(Rt_TU[:3,:3], verts.T, 1).T + Rt[:3, 3]
+
 
             objects = pyredner.load_obj(mesh_path, return_objects=True)
             objects[0].normals = pyredner.compute_vertex_normal(objects[0].vertices, objects[0].indices)
@@ -161,9 +165,7 @@ if __name__ == '__main__':
                 # gt_img = np.clip((255 * gt_img), 0, 255).astype(np.uint8)
                 # blend_img = np.clip((255 * blend_img), 0, 255).astype(np.uint8)
 
-                # align multi-view model to TU model
-                verts *= scale
-                verts = np.tensordot(Rt_TU[:3,:3], verts.T, 1).T + Rt[:3, 3]
+                
 
                 # make camera for projection
                 projcam = camera.CamPara(K = K, Rt = Rt)
