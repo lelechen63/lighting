@@ -109,6 +109,9 @@ if __name__ == '__main__':
                 
                 K = np.array(params['%d_K' % cam_idx])
                 Rt = np.array(params['%d_Rt' % cam_idx])
+
+                projcam = camera.CamPara(K = K, Rt = Rt)
+                
                 dist = np.array(params['%d_distortion' % cam_idx], dtype = float)
                 h_src = params['%d_height' % cam_idx]
                 w_src = params['%d_width' % cam_idx]
@@ -162,7 +165,7 @@ if __name__ == '__main__':
                 # gt_img = np.clip((255 * gt_img), 0, 255).astype(np.uint8)
                 # blend_img = np.clip((255 * blend_img), 0, 255).astype(np.uint8)
 
-                projcam = camera.CamPara(K = K, Rt = Rt)
+                
 
                 for ind, lm_ind in enumerate(lm_list_v10):
                     uv = projcam.project(verts[lm_ind])
