@@ -72,7 +72,7 @@ if __name__ == '__main__':
             
             scale = Rt_scale_dict['%d'%id_idx]['%d'%exp_idx][0]
             Rt_TU = np.array(Rt_scale_dict['%d'%id_idx]['%d'%exp_idx][1])
-            Rt_TU = torch.from_numpy(Rt_TU).type(torch.float32).to(pyredner.get_device())
+            
 
             mesh_path = f"{mesh_root}/{id_idx}/models_reg/{expressions[exp_idx]}.obj"
             if not os.path.exists(mesh_path):
@@ -87,7 +87,7 @@ if __name__ == '__main__':
             verts *= scale
             verts = np.tensordot(Rt_TU[:3,:3], verts.T, 1).T + Rt[:3, 3]
 
-
+            Rt_TU = torch.from_numpy(Rt_TU).type(torch.float32).to(pyredner.get_device())
             objects = pyredner.load_obj(mesh_path, return_objects=True)
             objects[0].normals = pyredner.compute_vertex_normal(objects[0].vertices, objects[0].indices)
             # objects[0].vertices = objects[0].vertices[indices_front]
