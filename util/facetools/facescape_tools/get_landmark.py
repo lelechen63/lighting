@@ -84,8 +84,10 @@ if __name__ == '__main__':
                 print(f"[WARN] {mesh_path} is empty!")
                 continue
             # align multi-view model to TU model
-            verts *= scale
-            verts = np.tensordot(Rt_TU[:3,:3], verts.T, 1).T + Rt_TU[:3, 3]
+            
+            verts = (np.tensordot(Rt[:3,:3].T, verts.vertices, 1) - Rt[:3, 3].T).T
+
+            verts /= scale
 
             Rt_TU = torch.from_numpy(Rt_TU).type(torch.float32).to(pyredner.get_device())
             objects = pyredner.load_obj(mesh_path, return_objects=True)
