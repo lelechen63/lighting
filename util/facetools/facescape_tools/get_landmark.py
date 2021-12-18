@@ -53,7 +53,7 @@ if __name__ == '__main__':
     Rt_scale_dict = json.load(open("/home/uss00022/lelechen/github/lighting/predef/Rt_scale_dict.json", 'r'))
     lm_list_v10 = np.load("/home/uss00022/lelechen/github/lighting/predef/landmark_indices.npz")['v10']
     
-    for id_idx in tqdm(range(1,160)):
+    for id_idx in tqdm(range(160,400)):
         for exp_idx in range(1,21):
 
             img_dir = f"{image_data_root}/{id_idx}/{expressions[exp_idx]}"
