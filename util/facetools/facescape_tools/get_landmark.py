@@ -76,7 +76,7 @@ if __name__ == '__main__':
 
             imgs = glob.glob(f"{img_dir}/*.jpg")
             landmark_dir = f"{landmark_root}/{id_idx}/{expressions[exp_idx]}"
-
+            os.mkdirs(landmark_dir, exists_ok = True)
             for img in imgs:
                 cam_idx = int(os.path.basename(img).split(".")[0])
 
