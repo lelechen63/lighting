@@ -63,17 +63,15 @@ if __name__ == '__main__':
     # f_front = np.array([f for f,_,_,_ in faces_front]) - 1
     # f_front = torch.tensor(f_front, device=pyredner.get_device(), dtype=torch.int32)
     lm_list_v10 = np.load("/home/uss00022/lelechen/github/lighting/predef/landmark_indices.npz")['v10']
-
+    # with open("/home/uss00022/lelechen/github/lighting/predef/Rt_scale_dict.json", 'r') as f:
+    Rt_scale_dict = json.load(open("/home/uss00022/lelechen/github/lighting/predef/Rt_scale_dict.json", 'r'))
 
     for id_idx in tqdm(range(1,400)):
         for exp_idx in range(1,21):
             print(f"Working on id={id_idx}, exp={exp_idx}")
-
-            with open("/home/uss00022/lelechen/github/lighting/predef/Rt_scale_dict.json", 'r') as f:
-                Rt_scale_dict = json.load(f)
-                scale = Rt_scale_dict['%d'%id_idx]['%d'%exp_idx][0]
-                Rt_TU = np.array(Rt_scale_dict['%d'%id_idx]['%d'%exp_idx][1])
             
+            scale = Rt_scale_dict['%d'%id_idx]['%d'%exp_idx][0]
+            Rt_TU = np.array(Rt_scale_dict['%d'%id_idx]['%d'%exp_idx][1])
             Rt_TU = torch.from_numpy(Rt_TU).type(torch.float32).to(pyredner.get_device())
 
             mesh_path = f"{mesh_root}/{id_idx}/models_reg/{expressions[exp_idx]}.obj"
@@ -109,12 +107,7 @@ if __name__ == '__main__':
                 
                 K = np.array(params['%d_K' % cam_idx])
                 Rt = np.array(params['%d_Rt' % cam_idx])
-
-
-                print (K)
-                print (Rt)
-                projcam = camera.CamPara(K = K, Rt = Rt)
-
+                
                 dist = np.array(params['%d_distortion' % cam_idx], dtype = float)
                 h_src = params['%d_height' % cam_idx]
                 w_src = params['%d_width' % cam_idx]
@@ -137,7 +130,7 @@ if __name__ == '__main__':
                 K[1,2] = 0
                 K[0,0] = K[0,0] * 2.0 / w_src
                 K[1,1] = -K[1,1] * 2.0 / w_src
-
+        
                 distortion = torch.tensor([dist[0], dist[1], 0, 0, 0, 0, dist[2], dist[3]]).type(torch.float32)
                 # print(f"distortion: {distortion}")
 
@@ -168,7 +161,13 @@ if __name__ == '__main__':
                 # gt_img = np.clip((255 * gt_img), 0, 255).astype(np.uint8)
                 # blend_img = np.clip((255 * blend_img), 0, 255).astype(np.uint8)
 
-                
+                # align multi-view model to TU model
+                verts *= scale
+                verts = np.tensordot(Rt_TU[:3,:3], verts.T, 1).T + Rt[:3, 3]
+
+                # make camera for projection
+                projcam = camera.CamPara(K = K, Rt = Rt)
+
 
                 for ind, lm_ind in enumerate(lm_list_v10):
                     uv = projcam.project(verts[lm_ind])
