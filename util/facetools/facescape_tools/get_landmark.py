@@ -55,7 +55,7 @@ if __name__ == '__main__':
     
     for id_idx in tqdm(range(1,400)):
         for exp_idx in range(1,21):
-            print (id_idx, exp_idx)
+
             img_dir = f"{image_data_root}/{id_idx}/{expressions[exp_idx]}"
             with open(f"{img_dir}/params.json", 'r') as f:
                 params = json.load(f)
@@ -75,7 +75,8 @@ if __name__ == '__main__':
             lmks /= scale # (68, 3), in world space
 
             imgs = glob.glob(f"{img_dir}/*.jpg")
-            rendering_dir = f"{rendering_root}/{id_idx}/{expressions[exp_idx]}"
+            landmark_dir = f"{landmark_root}/{id_idx}/{expressions[exp_idx]}"
+ 
             for img in imgs:
                 cam_idx = int(os.path.basename(img).split(".")[0])
 
@@ -90,12 +91,15 @@ if __name__ == '__main__':
                 pos = K @ (R @ lmks.T + T)
                 coord = pos[:2,:] / pos[2,:] # (2, 68)
 
-                # plot test
+                coord = np.transpose(coord, (1, 0))
+                
+                # np.save( os.path.join( landmark_dir, '%d.npy'%cam_idx), coord)
+                # # plot test
                 img = cv2.imread( os.path.join(  img_dir , "%d.jpg" % cam_idx ))
-                undist_img = cv2.undistort(img, K, dist)
+                # undist_img = cv2.undistort(img, K, dist)
 
                 for ind in range(68):
-                    uv = coord[:, ind]
+                    uv = coord[ind, :]
                     u, v = np.round(uv).astype(np.int)
                     color_draw = cv2.circle(undist_img, (u, v), 10, (100, 100, 100), -1)
                     color_draw = cv2.putText(color_draw, "%02d"%(ind), (u-8, v+4), 
