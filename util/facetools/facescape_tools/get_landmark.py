@@ -85,7 +85,7 @@ if __name__ == '__main__':
                 continue
             # align multi-view model to TU model
             
-            verts = (np.tensordot(Rt_TU[:3,:3].T, verts.vertices, 1) - Rt_TU[:3, 3].T).T
+            verts = (np.tensordot(Rt_TU[:3,:3].T, verts, 1) - Rt_TU[:3, 3].T).T
 
             verts /= scale
 
