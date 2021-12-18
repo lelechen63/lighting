@@ -101,7 +101,7 @@ if __name__ == '__main__':
                 for ind in range(68):
                     uv = coord[ind, :]
                     u, v = np.round(uv).astype(np.int)
-                    color_draw = cv2.circle(undist_img, (u, v), 10, (100, 100, 100), -1)
+                    color_draw = cv2.circle(img, (u, v), 10, (100, 100, 100), -1)
                     color_draw = cv2.putText(color_draw, "%02d"%(ind), (u-8, v+4), 
                                             fontFace = cv2.FONT_HERSHEY_SIMPLEX,
                                             fontScale = 0.4,
