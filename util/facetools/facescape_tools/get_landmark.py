@@ -53,7 +53,7 @@ if __name__ == '__main__':
     Rt_scale_dict = json.load(open("/home/uss00022/lelechen/github/lighting/predef/Rt_scale_dict.json", 'r'))
     lm_list_v10 = np.load("/home/uss00022/lelechen/github/lighting/predef/landmark_indices.npz")['v10']
     
-    for id_idx in tqdm(range(1,400)):
+    for id_idx in tqdm(range(1,160)):
         for exp_idx in range(1,21):
 
             img_dir = f"{image_data_root}/{id_idx}/{expressions[exp_idx]}"
@@ -93,21 +93,21 @@ if __name__ == '__main__':
 
                 coord = np.transpose(coord, (1, 0))
                 
-                # np.save( os.path.join( landmark_dir, '%d.npy'%cam_idx), coord)
+                np.save( os.path.join( landmark_dir, '%d.npy'%cam_idx), coord)
                 # # plot test
-                img = cv2.imread( os.path.join(  img_dir , "%d.jpg" % cam_idx ))
-                # undist_img = cv2.undistort(img, K, dist)
+                # img = cv2.imread( os.path.join(  img_dir , "%d.jpg" % cam_idx ))
+                # # undist_img = cv2.undistort(img, K, dist)
 
-                for ind in range(68):
-                    uv = coord[ind, :]
-                    u, v = np.round(uv).astype(np.int)
-                    color_draw = cv2.circle(img, (u, v), 10, (100, 100, 100), -1)
-                    color_draw = cv2.putText(color_draw, "%02d"%(ind), (u-8, v+4), 
-                                            fontFace = cv2.FONT_HERSHEY_SIMPLEX,
-                                            fontScale = 0.4,
-                                            color = (255, 255, 255))
+                # for ind in range(68):
+                #     uv = coord[ind, :]
+                #     u, v = np.round(uv).astype(np.int)
+                #     color_draw = cv2.circle(img, (u, v), 10, (100, 100, 100), -1)
+                #     color_draw = cv2.putText(color_draw, "%02d"%(ind), (u-8, v+4), 
+                #                             fontFace = cv2.FONT_HERSHEY_SIMPLEX,
+                #                             fontScale = 0.4,
+                #                             color = (255, 255, 255))
 
-                cv2.imwrite( os.path.join(landmark_dir, "%d.jpg" % cam_idx )  , color_draw)
+                # cv2.imwrite( os.path.join(landmark_dir, "%d.jpg" % cam_idx )  , color_draw)
 
 
   
