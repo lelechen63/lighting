@@ -83,12 +83,13 @@ if __name__ == '__main__':
             if (verts.shape[0] == 0):
                 print(f"[WARN] {mesh_path} is empty!")
                 continue
-            # align multi-view model to TU model
-            a = verts - Rt_TU[:3, 3].T
-           
+            
+            ##############BUG########################
+            # align multi-view model to TU model           
             verts = (np.tensordot(Rt_TU[:3,:3].T, (verts - Rt_TU[:3, 3]).T, 1)).T
-
             verts /= scale
+            
+
 
             Rt_TU = torch.from_numpy(Rt_TU).type(torch.float32).to(pyredner.get_device())
             objects = pyredner.load_obj(mesh_path, return_objects=True)
@@ -170,10 +171,10 @@ if __name__ == '__main__':
 
                 
 
+
+                #######BUG##############
                 # make camera for projection
                 projcam = camera.CamPara(K = K, Rt = Rt)
-
-
                 for ind, lm_ind in enumerate(lm_list_v10):
                     uv = projcam.project(verts[lm_ind])
                     u, v = np.round(uv).astype(np.int)
