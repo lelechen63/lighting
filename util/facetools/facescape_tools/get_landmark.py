@@ -60,8 +60,10 @@ if __name__ == '__main__':
     #     faces_front = pickle.load(f)
     # f_front = np.array([f for f,_,_,_ in faces_front]) - 1
     # f_front = torch.tensor(f_front, device=pyredner.get_device(), dtype=torch.int32)
+    lm_list_v10 = np.load("/home/uss00022/lelechen/github/lighting/predef/landmark_indices.npz")['v10']
 
-    for id_idx in range(1,400):
+
+    for id_idx in tqdm(range(1,400)):
         for exp_idx in range(1,21):
             print(f"Working on id={id_idx}, exp={exp_idx}")
 
@@ -102,8 +104,6 @@ if __name__ == '__main__':
                 rendering_path = f"{rendering_dir}/{cam_idx}.png"
                 if os.path.exists(rendering_path):
                     continue
-
-                # img_path = f"{img_dir}/{cam_idx}.jpg"
                 
                 K = np.array(params['%d_K' % cam_idx])
                 Rt = np.array(params['%d_Rt' % cam_idx])
@@ -118,10 +118,7 @@ if __name__ == '__main__':
                 dx = int(dx)
                 dy = int(dy)
 
-                # gt_img = imageio.imread(img_path) / 255.0
-                # gt_img = cv2.undistort(gt_img, K, dist)
-                # print(gt_img.shape)
-
+             
                 c2w = np.eye(4)
                 c2w[:3,:3] = Rt[:3,:3].T
                 c2w[:3,3] = -Rt[:3,:3].T @ Rt[:3,3]
@@ -162,10 +159,22 @@ if __name__ == '__main__':
                 rendered_full_head = np.clip((255 * rendered_full_head_neg), 0, 255).astype(np.uint8)
                 # gt_img = np.clip((255 * gt_img), 0, 255).astype(np.uint8)
                 # blend_img = np.clip((255 * blend_img), 0, 255).astype(np.uint8)
+
+                projcam = camera.CamPara(K = K, Rt = Rt)
+
+                for ind, lm_ind in enumerate(lm_list_v10):
+                    uv = projcam.project(verts[lm_ind])
+                    u, v = np.round(uv).astype(np.int)
+                    color_draw = cv2.circle(rendered_full_head, (u, v), 10, (100, 100, 100), -1)
+                    color_draw = cv2.putText(color_draw, "%02d"%(ind), (u-8, v+4), 
+                                            fontFace = cv2.FONT_HERSHEY_SIMPLEX,
+                                            fontScale = 0.4,
+                                            color = (255, 255, 255))
+
                 
                 if not os.path.exists(rendering_dir):
                     os.makedirs(rendering_dir)
-                imageio.imsave(rendering_path, rendered_full_head)
+                imageio.imsave(rendering_path, color_draw)
                 # imageio.imsave(f"results/head_id{id_idx}_exp{exp_idx}_cam{cam_idx}.png", rendered_full_head)
                 # imageio.imsave(f"results/ori_id{id_idx}_exp{exp_idx}_cam{cam_idx}.png", gt_img)
                 # imageio.imsave(f"results/blend_id{id_idx}_exp{exp_idx}_cam{cam_idx}.png", blend_img)
