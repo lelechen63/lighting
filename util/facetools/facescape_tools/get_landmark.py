@@ -76,7 +76,6 @@ if __name__ == '__main__':
 
             imgs = glob.glob(f"{img_dir}/*.jpg")
             landmark_dir = f"{landmark_root}/{id_idx}/{expressions[exp_idx]}"
-            rendering_dir = f"{rendering_root}/{id_idx}/{expressions[exp_idx]}"
 
             for img in imgs:
                 cam_idx = int(os.path.basename(img).split(".")[0])
@@ -108,7 +107,7 @@ if __name__ == '__main__':
                                             fontScale = 0.4,
                                             color = (255, 255, 255))
 
-                cv2.imwrite( os.path.join(rendering_dir, "%d.jpg" % cam_idx )  , color_draw)
+                cv2.imwrite( os.path.join(landmark_dir, "%d.jpg" % cam_idx )  , color_draw)
 
 
   
