@@ -16,6 +16,8 @@ from tqdm import tqdm
 import glob
 
 from skimage.transform import AffineTransform, warp
+import src.camera as camera
+
 
 expressions = {
     1: "1_neutral",
