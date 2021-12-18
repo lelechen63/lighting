@@ -65,7 +65,7 @@ if __name__ == '__main__':
         for exp_idx in range(1,21):
             print(f"Working on id={id_idx}, exp={exp_idx}")
 
-            with open("./predef/Rt_scale_dict.json", 'r') as f:
+            with open("/home/uss00022/lelechen/github/lighting/predef/Rt_scale_dict.json", 'r') as f:
                 Rt_scale_dict = json.load(f)
                 scale = Rt_scale_dict['%d'%id_idx]['%d'%exp_idx][0]
                 Rt_TU = np.array(Rt_scale_dict['%d'%id_idx]['%d'%exp_idx][1])
