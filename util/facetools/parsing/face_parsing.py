@@ -52,14 +52,8 @@ def vis_parsing_maps(im, parsing_anno, stride=1, show=False, save_parsing_path='
     # return vis_im
 
 
-def parsing(imgs, cp='./face_parsing.pth'):
+def parsing(imgs, net):
 
-    n_classes = 19
-    net = BiSeNet(n_classes=n_classes)
-    net.cuda()
-    weight = torch.load(cp)
-    net.load_state_dict(weight)
-    net.eval()
 
     to_tensor = transforms.Compose([
         transforms.ToTensor(),
