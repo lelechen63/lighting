@@ -81,35 +81,37 @@ def parsing(img, facenet, idet, save_face_path= None ):
 
         # front_img = img * binary_mask[:,:, np.newaxis]
         cv2.imwrite(save_face_path, binary_mask)
-    im = np.array(img)[..., ::-1]
-    # im = cv2.imread(img_path)[..., ::-1]
-    # try:
-    blank_image1 = np.zeros((shape), np.uint8)
-    blank_image2 = np.zeros((shape), np.uint8)
-    eye_lms = idet.detect_iris(im)
-    lms =   eye_lms[0][0,...].astype(np.int32)[:,::-1]
+        return None
+    else:
+        im = np.array(img)[..., ::-1]
+        # im = cv2.imread(img_path)[..., ::-1]
+        # try:
+        blank_image1 = np.zeros((shape), np.uint8)
+        blank_image2 = np.zeros((shape), np.uint8)
+        eye_lms = idet.detect_iris(im)
+        lms =   eye_lms[0][0,...].astype(np.int32)[:,::-1]
 
-    cv2.fillConvexPoly(blank_image1, lms[:8], 8)
-    cv2.fillConvexPoly(blank_image2, lms[8:16], 7)
-    
-    blank_image = blank_image1 + blank_image2
-    blank_image[blank_image <15 ] = 0
-    parsing_maps += blank_image
-    parsing_maps[parsing_maps>19] = 19
-
-    blank_image1 = np.zeros((shape), np.uint8)
-    blank_image2 = np.zeros((shape), np.uint8)
-
-    lms = eye_lms[0][1,...].astype(np.int32)[:,::-1]
-    cv2.fillConvexPoly(blank_image1, lms[:8], 8)
-    cv2.fillConvexPoly(blank_image2, lms[8:16], 8)
-
-    blank_image = blank_image1 + blank_image2
-    blank_image[blank_image < 16 ] = 0
-    parsing_maps += blank_image 
-    parsing_maps[parsing_maps>20] = 20  
-    # except:
-    #     print('no eyes ***********') 
+        cv2.fillConvexPoly(blank_image1, lms[:8], 8)
+        cv2.fillConvexPoly(blank_image2, lms[8:16], 7)
         
-    return parsing_maps
+        blank_image = blank_image1 + blank_image2
+        blank_image[blank_image <15 ] = 0
+        parsing_maps += blank_image
+        parsing_maps[parsing_maps>19] = 19
+
+        blank_image1 = np.zeros((shape), np.uint8)
+        blank_image2 = np.zeros((shape), np.uint8)
+
+        lms = eye_lms[0][1,...].astype(np.int32)[:,::-1]
+        cv2.fillConvexPoly(blank_image1, lms[:8], 8)
+        cv2.fillConvexPoly(blank_image2, lms[8:16], 8)
+
+        blank_image = blank_image1 + blank_image2
+        blank_image[blank_image < 16 ] = 0
+        parsing_maps += blank_image 
+        parsing_maps[parsing_maps>20] = 20  
+        # except:
+        #     print('no eyes ***********') 
+            
+        return parsing_maps
 
