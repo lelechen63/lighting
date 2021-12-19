@@ -41,7 +41,7 @@ def get_exp():
 
 detector = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, flip_input=False, device = "cuda:0" ) 
 
-def get_front_list(tt):
+def get_front_list():
 
     dataroot = '/nfs/STG/CodecAvatar/lelechen/Facescape'
     model_points_68 = _get_full_model_points()
@@ -60,14 +60,16 @@ def get_front_list(tt):
                 for i in range(60):
                     try:
                         img_p = os.path.join( img_f, '%d.jpg'%i)
-                        image = cv2.imread(img_p)
-                        image = cv2.resize(image, imgsize)
-                        input_img = io.imread(img_p)
-                        preds = detector.get_landmarks(image)
-                        if preds is None:
-                            continue 
-                        else:
-                            pp = np.asarray(preds[0])
+                        landmark_p = os.path.join( dataroot, 'fsmview_landmarks', pid, exp, '%d.npy'%i )
+                        # image = cv2.imread(img_p)
+                        # image = cv2.resize(image, imgsize)
+                        # input_img = io.imread(img_p)
+                        # preds = detector.get_landmarks(image)
+                        # if preds is None:
+                        #     continue 
+                        # else:
+                        if os.path.exists(landmark_p):
+                            pp = np.load(landmark_p)
                             pose = solve_pose_by_68_points(pp, imgsize, model_points_68)
                             yaw = abs(pose[0][0][0]) + abs(pose[0][1][0])
                             if yaw < smallyaw:
@@ -90,4 +92,4 @@ def get_front_list(tt):
         pickle.dump(frontlist, handle, protocol=pickle.HIGHEST_PROTOCOL)
         
 
-get_front_list('test')
+get_front_list()

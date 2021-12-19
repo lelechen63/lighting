@@ -65,15 +65,11 @@ def get_parsing_batch( ids ):
                 # try:
                 image = Image.open(img_path)
                 res = parsing(image, facenet, img_path[:-4] +'_mask.png' )
+                print  (img_path[:-4] +'_mask.png')
                 # vis_parsing_maps(image, res, save_parsing_path=parsing_path, save_vis_path ='./gg2.png' ) 
                 # except:
                 #     print ('**********')
                 #     print (img_path)
                 #     continue
-        #         break
-        #     break 
-        # break
+        
 get_parsing_batch(total_ids)
-# batch = 7
-# for i in range(1):
-#     threading.Thread(target = get_parsing_batch, args = (total_ids[batch * i: batch *(i+1)], )).start()
