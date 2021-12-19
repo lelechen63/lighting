@@ -57,24 +57,20 @@ def get_parsing_batch( ids ):
             current_p1 = os.path.join( current_p , motion_p)
             for valid_f in range( len ( os.listdir( current_p1 ))):
                 img_path = os.path.join( current_p1, str(valid_f) + '.jpg')
-                # if os.path.exists(img_path[:-4] +'_mask.png'):
-                #     continue
+                if os.path.exists(img_path[:-4] +'_mask.png'):
+                    continue
                 # parsing_path = img_path.replace('ffhq_aligned_img', 'fsmview_landmarks')[:-4] +'_parsing.png'
-                parsing_path = './gg.png'
-                print (img_path)
-                # try:
-                image = Image.open(img_path)
-                # res = parsing(image, facenet, idet, img_path[:-4] +'_mask.png')
-                res = parsing(image, facenet)
-                vis_parsing_maps(image, res, save_parsing_path=parsing_path, save_vis_path ='./gg2.png' ) 
-                print('---------')
-                # except:
-                #     print ('**********')
-                #     print (img_path)
-                #     continue
-                break
-            break 
-        break
+                try:
+                    image = Image.open(img_path)
+                    res = parsing(image, facenet, img_path[:-4] +'_mask.png' )
+                # vis_parsing_maps(image, res, save_parsing_path=parsing_path, save_vis_path ='./gg2.png' ) 
+                except:
+                    print ('**********')
+                    print (img_path)
+                    continue
+        #         break
+        #     break 
+        # break
 get_parsing_batch(total_ids)
 # batch = 7
 # for i in range(1):

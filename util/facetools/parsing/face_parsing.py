@@ -52,7 +52,7 @@ def vis_parsing_maps(im, parsing_anno, stride=1, show=False, save_parsing_path='
     # return vis_im
 
 
-def parsing(imgs, net):
+def parsing(imgs, net, mask_path = None):
 
 
     to_tensor = transforms.Compose([
@@ -69,5 +69,13 @@ def parsing(imgs, net):
         out = net(img)[0]
         parsing_maps = out.squeeze(0).cpu().numpy().argmax(0).astype('float32')
         parsing_maps = cv2.resize(parsing_maps, shape, interpolation=cv2.INTER_NEAREST)
-        return parsing_maps
+        # return parsing_maps
+        if mask_path is not None:
+            binary_mask= np.zeros((shape), np.uint8)
+            binary_mask[parsing_maps==17] = 1
+            binary_mask[parsing_maps>14] = 0
+            binary_mask[parsing_maps>0] = 1
 
+            # front_img = img * binary_mask[:,:, np.newaxis]
+            cv2.imwrite(mask_path, binary_mask)
+        return parsing_maps
