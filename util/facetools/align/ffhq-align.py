@@ -90,8 +90,12 @@ def align_face(filepath):
     :param filepath: str
     :return: PIL Image
     """
+    if  os.path.exists( filepath.replace('fsmview_images', 'fsmview_landmarks')[:-3] + '.npy' ):
+        lm = np.load(filepath.replace('fsmview_images', 'fsmview_landmarks')[:-3] + '.npy' )
+    else:
+        return None
 
-    lm = get_landmark(filepath)
+    # lm = get_landmark(filepath)
     
     lm_chin          = lm[0  : 17]  # left-right
     lm_eyebrow_left  = lm[17 : 22]  # left-right
@@ -173,22 +177,24 @@ def align_face(filepath):
 def main():
     original_p = '/nfs/STG/CodecAvatar/lelechen/Facescape/'
     exps = get_exp()
-    # for i in range( 1, 321):
-    #     print (i)
-    # i  = 307
-    # for exp in exps:
-    #     for j in range(60):
-    #         print (os.path.join( original_p, 'fsmview_images', str(i), exp, '%d.jpg'%j))
-    #         if os.path.exists( os.path.join( original_p, 'fsmview_images', str(i), exp, '%d.jpg'%j) ) and not  os.path.exists( os.path.join( original_p, 'ffhq_aligned_img', str(i), exp, '%d.jpg'%j) ):
-    #             try:
-    #                 img = align_face(os.path.join( original_p, 'fsmview_images', str(i), exp, '%d.jpg'%j) )
-    #                 os.mkdirs( os.path.join( original_p, 'ffhq_aligned_img', str(i), exp), exists_ok = True )
-    #                 img.save(os.path.join( original_p, 'ffhq_aligned_img', str(i), exp, '%d.jpg'%j), 'PNG'
-    #             except:
-    #                 continue
-    img_p = '/nfs/STG/CodecAvatar/lelechen/Facescape/fsmview_images/307/9_mouth_right/0.jpg'
-    img = align_face(img_p)
-    img.save('./tmp.png', 'PNG')
+    for i in range( 1, 321):
+        # print (i)
+        i  = 307
+        for exp in exps:
+            for j in range(60):
+                
+                if os.path.exists( os.path.join( original_p, 'fsmview_images', str(i), exp, '%d.jpg'%j) ) and not  os.path.exists( os.path.join( original_p, 'ffhq_aligned_img', str(i), exp, '%d.jpg'%j) ):
+                    print (os.path.join( original_p, 'fsmview_images', str(i), exp, '%d.jpg'%j))
+                    img = align_face(os.path.join( original_p, 'fsmview_images', str(i), exp, '%d.jpg'%j) )
+                    if img is not None:
+                        os.mkdirs( os.path.join( original_p, 'ffhq_aligned_img', str(i), exp), exists_ok = True )
+                        img.save(os.path.join( original_p, 'ffhq_aligned_img', str(i), exp, '%d.jpg'%j), 'PNG'
+                    else:
+                        print (os.path.join( original_p, 'fsmview_images', str(i), exp, '%d.jpg'%j),'++++=')
+                        continue
+    # img_p = '/nfs/STG/CodecAvatar/lelechen/Facescape/fsmview_images/307/9_mouth_right/0.jpg'
+    # img = align_face(img_p)
+    # img.save('./tmp.png', 'PNG')
 main()
 # if __name__ == '__main__':
  
