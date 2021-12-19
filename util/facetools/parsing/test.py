@@ -60,14 +60,14 @@ def get_parsing_batch( ids ):
                 if os.path.exists(img_path[:-4] +'_mask.png'):
                     continue
                 # parsing_path = img_path.replace('ffhq_aligned_img', 'fsmview_landmarks')[:-4] +'_parsing.png'
-                try:
-                    image = Image.open(img_path)
-                    res = parsing(image, facenet, img_path[:-4] +'_mask.png' )
+                # try:
+                image = Image.open(img_path)
+                res = parsing(image, facenet, img_path[:-4] +'_mask.png' )
                 # vis_parsing_maps(image, res, save_parsing_path=parsing_path, save_vis_path ='./gg2.png' ) 
-                except:
-                    print ('**********')
-                    print (img_path)
-                    continue
+                # except:
+                #     print ('**********')
+                #     print (img_path)
+                #     continue
         #         break
         #     break 
         # break
