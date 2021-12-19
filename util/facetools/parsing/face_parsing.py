@@ -8,7 +8,7 @@ import os.path as osp
 import numpy as np
 from PIL import Image
 import torchvision.transforms as transforms
-from .model import BiSeNet
+from model import BiSeNet
 
 
 def vis_parsing_maps(im, parsing_anno, stride=1, show=False, save_parsing_path='imgs/gg.png', save_vis_path = None):
