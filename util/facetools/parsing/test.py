@@ -4,7 +4,7 @@ import numpy as np
 import face_alignment
 from eye_parsing.iris_detector import IrisDetector
 import dlib
-from parsing.model import BiSeNet
+from model import BiSeNet
 import os
 import pickle
 import torch
