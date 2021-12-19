@@ -66,7 +66,7 @@ def get_parsing_batch( ids ):
                 image = Image.open(img_path)
                 # res = parsing(image, facenet, idet, img_path[:-4] +'_mask.png')
                 res = parsing(image, facenet)
-                vis_parsing_maps(image, res, save_parsing_path=parsing_path)#, save_vis_path ='/raid/celong/FaceScape/tmp/tmp2/' + id_p +'_' + motion_p +'_' +str(valid_f_ +'.png' ) 
+                vis_parsing_maps(image, res, save_parsing_path=parsing_path, save_vis_path ='./gg2.png' ) 
                 print('---------')
                 # except:
                 #     print ('**********')
