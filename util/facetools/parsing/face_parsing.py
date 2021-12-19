@@ -73,7 +73,6 @@ def parsing(imgs, cp='checkpoint/face_parsing.pth'):
         img = img.cuda()
         out = net(img)[0]
         parsing_maps = out.squeeze(0).cpu().numpy().argmax(0).astype('float32')
-        print (parsing_maps.shape)
         parsing_maps = cv2.resize(parsing_maps, shape, interpolation=cv2.INTER_NEAREST)
         return parsing_maps
 

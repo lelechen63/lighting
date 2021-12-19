@@ -1,8 +1,8 @@
 from PIL import Image
-from faceeye_parsing import parsing, vis_parsing_maps
+from face_parsing import parsing, vis_parsing_maps
 import numpy as np
 import face_alignment
-from eye_parsing.iris_detector import IrisDetector
+# from eye_parsing.iris_detector import IrisDetector
 import dlib
 from model import BiSeNet
 import os
@@ -36,8 +36,8 @@ expressions = {
 }
 
 fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, flip_input=False)
-idet = IrisDetector()
-idet.set_detector(fa)
+# idet = IrisDetector()
+# idet.set_detector(fa)
 
 n_classes = 19
 facenet = BiSeNet(n_classes=n_classes)
@@ -65,7 +65,7 @@ def get_parsing_batch( ids ):
                 try:
                     image = Image.open(img_path)
                     # res = parsing(image, facenet, idet, img_path[:-4] +'_mask.png')
-                    res = parsing(image, facenet, idet)
+                    res = parsing(image, facenet)
                     vis_parsing_maps(image, res, save_parsing_path=parsing_path)#, save_vis_path ='/raid/celong/FaceScape/tmp/tmp2/' + id_p +'_' + motion_p +'_' +str(valid_f_ +'.png' ) 
                     print('---------')
                 except:
