@@ -42,7 +42,7 @@ fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, flip_input=F
 n_classes = 19
 facenet = BiSeNet(n_classes=n_classes)
 facenet.cuda()
-facenet.load_state_dict(torch.load('checkpoint/face_parsing.pth'))
+facenet.load_state_dict(torch.load('./face_parsing.pth'))
 facenet.eval()
 
 base_p = '/nfs/STG/CodecAvatar/lelechen/Facescape/ffhq_aligned_img'
