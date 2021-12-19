@@ -56,34 +56,31 @@ def get_front_list():
             # frames = []
             new_p = []
             smallyaw = 100
-            try:
-                for i in range(60):
-                    try:
-                        img_p = os.path.join( img_f, '%d.jpg'%i)
-                        landmark_p = os.path.join( dataroot, 'fsmview_landmarks', pid, exp, '%d.npy'%i )
-                        # image = cv2.imread(img_p)
-                        # image = cv2.resize(image, imgsize)
-                        # input_img = io.imread(img_p)
-                        # preds = detector.get_landmarks(image)
-                        # if preds is None:
-                        #     continue 
-                        # else:
-                        if os.path.exists(landmark_p):
-                            pp = np.load(landmark_p)
-                            pose = solve_pose_by_68_points(pp, imgsize, model_points_68)
-                            yaw = abs(pose[0][0][0]) + abs(pose[0][1][0])
-                            if yaw < smallyaw:
-                                smallyaw = yaw
-                                smallidx = i
-                            
-                    except:
-                        print ('===', img_p)
-                        continue
+            for i in range(60):
+                try:
+                    img_p = os.path.join( img_f, '%d.jpg'%i)
+                    landmark_p = os.path.join( dataroot, 'fsmview_landmarks', pid, exp, '%d.npy'%i )
+                    # image = cv2.imread(img_p)
+                    # image = cv2.resize(image, imgsize)
+                    # input_img = io.imread(img_p)
+                    # preds = detector.get_landmarks(image)
+                    # if preds is None:
+                    #     continue 
+                    # else:
+                    if os.path.exists(landmark_p):
+                        pp = np.load(landmark_p)
+                        pose = solve_pose_by_68_points(pp, imgsize, model_points_68)
+                        yaw = abs(pose[0][0][0]) + abs(pose[0][1][0])
+                        if yaw < smallyaw:
+                            smallyaw = yaw
+                            smallidx = i
+                        
+                except:
+                    print ('===', img_p)
+                    continue
+        
+            frontlist[ pid+ '/models_reg/' + exp] = smallidx
             
-                frontlist[ pid+ '/models_reg/' + exp] = smallidx
-            except:
-                print (img_f, '!!!!!!!')
-                continue
         #     break
         # break
     print (frontlist)
