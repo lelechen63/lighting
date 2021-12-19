@@ -55,8 +55,10 @@ def get_parsing_batch( ids ):
         for k in range(len(expressions)):
             motion_p = expressions[k + 1]
             current_p1 = os.path.join( current_p , motion_p)
-            for valid_f in range( len ( os.listdir( current_p1 ))):
-                img_path = os.path.join( current_p1, str(valid_f) + '.jpg')
+            for camid in range(60):
+                img_path = os.path.join( current_p1, str(camid) + '.jpg')
+                if not os.path.exists(img_path):
+                    continue
                 if os.path.exists(img_path[:-4] +'_mask.png'):
                     continue
                 # parsing_path = img_path.replace('ffhq_aligned_img', 'fsmview_landmarks')[:-4] +'_parsing.png'
