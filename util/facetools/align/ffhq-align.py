@@ -90,8 +90,9 @@ def align_face(filepath):
     :param filepath: str
     :return: PIL Image
     """
-    if  os.path.exists( filepath.replace('fsmview_images', 'fsmview_landmarks')[:-3] + '.npy' ):
-        lm = np.load(filepath.replace('fsmview_images', 'fsmview_landmarks')[:-3] + '.npy' )
+
+    if  os.path.exists( filepath.replace('fsmview_images', 'fsmview_landmarks')[:-3] + 'npy' ):
+        lm = np.load(filepath.replace('fsmview_images', 'fsmview_landmarks')[:-3] + 'npy' )
     else:
         return None
 
