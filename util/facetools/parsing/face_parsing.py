@@ -57,7 +57,8 @@ def parsing(imgs, cp='./face_parsing.pth'):
     n_classes = 19
     net = BiSeNet(n_classes=n_classes)
     net.cuda()
-    net.load_state_dict(torch.load(cp))
+    weight = torch.load(cp)
+    net.load_state_dict(weight)
     net.eval()
 
     to_tensor = transforms.Compose([
