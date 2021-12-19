@@ -50,8 +50,6 @@ def get_front_list():
     exps = get_exp()
     for pid in tqdm(os.listdir(  '/nfs/STG/CodecAvatar/lelechen/Facescape/ffhq_aligned_img' )):
         for exp in exps:
-            # pid = '90'
-            # exp = '9_mouth_right'
             img_f = os.path.join( dataroot, 'ffhq_aligned_img', pid, exp )
             # frames = []
             new_p = []
