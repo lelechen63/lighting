@@ -188,7 +188,7 @@ def main():
                     print (os.path.join( original_p, 'fsmview_images', str(i), exp, '%d.jpg'%j))
                     img = align_face(os.path.join( original_p, 'fsmview_images', str(i), exp, '%d.jpg'%j) )
                     if img is not None:
-                        os.makedirs( os.path.join( original_p, 'ffhq_aligned_img', str(i), exp), exists_ok = True )
+                        os.makedirs( os.path.join( original_p, 'ffhq_aligned_img', str(i), exp), exist_ok = True )
                         img.save(os.path.join( original_p, 'ffhq_aligned_img', str(i), exp, '%d.jpg'%j), 'PNG')
                     else:
                         print (os.path.join( original_p, 'fsmview_images', str(i), exp, '%d.jpg'%j),'++++=')
