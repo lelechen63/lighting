@@ -514,7 +514,7 @@ def get_list( tt = 'train'):
 
 def filter_list(tt):
     codelist = 'compressed/all320_{}list.pkl'.format(tt)
-    imgpkl = 'compressed/ffhq_aligned_pkl.pkl'
+    imgpkl = 'compressed/ffhq_aligned_list.pkl'
     
     dataroot = '/nfs/STG/CodecAvatar/lelechen/Facescape'
     _file = open(os.path.join(dataroot, imgpkl), "rb")
@@ -559,7 +559,7 @@ def get_front():
             print ('+++++')
             continue
         
-    with open( dataroot + '/compressed/ffhq_aligned_pkl.pkl', 'wb') as handle:
+    with open( dataroot + '/compressed/ffhq_aligned_list.pkl', 'wb') as handle:
         pickle.dump(flist, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
