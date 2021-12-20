@@ -526,7 +526,7 @@ def filter_list(tt):
     data_list = []
     for i in tmp:
         if i in allimg.keys():
-            data_list.append(tmp)
+            data_list.append(i)
     _file.close()
 
     with open( dataroot +   '/compressed/all320_{}list_filtered.pkl'.format(tt), 'wb') as handle:
