@@ -698,7 +698,7 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
         _file.close()
 
         _file = open(os.path.join(opt.dataroot, codelist), "rb")
-        data_list = pickle.load(_file)
+        self.data_list = pickle.load(_file)
         _file.close()
 
 
@@ -711,15 +711,6 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
         
         print (self.data_list[index])
         tmp = self.data_list[index].split('/')
-        # print (tmp)
-        # print ('=========')
-        # img_p = os.path.join( self.dir_B , tmp[0], tmp[-1], '1.jpg' )
-        # mask_p =  os.path.join(  self.dir_B , tmp[0], tmp[-1],  '1_mask.png' )
-        # img = cv2.imread(img_p)
-        # img = cv2.resize(img, (256,256))
-        # mask = cv2.imread(mask_p)
-        # mask = cv2.resize(mask, (256,256))
-        # img = img * mask
         
         img = self.allimg[self.data_list[index]]
         print (img.shape)
