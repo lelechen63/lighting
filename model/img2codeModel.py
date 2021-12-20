@@ -211,8 +211,8 @@ class Image2MeshcodeModule(pl.LightningModule):
         self.resblocks = nn.Sequential(*model)
         self.visualizer = Visualizer(opt)
         self.ckpt_path = os.path.join(opt.checkpoints_dir, opt.name)
-
-
+        self.l2loss = torch.nn.MSELoss()
+        
     def forward(self, image ):
         img_fea = self.ImageEncoder(image)
         x = self.resblocks(img_fea)
