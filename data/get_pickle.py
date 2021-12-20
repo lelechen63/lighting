@@ -564,7 +564,7 @@ def get_front():
 
 
 
-filter_list('train')
+filter_list('test')
 
 
 # get_code()
