@@ -216,7 +216,9 @@ class Image2MeshcodeModule(pl.LightningModule):
     def forward(self, image ):
         img_fea = self.ImageEncoder(image)
         x = self.resblocks(img_fea)
+        print (x.shape, '+++++')
         x = x.view(x.shape[0], -1)
+        print (x.shape)
         
         code = self.meshcode_dec(x)
         return code
