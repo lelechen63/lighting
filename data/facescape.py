@@ -678,20 +678,30 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
         if opt.isTrain:
             codelist = 'compressed/all320_trainlist.pkl'
             codepkl = 'compressed/all320_train.pkl'
+            imgpkl = '/compressed/ffhq_aligned_list.pkl'
         else:
             codelist = 'compressed/all320_testlist.pkl'
             codepkl = 'compressed/all320_test.pkl'
+            imgpkl = '/compressed/ffhq_aligned_list.pkl'
 
         if opt.debug:
             codelist = 'compressed/all320_debuglist.pkl'
             codepkl = 'compressed/all320_debug.pkl'
-        
-        _file = open(os.path.join(opt.dataroot, codelist), "rb")
-        self.data_list = pickle.load(_file)
-        _file.close()
+            imgpkl = '/compressed/ffhq_aligned_list.pkl'
         
         _file = open(os.path.join(opt.dataroot, codepkl), "rb")
         self.allcode = pickle.load(_file)
+        _file.close()
+
+        _file = open(os.path.join(opt.dataroot, imgpkl), "rb")
+        self.allimg = pickle.load(_file)
+        _file.close()
+
+        _file = open(os.path.join(opt.dataroot, codelist), "rb")
+        tmp = pickle.load(_file)
+        for i in tmp:
+            if i in self.allimg.keys():
+                self.data_list.append(tmp)
         _file.close()
 
 

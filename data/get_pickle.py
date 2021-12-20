@@ -463,28 +463,14 @@ def get_texnorm():
     np.save( '/data/home/uss00022/lelechen/github/lighting/predef/originalstdtex.npy', stdtex)
     cv2.imwrite('./gg.png', meantex)
 
-def get_code( tt = 'train'):
+def get_list( tt = 'train'):
 
     dataroot = '/nfs/STG/CodecAvatar/lelechen/Facescape'
     meshpkl = 'lists/mesh_{}.pkl'.format(tt)
     _file = open(os.path.join(dataroot, meshpkl), "rb")
     data_list = pickle.load(_file)
     _file.close()
-    codepkl = {}
     texmeshlist = []
-    x = 1019
-    y =500
-    w =2000
-    h = 1334
-    l = max(w ,h)
-
-    facial_seg = Image.open("./predef/facial_mask_v10.png")
-    facial_seg  = np.array(facial_seg ) / 255.0
-    
-    facial_seg = facial_seg[y:y+l,x :x +l]
-    facial_seg = cv2.resize(facial_seg, (256,256), interpolation = cv2.INTER_AREA)
-    facial_seg = np.expand_dims(facial_seg, axis=2)
-    
     for item in tqdm(data_list):
         expid = int(item.split('/')[-1].split('_')[0])
         mcode_p = os.path.join( dataroot, 'meshcode', item + '_mesh.npy' ) # mesh code path
@@ -518,13 +504,34 @@ def get_code( tt = 'train'):
         except:
             print (item, '++++++')
             continue
-        if len(texmeshlist) == 100:
-            break
+        # if len(texmeshlist) == 100:
+        #     break
     print (len(texmeshlist))
     with open( dataroot +   '/compressed/all320_{}.pkl'.format(tt), 'wb') as handle:
         pickle.dump(codepkl, handle, protocol=pickle.HIGHEST_PROTOCOL)
     with open( dataroot +   '/compressed/all320_{}list.pkl'.format(tt), 'wb') as handle:
         pickle.dump(texmeshlist, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+def filter_list(tt):
+    codelist = 'compressed/all320_{}list.pkl'.format(tt)
+    imgpkl = '/compressed/ffhq_aligned_list.pkl'
+    
+    dataroot = '/nfs/STG/CodecAvatar/lelechen/Facescape'
+    _file = open(os.path.join(dataroot, imgpkl), "rb")
+    allimg = pickle.load(_file)
+    _file.close()
+
+    _file = open(os.path.join(dataroot, codelist), "rb")
+    tmp = pickle.load(_file)
+    data_list = []
+    for i in tmp:
+        if i in allimg.keys():
+            data_list.append(tmp)
+    _file.close()
+
+    with open( dataroot +   '/compressed/all320_{}list_filtered.pkl'.format(tt), 'wb') as handle:
+        pickle.dump(data_list, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
 
 def get_front():
 
@@ -552,12 +559,12 @@ def get_front():
             print ('+++++')
             continue
         
-    with open( dataroot +   '/compressed/ffhq_aligned_list.pkl', 'wb') as handle:
+    with open( dataroot + '/compressed/ffhq_aligned_pkl.pkl', 'wb') as handle:
         pickle.dump(flist, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 
-get_front()
+filter_list('train')
 
 
 # get_code()
