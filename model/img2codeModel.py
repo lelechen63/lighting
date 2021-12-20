@@ -158,7 +158,7 @@ class Image2MeshcodeModule(pl.LightningModule):
         code_n = 256
         activation = nn.ReLU(True)
 
-        self.ImageEncoder = nn.Sequential(
+        model = [
             nn.ReflectionPad2d(3), nn.Conv2d(3, ngf, kernel_size=7, padding=0),
             norm_layer(ngf), 
             nn.ReLU(True),  
@@ -190,7 +190,11 @@ class Image2MeshcodeModule(pl.LightningModule):
             nn.Conv2d(ngf*8 , ngf  * 16, kernel_size=3, stride=2, padding=1),
             norm_layer(ngf  * 16),
             nn.ReLU(True),  #128
-        )
+        ]
+        for i in range(n_blocks):
+            model += [ResnetBlock(ngf * 16, padding_type=padding_type, activation=activation, norm_layer=norm_layer)]
+        
+        self.ImageEncoder = nn.Sequential(*model)
 
         self.enc_input_size = int(ngf * 16 * self.tex_shape/128 * self.tex_shape/128 )
 
@@ -204,19 +208,14 @@ class Image2MeshcodeModule(pl.LightningModule):
             nn.Linear( ngf*4,code_n),
             )
 
-        model = []
-        for i in range(n_blocks):
-            model += [ResnetBlock(ngf * 16, padding_type=padding_type, activation=activation, norm_layer=norm_layer)]
         
-        self.resblocks = nn.Sequential(*model)
         self.visualizer = Visualizer(opt)
         self.ckpt_path = os.path.join(opt.checkpoints_dir, opt.name)
         self.l2loss = torch.nn.MSELoss()
-        
+
     def forward(self, image ):
         img_fea = self.ImageEncoder(image)
-        x = self.resblocks(img_fea)
-        x = x.view(x.shape[0], -1)
+        x = img_fea.view(img_fea.shape[0], -1)
         
         code = self.meshcode_dec(x)
         return code
@@ -245,7 +244,7 @@ class Image2MeshcodeModule(pl.LightningModule):
           
     def configure_optimizers(self):
         lr = self.opt.lr   
-        opt_g = torch.optim.Adam((list(self.ImageEncoder.parameters()) + list(self.resblocks.parameters()) + list(self.meshcode_dec.parameters())), lr=lr, betas=(self.opt.beta1, 0.999))
+        opt_g = torch.optim.Adam((list(self.ImageEncoder.parameters()) + list(self.meshcode_dec.parameters())), lr=lr, betas=(self.opt.beta1, 0.999))
         def lr_foo(epoch):
             lr_scale = 0.95 ** int(epoch/10)
             if lr_scale < 0.08:
@@ -258,5 +257,6 @@ class Image2MeshcodeModule(pl.LightningModule):
         if self.current_epoch % 5 == 0:
             # print ('!!!!!save model')
             # self.trainer.save_checkpoint( os.path.join( self.ckpt_path, '%05d.ckpt'%self.current_epoch) )
-            torch.save(self.Decoder, os.path.join( self.ckpt_path, 'image2mesh.pth'))
+            torch.save(self.ImageEncoder, os.path.join( self.ckpt_path, 'ImageEncoder.pth'))
+            torch.save(self.meshcode_dec, os.path.join( self.ckpt_path, 'meshcode_dec.pth'))
             
