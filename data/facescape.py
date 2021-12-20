@@ -710,7 +710,7 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
     def __getitem__(self, index):
         
         print (self.data_list[index])
-        tmp = self.data_list[index].split('/')
+        # tmp = self.data_list[index].split('/')
         
         img = self.allimg[self.data_list[index]]
         print (img.shape)
