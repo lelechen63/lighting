@@ -123,7 +123,7 @@ else:
             if num == 100:
                 break
             
-            img_fea = ImgEncoder( batch['image']).to(device))
+            img_fea = ImgEncoder( batch['image']).to(device)
             img_fea = img_fea.view(img_fea.shape[0], -1)
         
             fakecode = MeshCodeDecoder(img_fea)
