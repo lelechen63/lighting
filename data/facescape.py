@@ -676,16 +676,16 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
         self.dir_json = os.path.join(opt.dataroot, "fsmview_images")
 
         if opt.isTrain:
-            codelist = 'compressed/all320_trainlist.pkl'
+            codelist = 'compressed/all320_trainlist_filtered.pkl'
             codepkl = 'compressed/all320_train.pkl'
             imgpkl = '/compressed/ffhq_aligned_list.pkl'
         else:
-            codelist = 'compressed/all320_testlist.pkl'
+            codelist = 'compressed/all320_testlist_filtered.pkl'
             codepkl = 'compressed/all320_test.pkl'
             imgpkl = '/compressed/ffhq_aligned_list.pkl'
 
         if opt.debug:
-            codelist = 'compressed/all320_debuglist.pkl'
+            codelist = 'compressed/all320_debuglist_filtered.pkl'
             codepkl = 'compressed/all320_debug.pkl'
             imgpkl = '/compressed/ffhq_aligned_list.pkl'
         
@@ -698,10 +698,7 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
         _file.close()
 
         _file = open(os.path.join(opt.dataroot, codelist), "rb")
-        tmp = pickle.load(_file)
-        for i in tmp:
-            if i in self.allimg.keys():
-                self.data_list.append(tmp)
+        data_list = pickle.load(_file)
         _file.close()
 
 
@@ -714,17 +711,18 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
         
         print (self.data_list[index])
         tmp = self.data_list[index].split('/')
-        print (tmp)
-        print ('=========')
-        img_p = os.path.join( self.dir_B , tmp[0], tmp[-1], '1.jpg' )
-        mask_p =  os.path.join(  self.dir_B , tmp[0], tmp[-1],  '1_mask.png' )
-        img = cv2.imread(img_p)
-        img = cv2.resize(img, (256,256))
-        mask = cv2.imread(mask_p)
-        mask = cv2.resize(mask, (256,256))
-        img = img * mask
+        # print (tmp)
+        # print ('=========')
+        # img_p = os.path.join( self.dir_B , tmp[0], tmp[-1], '1.jpg' )
+        # mask_p =  os.path.join(  self.dir_B , tmp[0], tmp[-1],  '1_mask.png' )
+        # img = cv2.imread(img_p)
+        # img = cv2.resize(img, (256,256))
+        # mask = cv2.imread(mask_p)
+        # mask = cv2.resize(mask, (256,256))
+        # img = img * mask
         
-
+        img = self.allimg[self.data_list[index]]
+        print (img.shape)
         meshcode = self.allcode[self.data_list[index]][0].reshape(-1) # 256
         texcode = self.allcode[self.data_list[index]][1] # 512
         mesh = self.allcode[self.data_list[index]][2]
