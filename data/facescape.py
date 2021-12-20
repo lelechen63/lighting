@@ -701,32 +701,32 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
         self.data_list = pickle.load(_file)
         _file.close()
 
-
         self.totalmeanmesh = np.load( "./predef/meshmean.npy" )
         self.totalstdmesh = np.load( "./predef/meshstd.npy" )
 
         print ('******************', len(self.data_list), len(self.allcode))
+
+        # define transformation
+        transform_list = [transforms.ToTensor()]
+        transform_list += [transforms.Normalize((0.5, 0.5, 0.5),
+                                                (0.5, 0.5, 0.5))]
+        self.transform = transforms.Compose(transform_list)
        
     def __getitem__(self, index):
-        
-        print (self.data_list[index])
-        # tmp = self.data_list[index].split('/')
-        
+                
         img = self.allimg[self.data_list[index]]
-        print (img.shape)
         meshcode = self.allcode[self.data_list[index]][0].reshape(-1) # 256
         texcode = self.allcode[self.data_list[index]][1] # 512
         mesh = self.allcode[self.data_list[index]][2]
         tex = self.allcode[self.data_list[index]][3]
         
-        print ( meshcode.shape, texcode.shape, '++++++') 
         input_dict = { 
             'meshcode': torch.FloatTensor(meshcode),
             'texcode': torch.FloatTensor(texcode),
             'mesh': torch.FloatTensor(mesh),
-            'tex': torch.FloatTensor(tex),
+            'tex': self.transform(tex),
             'A_path': self.data_list[index],
-            'image': torch.FloatTensor(img)
+            'image': self.transform(img)
             }
        
         return input_dict
