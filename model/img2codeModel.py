@@ -192,7 +192,7 @@ class Image2MeshcodeModule(pl.LightningModule):
             nn.ReLU(True),  #128
         )
 
-        self.enc_input_size = int(ngf * 16 * self.tex_shape/128 * self.tex_shape/128  + ngf * 4)
+        self.enc_input_size = int(ngf * 16 * self.tex_shape/128 * self.tex_shape/128 )
 
         self.meshcode_dec = nn.Sequential(
             nn.Linear( self.enc_input_size, ngf*4),
@@ -216,9 +216,7 @@ class Image2MeshcodeModule(pl.LightningModule):
     def forward(self, image ):
         img_fea = self.ImageEncoder(image)
         x = self.resblocks(img_fea)
-        print (x.shape, '+++++')
         x = x.view(x.shape[0], -1)
-        print (x.shape)
         
         code = self.meshcode_dec(x)
         return code
