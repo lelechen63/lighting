@@ -104,80 +104,48 @@ else:
             visualizer.display_current_results(visuals, num, 1000000)
         print (sum(loss)/len(loss))
 
-    if opt.name == 'img2meshcode' :
-        checkpoint_path = './checkpoints/img2meshcode/latest.ckpt'
-        
-        from model.model2 import TexGenerator as module
-
-        module = module(3,3)
-    
-        checkpoint = torch.load(checkpoint_path)
-        module.load_state_dict(pl2normal(checkpoint['state_dict']))
+    elif opt.name == 'img2meshcode' :
+        device = torch.device('cuda', 0)
+        ImgEncoder = torch.load('./checkpoints/img2meshcode/ImageEncoder.pth')
+        MeshCodeDecoder = torch.load('./checkpoints/img2meshcode/meshcode_dec.pth')
+        Decoder = torch.load('./checkpoints/MeshEncoderDecoder/decoder.pth')
 
         dm.setup()
         testdata = dm.test_dataloader()
         opt.name = opt.name + '_test'
         visualizer = Visualizer(opt)
         l2loss = torch.nn.MSELoss()
-        print ('***********', len(testdata),'*************')
+        ImgEncoder = ImgEncoder.to(device)
+        MeshCodeDecoder = MeshCodeDecoder.to(device)
+        Decoder = Decoder.to(device)
+        loss = []
         for num,batch in enumerate(testdata):
-            rec_tex_A= module(  batch['Atex'])
-            Atex = batch['Atex'].data[0].cpu()  #* stdtex + meantex 
-            Atex = util.tensor2im(Atex  , normalize = False)
-            Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
-            Atex = util.writeText(Atex, batch['A_path'][0])
-            Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
-            Atex = np.clip(Atex, 0, 255)
-
-
-            rec_tex_A_vis =rec_tex_A.data[0].cpu()# * stdtex + meantex  
-            rec_tex_A_vis = util.tensor2im(rec_tex_A_vis, normalize = False)
-            rec_tex_A_vis = np.ascontiguousarray(rec_tex_A_vis, dtype=np.uint8)
-            rec_tex_A_vis = np.clip(rec_tex_A_vis, 0, 255)
-
-            tmp = batch['A_path'][0].split('/')
-            visuals = OrderedDict([
-                ('Atex', Atex),
-                ('rec_tex_A',rec_tex_A_vis)
-                ])
-            visualizer.display_current_results(visuals, num, 1000000)
-    elif opt.name == 'tex' :
-        checkpoint_path = './checkpoints/tex/latest.ckpt'
+            if num == 100:
+                break
+            
+            img_fea = ImgEncoder( batch['image']).to(device))
+            img_fea = img_fea.view(img_fea.shape[0], -1)
         
-        from model.model2 import TexGenerator as module
-
-        module = module(opt.loadSize, not opt.no_linearity,
-            3, opt.code_n,opt.encoder_fc_n, opt.ngf, 
-            opt.n_downsample_global, opt.n_blocks_global,opt.norm)
-    
-        checkpoint = torch.load(checkpoint_path)
-        module.load_state_dict(pl2normal(checkpoint['state_dict']))
-
-        dm.setup()
-        testdata = dm.test_dataloader()
-        opt.name = opt.name + '_test'
-        visualizer = Visualizer(opt)
-        l2loss = torch.nn.MSELoss()
-        print ('***********', len(testdata),'*************')
-        for num,batch in enumerate(testdata):
-            rec_tex_A= \
-            module(  batch['Atex'])
-            Atex = batch['Atex'].data[0].cpu()  * stdtex + meantex 
-            Atex = util.tensor2im(Atex  , normalize = False)
-            Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
-            Atex = util.writeText(Atex, batch['A_path'][0])
-            Atex = np.ascontiguousarray(Atex, dtype=np.uint8)
-            Atex = np.clip(Atex, 0, 255)
-
-
-            rec_tex_A_vis =rec_tex_A.data[0].cpu() * stdtex + meantex  
-            rec_tex_A_vis = util.tensor2im(rec_tex_A_vis, normalize = False)
-            rec_tex_A_vis = np.ascontiguousarray(rec_tex_A_vis, dtype=np.uint8)
-            rec_tex_A_vis = np.clip(rec_tex_A_vis, 0, 255)
-
+            fakecode = MeshCodeDecoder(img_fea)
+            print (fakecode.shape)
+            loss_code = l2loss(rec_mesh_A.cpu(), batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).detach() )
+            rec_mesh_A = Decoder(code)
+            loss_mesh = l2loss(rec_mesh_A.cpu(), batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).detach() )
+            print (loss_mesh)
+            loss.append(loss_mesh)
             tmp = batch['A_path'][0].split('/')
+            gt_mesh = batch['Amesh'].data[0].cpu() * totalstdmesh + totalmeanmesh
+            rec_Amesh = rec_mesh_A.data[0].cpu().view(-1) * totalstdmesh + totalmeanmesh
+            gt_mesh = gt_mesh.float()
+            rec_Amesh = rec_Amesh.float()
+            gt_Amesh = meshrender( opt.dataroot, int(tmp[0]), int(tmp[-1].split('_')[0]),gt_mesh )
+            rec_Amesh = meshrender(opt.dataroot,int(tmp[0]), int(tmp[-1].split('_')[0]), rec_Amesh )
+            gt_Amesh = np.ascontiguousarray(gt_Amesh, dtype=np.uint8)
+            gt_Amesh = util.writeText(gt_Amesh, batch['A_path'][0], 100)
             visuals = OrderedDict([
-                ('Atex', Atex),
-                ('rec_tex_A',rec_tex_A_vis)
+                ('gt_Amesh', gt_Amesh),
+                ('rec_Amesh', rec_Amesh),
+            
                 ])
             visualizer.display_current_results(visuals, num, 1000000)
+        print (sum(loss)/len(loss))
