@@ -514,7 +514,7 @@ def get_list( tt = 'train'):
 
 def filter_list(tt):
     codelist = 'compressed/all320_{}list.pkl'.format(tt)
-    imgpkl = '/compressed/ffhq_aligned_list.pkl'
+    imgpkl = '/compressed/ffhq_aligned_pkl.pkl'
     
     dataroot = '/nfs/STG/CodecAvatar/lelechen/Facescape'
     _file = open(os.path.join(dataroot, imgpkl), "rb")
