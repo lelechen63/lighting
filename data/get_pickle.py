@@ -564,7 +564,7 @@ def get_front():
 
 
 
-filter_list('debug')
+filter_list('train')
 
 
 # get_code()
