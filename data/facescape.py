@@ -704,6 +704,8 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
         self.totalmeanmesh = np.load( "./predef/meshmean.npy" )
         self.totalstdmesh = np.load( "./predef/meshstd.npy" )
 
+        # normalize the mesh
+
         print ('******************', len(self.data_list), len(self.allcode), len(self.allimg))
 
         # define transformation
