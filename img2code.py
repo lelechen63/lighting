@@ -149,9 +149,11 @@ else:
             gt_Amesh = np.ascontiguousarray(gt_Amesh, dtype=np.uint8)
             # gt_Amesh = util.writeText(gt_Amesh, batch['A_path'][0], 100)
             visuals = OrderedDict([
-                ('gt_Amesh', gt_Amesh),
-                ('rec_mesh_gt', rec_mesh_gt),
                 ('rec_Amesh', rec_Amesh),
+                ('rec_mesh_gt', rec_mesh_gt),
+                ('gt_Amesh', gt_Amesh),
+                
+                
                 
                 ])
             visualizer.display_current_results(visuals, num, 1000000)
