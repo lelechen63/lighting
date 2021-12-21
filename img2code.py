@@ -127,15 +127,14 @@ else:
             img_fea = img_fea.view(img_fea.shape[0], -1)
         
             fakecode = MeshCodeDecoder(img_fea)
-            print (fakecode.shape)
-            loss_code = l2loss(rec_mesh_A.cpu(), batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).detach() )
-            rec_mesh_A = Decoder(code)
-            loss_mesh = l2loss(rec_mesh_A.cpu(), batch['Amesh'].view(batch['Amesh'].shape[0], -1, 3).detach() )
-            print (loss_mesh)
+            loss_code = l2loss(fakecode.cpu(), batch['meshcode'].detach() )
+            rec_mesh = Decoder(fakecode)
+            loss_mesh = l2loss(rec_mesh.cpu(), batch['mesh'].view(batch['mesh'].shape[0], -1, 3).detach() )
+            print ("loss_mesh: ", loss_mesh, "  loss_code", loss_code)
             loss.append(loss_mesh)
             tmp = batch['A_path'][0].split('/')
-            gt_mesh = batch['Amesh'].data[0].cpu() * totalstdmesh + totalmeanmesh
-            rec_Amesh = rec_mesh_A.data[0].cpu().view(-1) * totalstdmesh + totalmeanmesh
+            gt_mesh = batch['mesh'].data[0].cpu() * totalstdmesh + totalmeanmesh
+            rec_Amesh = rec_mesh.data[0].cpu().view(-1) * totalstdmesh + totalmeanmesh
             gt_mesh = gt_mesh.float()
             rec_Amesh = rec_Amesh.float()
             gt_Amesh = meshrender( opt.dataroot, int(tmp[0]), int(tmp[-1].split('_')[0]),gt_mesh )
