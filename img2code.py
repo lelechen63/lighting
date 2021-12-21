@@ -131,7 +131,7 @@ else:
             rec_mesh = Decoder(fakecode)
             rec_Amesh = rec_mesh.data[0].cpu().view(-1) * totalstdmesh + totalmeanmesh
 
-            loss_mesh = l2loss(rec_Amesh, batch['mesh'].view(batch['mesh'].shape[0], -1, 3).detach() )
+            loss_mesh = l2loss(rec_Amesh, batch['mesh'] )
             print ("loss_mesh: ", loss_mesh, "  loss_code", loss_code)
             loss.append(loss_mesh)
             tmp = batch['A_path'][0].split('/')
