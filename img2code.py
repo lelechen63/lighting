@@ -131,6 +131,9 @@ else:
             rec_mesh = Decoder(fakecode)
             rec_Amesh = rec_mesh.data[0].cpu().view(-1) * totalstdmesh + totalmeanmesh
 
+            rec_mesh_gt = Decoder(batch['meshcode'].to(device))
+            rec_mesh_gt = rec_mesh_gt.data[0].cpu().view(-1) * totalstdmesh + totalmeanmesh
+
             loss_mesh = l2loss(rec_Amesh, batch['mesh'] )
             print ("loss_mesh: ", loss_mesh, "  loss_code", loss_code)
             loss.append(loss_mesh)
@@ -139,14 +142,17 @@ else:
             
             gt_mesh = gt_mesh.float()
             rec_Amesh = rec_Amesh.float()
+            rec_mesh_gt = rec_mesh_gt.float()
             gt_Amesh = meshrender( opt.dataroot, int(tmp[0]), int(tmp[-1].split('_')[0]),gt_mesh )
             rec_Amesh = meshrender(opt.dataroot,int(tmp[0]), int(tmp[-1].split('_')[0]), rec_Amesh )
+            rec_mesh_gt = meshrender(opt.dataroot,int(tmp[0]), int(tmp[-1].split('_')[0]), rec_mesh_gt )
             gt_Amesh = np.ascontiguousarray(gt_Amesh, dtype=np.uint8)
-            gt_Amesh = util.writeText(gt_Amesh, batch['A_path'][0], 100)
+            # gt_Amesh = util.writeText(gt_Amesh, batch['A_path'][0], 100)
             visuals = OrderedDict([
                 ('gt_Amesh', gt_Amesh),
+                ('rec_mesh_gt', rec_mesh_gt),
                 ('rec_Amesh', rec_Amesh),
-            
+                
                 ])
             visualizer.display_current_results(visuals, num, 1000000)
         print (sum(loss)/len(loss))

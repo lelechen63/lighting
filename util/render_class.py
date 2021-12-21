@@ -140,7 +140,7 @@ def meshrender(data_root, id_idx, exp_idx, vertices, cam_idx=1):
 
     info = 'id: ' + str(id_idx) + ', exp: ' + str(exp_idx) + ', cam: ' + str(cam_idx)
     img = cv2.putText(img, info, (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 
-                   1, (255, 255, 255), 2, cv2.LINE_AA)
+                   3, (255, 255, 255), 6, cv2.LINE_AA)
 
 
     return img
