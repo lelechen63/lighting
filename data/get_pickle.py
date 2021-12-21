@@ -560,7 +560,6 @@ def get_front():
             mask = cv2.imread(mask_p)
             mask = cv2.resize(mask, (256,256))
             img = img * mask
-            # cv2.imwrite('./tmp/{}_{}.png'.format(tmp[0], tmp[-1]), img)
             flist[x] = img 
         except:
             print ('+++++')
@@ -570,7 +569,7 @@ def get_front():
         pickle.dump(flist, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
-filter_list('train')
+filter_list('debug')
 
 
 # get_code()
