@@ -504,8 +504,7 @@ def get_list( tt = 'train'):
         except:
             print (item, '++++++')
             continue
-        # if len(texmeshlist) == 100:
-        #     break
+        
     print (len(texmeshlist))
     with open( dataroot +   '/compressed/all320_{}.pkl'.format(tt), 'wb') as handle:
         pickle.dump(codepkl, handle, protocol=pickle.HIGHEST_PROTOCOL)
@@ -513,19 +512,27 @@ def get_list( tt = 'train'):
         pickle.dump(texmeshlist, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 def filter_list(tt):
+
+    dataroot = '/nfs/STG/CodecAvatar/lelechen/Facescape'
+
     codelist = 'compressed/all320_{}list.pkl'.format(tt)
+    codepkl = 'compressed/all320_{}.pkl'.format(tt)
     imgpkl = 'compressed/ffhq_aligned_list.pkl'
     
-    dataroot = '/nfs/STG/CodecAvatar/lelechen/Facescape'
+    
     _file = open(os.path.join(dataroot, imgpkl), "rb")
     allimg = pickle.load(_file)
+    _file.close()
+
+    _file = open(os.path.join(dataroot, codepkl), "rb")
+    allcode = pickle.load(_file)
     _file.close()
 
     _file = open(os.path.join(dataroot, codelist), "rb")
     tmp = pickle.load(_file)
     data_list = []
     for i in tmp:
-        if i in allimg.keys():
+        if i in allimg.keys() and i in allcode.keys():
             data_list.append(i)
     _file.close()
 
@@ -564,7 +571,7 @@ def get_front():
 
 
 
-filter_list('test')
+filter_list('train')
 
 
 # get_code()
