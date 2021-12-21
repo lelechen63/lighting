@@ -570,7 +570,6 @@ def get_front():
         pickle.dump(flist, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
-
 filter_list('train')
 
 
