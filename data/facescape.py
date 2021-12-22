@@ -472,103 +472,46 @@ class FacescapeMeshTexDataset(torch.utils.data.Dataset):
 class FacescapeTexDataset(torch.utils.data.Dataset):
     def __init__(self, opt):
         self.opt = opt
-     
-        ### input B (real images)
-        self.dir_B = os.path.join(opt.dataroot, "ffhq_aligned_img")
-
-        ### input C (eye parsing images)
-        self.dir_C = os.path.join(opt.dataroot, "fsmview_landmarks")
-
-        ### json 
-        self.dir_json = os.path.join(opt.dataroot, "fsmview_images")
-
+    
         if opt.isTrain:
             _file = open(os.path.join(opt.dataroot, "lists/texmesh_train.pkl"), "rb")
-            total_m = '/data/home/uss00022/lelechen/data/Facescape/bigmeshtrain.npy'
-            total_t = '/data/home/uss00022/lelechen/data/Facescape/originalbigtex256train.npy'
+            total_t = os.path.join(opt.dataroot, 'originalbigtex256train.npy' )
         else:
             _file = open(os.path.join(opt.dataroot, "lists/texmesh_test.pkl"), "rb")
-            total_m = '/data/home/uss00022/lelechen/data/Facescape/bigmeshtest.npy'
-            total_t = '/data/home/uss00022/lelechen/data/Facescape/originalbigtex256test.npy'
-
-            # _file = open(os.path.join(opt.dataroot, "lists/texmesh_train.pkl"), "rb")
-            # total_m = '/data/home/uss00022/lelechen/data/Facescape/bigmeshtrain.npy'
-            # total_t = '/data/home/uss00022/lelechen/data/Facescape/bigtex256train.npy'
-
-
-        self.data_list = pickle.load(_file)#[:1]
-
-        self.meantex = np.load('/data/home/uss00022/lelechen/github/lighting/predef/originalmeantex.npy')
-        self.stdtex = np.load('/data/home/uss00022/lelechen/github/lighting/predef/originalstdtex.npy') + 0.00000001
-      
+            total_t = os.path.join(opt.dataroot, 'originalbigtex256test.npy' )
         _file.close()
-        
-        ids = open(os.path.join(opt.dataroot, "lists/ids.pkl"), "rb")
-        self.id_set = set(pickle.load(ids))
-        self.exp_set = get_exp()
+        self.data_list = pickle.load(_file)
+
+        self.meantex = np.load('./predef/originalmeantex.npy')
+        self.stdtex = np.load('./predef/originalstdtex.npy') + 0.00000001
+      
+    
         self.total_tex = {}
         self.total_t = np.load(total_t)
-        self.total_m = np.load(total_m)
         transform_list = [transforms.ToTensor()]
-        transform_list += [transforms.Normalize((0.5, 0.5, 0.5),
-                                                (0.5, 0.5, 0.5))]
+        # transform_list += [transforms.Normalize((0.5, 0.5, 0.5),
+        #                                         (0.5, 0.5, 0.5))]
         self.transform = transforms.Compose(transform_list)
 
-        
         bk = get_blacklist()
         cc = 0
         for data in tqdm(self.data_list):
-            
-            tmp = data.split('/')
-            tex = self.total_t[cc]
-            # tmp = (tex - self.meantex)/self.stdtex
-            
+            tex = self.total_t[cc]            
             self.total_tex[data] = [ tex ]
             cc += 1
             if opt.debug:
                 if len(self.total_tex) == 1:
                     break
-
-        # remove blacklisted item
-        for element in bk:
-            try:
-                del self.total_tex[element]
-                self.data_list.remove(element)
-            except:
-                print(element)
                 
         print ('******************', len(self.data_list), len(self.total_tex))
         self.total_t = []
-        self.total_m = []
     def __getitem__(self, index):
         t = time.time()
         tmp = self.data_list[index].split('/')
-        # id_p , 'models_reg', motion_p
-
-        # tex_path = os.path.join( self.dir_tex , tmp[0], tmp[-1] + '.png')
         tex = self.total_tex[self.data_list[index]][0].astype(np.uint8)
-        # print ('=11====', tex.max(), tex.min())
-        
-        # tex = adjust_contrast_linear(tex, random.uniform(0.75, 1.5))
-        # print ('===222==', tex.max(), tex.min())
-        # tex = multiply(tex, random.uniform(0.8, 1.2) )
-        # print ('===333==', tex.max(), tex.min())
-        
-        # cv2.imwrite('./tmp/gg' + str(len(os.listdir('./tmp'))) +'.png', tex[:,:,::-1])
-        # tex = tex.astype(np.float64)
-        
-        # print ('==444===', tex.max(), tex.min())
-        # tex = (tex - self.meantex)/self.stdtex
-        # tex = np.clip(tex, -10, 10)
-        # print ('===555==', tex.max(), tex.min())
-        # tex_tensor = torch.FloatTensor(tex).permute(2,0,1)
+
         tex_tensor = self.transform(tex)
-        # tex_tensor = torch.FloatTensor(tex_tensor)
-        # print (tex_tensor.max(), tex_tensor.min())
-        # print (tex_tensor.shape)
-        input_dict = { 'Atex':tex_tensor, 'Aid': int(tmp[0]) - 1, 'Aexp': int(tmp[-1].split('_')[0] )- 1, 'A_path': self.data_list[index]}
-       
-       
+        input_dict = { 'Atex':tex_tensor,  'A_path': self.data_list[index]}
         return input_dict
 
     def __len__(self):

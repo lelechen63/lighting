@@ -36,6 +36,9 @@ if  opt.name == 'img2meshcode':
 elif opt.name == 'MeshEncoderDecoder':
     from model.img2codeModel import MeshEncodeDecodeModule as module
     opt.datasetname = 'fs_mesh'
+elif opt.name == 'TexEncoderDecoder':
+    from model.img2codeModel import MeshEncodeDecodeModule as module
+    opt.datasetname = 'fs_tex'
 
 totalmeanmesh = torch.FloatTensor( np.load( "./predef/meanmesh.npy" ) )#.view(-1,3) 
 totalstdmesh = torch.FloatTensor(np.load( "./predef/meshstd.npy" ))#.view(-1,3)
@@ -152,9 +155,6 @@ else:
                 ('rec_Amesh', rec_Amesh),
                 ('rec_mesh_gt', rec_mesh_gt),
                 ('gt_Amesh', gt_Amesh),
-                
-                
-                
                 ])
             visualizer.display_current_results(visuals, num, 1000000)
         print (sum(loss)/len(loss))
