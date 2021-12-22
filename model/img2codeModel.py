@@ -343,7 +343,7 @@ class Image2TexcodeModule(pl.LightningModule):
         code = self( batch['image'] )
 
         # mesh loss
-        loss = self.l2loss(code, batch['meshcode'].detach() )
+        loss = self.l2loss(code, batch['texcode'].detach() )
 
         tqdm_dict = { "loss" :loss }
 
