@@ -341,8 +341,7 @@ class Image2TexcodeModule(pl.LightningModule):
 
         # generate images
         code = self( batch['image'] )
-        # regularization
-        # loss_code = ( code ** 2 ).mean()
+
         # mesh loss
         loss = self.l2loss(code, batch['meshcode'].detach() )
 

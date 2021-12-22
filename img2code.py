@@ -28,7 +28,6 @@ opt = TrainOptions().parse()
 if opt.debug:
     opt.nThreads = 1
 
-dm = FacescapeDataModule(opt)
 
 if  opt.name == 'img2meshcode':
     from model.img2codeModel import Image2MeshcodeModule as module
@@ -36,9 +35,11 @@ if  opt.name == 'img2meshcode':
 elif opt.name == 'MeshEncoderDecoder':
     from model.img2codeModel import MeshEncodeDecodeModule as module
     opt.datasetname = 'fs_mesh'
-elif opt.name == 'TexEncoderDecoder':
-    from model.img2codeModel import TexEncodeDecodeModule as module
-    opt.datasetname = 'fs_tex'
+elif  opt.name == 'img2texcode':
+    from model.img2codeModel import Image2TexcodeModule as module
+    opt.datasetname = 'fs_code'
+
+dm = FacescapeDataModule(opt)
 
 totalmeanmesh = torch.FloatTensor( np.load( "./predef/meanmesh.npy" ) )#.view(-1,3) 
 totalstdmesh = torch.FloatTensor(np.load( "./predef/meshstd.npy" ))#.view(-1,3)
