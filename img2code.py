@@ -47,9 +47,8 @@ meantex = torch.FloatTensor(np.load('./predef/meantex.npy')).permute(2, 0,1)
 stdtex = torch.FloatTensor(np.load('./predef/stdtex.npy')).permute(2,0,1)
 
 if opt.isTrain:
-    print ( opt.gpu_ids)
+    print ( opt.name)
     model = module(opt)
-    print (model)
     
     checkpoint_callback = ModelCheckpoint(
         monitor='train_loss',
