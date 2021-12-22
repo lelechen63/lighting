@@ -482,7 +482,7 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         
         self.data_list = pickle.load(_file)
         _file.close()
-        
+
         self.meantex = np.load('./predef/originalmeantex.npy')
         self.stdtex = np.load('./predef/originalstdtex.npy') + 0.00000001
       
@@ -654,9 +654,9 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
 
         # define transformation
         transform_list = [transforms.ToTensor()]
-        transform_list += [transforms.Normalize((0.5, 0.5, 0.5),
-                                                (0.5, 0.5, 0.5))]
-        self.transform = transforms.Compose(transform_list)
+        # transform_list += [transforms.Normalize((0.5, 0.5, 0.5),
+        #                                         (0.5, 0.5, 0.5))]
+        # self.transform = transforms.Compose(transform_list)
        
     def __getitem__(self, index):
                 
@@ -670,7 +670,7 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
             'meshcode': torch.FloatTensor(meshcode),
             'texcode': torch.FloatTensor(texcode),
             'mesh': torch.FloatTensor(mesh),
-            'tex': self.transform(tex),
+            'tex': tex, # self.transform(tex),
             'A_path': self.data_list[index],
             'image': self.transform(img)
             }
