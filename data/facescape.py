@@ -479,9 +479,10 @@ class FacescapeTexDataset(torch.utils.data.Dataset):
         else:
             _file = open(os.path.join(opt.dataroot, "lists/texmesh_test.pkl"), "rb")
             total_t = os.path.join(opt.dataroot, 'originalbigtex256test.npy' )
-        _file.close()
+        
         self.data_list = pickle.load(_file)
-
+        _file.close()
+        
         self.meantex = np.load('./predef/originalmeantex.npy')
         self.stdtex = np.load('./predef/originalstdtex.npy') + 0.00000001
       
