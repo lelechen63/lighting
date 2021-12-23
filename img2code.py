@@ -164,7 +164,7 @@ else:
     elif opt.name == 'img2texcode' :
         device = torch.device('cuda', 0)
         ImgEncoder = torch.load('./checkpoints/img2texcode/ImageEncoder.pth')
-        TexCodeDecoder = torch.load('./checkpoints/img2texcode/meshcode_dec.pth')
+        TexCodeDecoder = torch.load('./checkpoints/img2texcode/texcode_dec.pth')
         with dnnlib.util.open_url('/home/uss00022/lelechen/github/stylegannerf/checkpoints/00012-target-face256/network-snapshot-002400.pkl') as fp:
             Decoder = legacy.load_network_pkl(fp)['G_ema'].requires_grad_(False) # type: ignore
 
