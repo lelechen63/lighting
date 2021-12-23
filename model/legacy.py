@@ -12,7 +12,6 @@ import re
 import copy
 import numpy as np
 import torch
-from dnnlib import misc
 from . import dnnlib
 
 #----------------------------------------------------------------------------
@@ -56,7 +55,7 @@ def load_network_pkl(f, force_fp16=False):
                 kwargs.conv_clamp = 256
             if kwargs != old.init_kwargs:
                 new = type(old)(**kwargs).eval().requires_grad_(False)
-                misc.copy_params_and_buffers(old, new, require_all=True)
+                dnnlin.copy_params_and_buffers(old, new, require_all=True)
                 data[key] = new
     return data
 
@@ -87,7 +86,7 @@ def _collect_tf_params(tf_net):
 #----------------------------------------------------------------------------
 
 def _populate_module_params(module, *patterns):
-    for name, tensor in misc.named_params_and_buffers(module):
+    for name, tensor in dnnlib.named_params_and_buffers(module):
         found = False
         value = None
         for pattern, value_fn in zip(patterns[0::2], patterns[1::2]):
