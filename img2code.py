@@ -196,7 +196,7 @@ else:
             rec_tex = (rec_tex + 1) * (255/2)
             rec_tex = rec_tex.permute(0, 2, 3, 1).clamp(0, 255).to(torch.uint8)[0].cpu().numpy()
 
-            loss_tex = l2loss(fake_tex, batch['tex'][0] )
+            loss_tex = l2loss(fake_tex, batch['tex'][0].numpy() )
             print ("loss_tex: ", loss_tex, "  loss_code", loss_code)
             loss.append(loss_mesh)
             tmp = batch['A_path'][0].split('/')
