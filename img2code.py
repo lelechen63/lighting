@@ -192,7 +192,9 @@ else:
             fake_tex = (fake_tex + 1) * (255/2)
             fake_tex = fake_tex.permute(0, 2, 3, 1).clamp(0, 255).to(torch.uint8)[0].cpu()
             
-            loss_tex = l2loss(fake_tex, batch['tex'][0].numpy() )
+            print (fake_tex.shape)
+            print ( batch['tex'][0].shape)
+            loss_tex = l2loss(fake_tex, batch['tex'][0] )
  
             fake_tex = fake_tex.numpy()
             
