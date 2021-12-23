@@ -187,7 +187,7 @@ else:
             fakecode = TexCodeDecoder(img_fea)
             loss_code = l2loss(fakecode.cpu(), batch['texcode'].detach() )
             fakecode = fakecode.repeat(14,1)
-
+            fakecode[:,:] = 0
             fake_tex = Decoder.synthesis(fakecode.unsqueeze(0), noise_mode='const')
             fake_tex = (fake_tex + 1) * (255/2)
             fake_tex = fake_tex.permute(0, 2, 3, 1).clamp(0, 255).to(torch.uint8)[0].cpu()
@@ -207,9 +207,7 @@ else:
             loss.append(loss_tex)
             tmp = batch['A_path'][0].split('/')
             gt_tex = batch['tex'].to(torch.uint8)[0].cpu().numpy()
-            
-            print (fake_tex.shape, rec_tex.shape, gt_tex.shape)
-          
+                      
             visuals = OrderedDict([
                 ('fake_tex', fake_tex),
                 ('rec_tex', rec_tex),
