@@ -187,7 +187,7 @@ else:
             fakecode = TexCodeDecoder(img_fea)
             loss_code = l2loss(fakecode.cpu(), batch['texcode'].detach() )
             print (fakecode.shape, batch['texcode'].shape)
-            fakecode = fakecode.repeat(14,512)
+            fakecode = fakecode.repeat(14,1)
             print (fakecode.shape)
             print ('!!!')
 
