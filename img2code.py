@@ -200,7 +200,7 @@ else:
             print ("loss_tex: ", loss_tex, "  loss_code", loss_code)
             loss.append(loss_mesh)
             tmp = batch['A_path'][0].split('/')
-            gt_tex = batch['tex'].data[0].cpu() 
+            gt_tex = batch['tex'].data[0].cpu().numpy()
             
           
             visuals = OrderedDict([
