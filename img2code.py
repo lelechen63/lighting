@@ -195,7 +195,10 @@ else:
             rec_tex = Decoder.synthesis(batch['texcode'].repeat(14,1).unsqueeze(0).to(device), noise_mode='const')
             rec_tex = (rec_tex + 1) * (255/2)
             rec_tex = rec_tex.permute(0, 2, 3, 1).clamp(0, 255).to(torch.uint8)[0].cpu().numpy()
-
+            print ( batch['tex'][0].shape)
+            print (fake_tex.shape)
+            print (type( batch['tex'][0]))
+            print (type(fake_tex))
             loss_tex = l2loss(fake_tex, batch['tex'][0].numpy() )
             print ("loss_tex: ", loss_tex, "  loss_code", loss_code)
             loss.append(loss_mesh)
