@@ -206,7 +206,7 @@ else:
             print ("loss_tex: ", loss_tex, "  loss_code", loss_code)
             loss.append(loss_tex)
             tmp = batch['A_path'][0].split('/')
-            gt_tex = batch['tex'].data[0].cpu().numpy()
+            gt_tex = batch['tex'].to(torch.uint8)[0].cpu().numpy()
             
             print (fake_tex.shape, rec_tex.shape, gt_tex.shape)
           
