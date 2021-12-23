@@ -659,7 +659,6 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
         self.transform = transforms.Compose(transform_list)
        
     def __getitem__(self, index):
-        print (self.data_list[index])
         
         img = self.allimg[self.data_list[index]]
         meshcode = self.allcode[self.data_list[index]][0].reshape(-1) # 256

@@ -569,7 +569,7 @@ def get_front():
         pickle.dump(flist, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
-filter_list('debug')
+filter_list('test')
 
 
 # get_code()
