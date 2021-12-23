@@ -208,6 +208,7 @@ else:
             tmp = batch['A_path'][0].split('/')
             gt_tex = batch['tex'].data[0].cpu().numpy()
             
+            print (fake_tex.shape, rec_tex.shape, gt_tex.shape)
           
             visuals = OrderedDict([
                 ('fake_tex', fake_tex),
