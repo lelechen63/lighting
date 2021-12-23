@@ -36,7 +36,6 @@ from typing import Any, List, Tuple, Union
 # Util classes
 # ------------------------------------------------------------------------------------------
 
-
 class EasyDict(dict):
     """Convenience class that behaves like a dict but allows access with the attribute syntax."""
 
