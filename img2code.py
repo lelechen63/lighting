@@ -22,8 +22,8 @@ from util.render_class import meshrender
 import numpy as np
 from model.meshnetwork import *
 from util import mesh_sampling
-from model import legacy, dnnlib
-
+import  legacy
+import dnnlib
 
 opt = TrainOptions().parse()
 
