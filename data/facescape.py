@@ -654,9 +654,9 @@ class FacescapeImg2CodeDataset(torch.utils.data.Dataset):
 
         # define transformation
         transform_list = [transforms.ToTensor()]
-        # transform_list += [transforms.Normalize((0.5, 0.5, 0.5),
-        #                                         (0.5, 0.5, 0.5))]
-        # self.transform = transforms.Compose(transform_list)
+        transform_list += [transforms.Normalize((0.5, 0.5, 0.5),
+                                                (0.5, 0.5, 0.5))]
+        self.transform = transforms.Compose(transform_list)
        
     def __getitem__(self, index):
                 
