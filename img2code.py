@@ -186,7 +186,8 @@ else:
         
             fakecode = TexCodeDecoder(img_fea)
             loss_code = l2loss(fakecode.cpu(), batch['texcode'].detach() )
-            print (fakecode.shape)
+            print (fakecode.shape, batch['texcode'].shape)
+            fakecode = fakecode.repeat(14,0)
 
             rec_tex = Decoder.synthesis(fakecode.unsqueeze(0), noise_mode='const')
             rec_tex = (rec_tex + 1) * (255/2)
