@@ -375,4 +375,134 @@ class Image2TexcodeModule(pl.LightningModule):
             # self.trainer.save_checkpoint( os.path.join( self.ckpt_path, '%05d.ckpt'%self.current_epoch) )
             torch.save(self.ImageEncoder, os.path.join( self.ckpt_path, 'ImageEncoder.pth'))
             torch.save(self.texturecode_dec, os.path.join( self.ckpt_path, 'texturecode_dec.pth'))
+
+
+
+
+class Image2TexMeshcodeModule(pl.LightningModule):
+    def __init__(self, opt ):
+        super().__init__()
+        self.save_hyperparameters()
+        self.opt = opt
+        norm_layer = get_norm_layer(norm_type='batch')  
+        self.tex_shape = 256
+        ngf = 64
+        n_blocks = 4
+        padding_type='reflect'
+        # code_n = 512
+        activation = nn.ReLU(True)
+
+        model = [
+            nn.ReflectionPad2d(3), nn.Conv2d(3, ngf, kernel_size=7, padding=0),
+            norm_layer(ngf), 
+            nn.ReLU(True),  
+
+            nn.Conv2d(ngf , ngf  * 2, kernel_size=3, stride=2, padding=1),
+            norm_layer(ngf  * 2),
+            nn.ReLU(True),  # 2
+
+            nn.Conv2d( ngf * 2, ngf  * 2, kernel_size=3, stride=2, padding=1),
+            norm_layer(ngf  * 2),
+            nn.ReLU(True),  #4
+
+            nn.Conv2d(ngf*2 , ngf  * 4, kernel_size=3, stride=2, padding=1),
+            norm_layer(ngf  * 4),
+            nn.ReLU(True), # 8
+
+            nn.Conv2d(ngf*4 , ngf  * 4, kernel_size=3, stride=2, padding=1),
+            norm_layer(ngf  * 4),
+            nn.ReLU(True), # 16
+
+            nn.Conv2d(ngf*4 , ngf  * 8, kernel_size=3, stride=2, padding=1),
+            norm_layer(ngf  * 8),
+            nn.ReLU(True),  #32
+
+            nn.Conv2d(ngf*8 , ngf  * 8, kernel_size=3, stride=2, padding=1),
+            norm_layer(ngf  * 8),
+            nn.ReLU(True),  #64
+
+            nn.Conv2d(ngf*8 , ngf  * 16, kernel_size=3, stride=2, padding=1),
+            norm_layer(ngf  * 16),
+            nn.ReLU(True),  #128
+        ]
+        for i in range(n_blocks):
+            model += [ResnetBlock(ngf * 16, padding_type=padding_type, activation=activation, norm_layer=norm_layer)]
+        
+        self.ImageEncoder = nn.Sequential(*model)
+
+        self.enc_input_size = int(ngf * 16 * self.tex_shape/128 * self.tex_shape/128 )
+
+        self.texturecode_dec = nn.Sequential(
+            nn.Linear( self.enc_input_size, ngf*4),
+            nn.ReLU(True),
+            nn.Linear( ngf*4, ngf*4),
+            nn.ReLU(True),
+            nn.Linear( ngf*4, ngf*4),
+            nn.ReLU(True),
+            nn.Linear( ngf*4,512),
+            )
+
+        self.meshcode_dec = nn.Sequential(
+            nn.Linear( self.enc_input_size, ngf*4),
+            nn.ReLU(True),
+            nn.Linear( ngf*4, ngf*4),
+            nn.ReLU(True),
+            nn.Linear( ngf*4, ngf*4),
+            nn.ReLU(True),
+            nn.Linear( ngf*4,256),
+            )
+
+        
+        self.visualizer = Visualizer(opt)
+        self.ckpt_path = os.path.join(opt.checkpoints_dir, opt.name)
+        self.l2loss = torch.nn.MSELoss()
+
+    def forward(self, image ):
+        img_fea = self.ImageEncoder(image)
+        x = img_fea.view(img_fea.shape[0], -1)
+        
+        texcode = self.texturecode_dec(x)
+        meshcode = self.meshcode_dec(x)
+        return texcode, meshcode
+    
+    def training_step(self, batch, batch_idx):
+
+        # generate images
+        texcode, meshcode = self( batch['image'] )
+
+        # tex loss
+        loss_tex = self.l2loss(texcode, batch['texcode'].detach() )
+        loss_mesh = self.l2loss(meshcode, batch['meshcode'].detach() )
+        loss = loss_tex + loss_mesh
+        tqdm_dict = { "loss" :loss }
+
+        output = OrderedDict({
+            'loss': loss,
+            'progress_bar': tqdm_dict,
+            'log': tqdm_dict
+        })
+
+        errors = {k: v.data.item() if not isinstance(v, int) else v for k, v in tqdm_dict.items()}            
+        self.visualizer.print_current_errors(self.current_epoch, batch_idx, errors, 0)
+        self.visualizer.plot_current_errors(errors, batch_idx)
+        return output
+          
+    def configure_optimizers(self):
+        lr = self.opt.lr   
+        opt_g = torch.optim.Adam((list(self.ImageEncoder.parameters()) + list(self.texturecode_dec.parameters())), lr=lr, betas=(self.opt.beta1, 0.999))
+        def lr_foo(epoch):
+            lr_scale = 0.95 ** int(epoch/10)
+            if lr_scale < 0.08:
+                lr_scale = 0.08
+            return lr_scale
+        scheduler = torch.optim.lr_scheduler.LambdaLR( opt_g, lr_lambda=lr_foo )
+        return [opt_g], [scheduler]
+    
+    def on_epoch_end(self):
+        if self.current_epoch % 5 == 0:
+            # print ('!!!!!save model')
+            # self.trainer.save_checkpoint( os.path.join( self.ckpt_path, '%05d.ckpt'%self.current_epoch) )
+            torch.save(self.ImageEncoder, os.path.join( self.ckpt_path, 'ImageEncoder.pth'))
+            torch.save(self.texturecode_dec, os.path.join( self.ckpt_path, 'texturecode_dec.pth'))
+            torch.save(self.meshcode_dec, os.path.join( self.ckpt_path, 'meshcode_dec.pth'))
            

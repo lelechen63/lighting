@@ -40,6 +40,9 @@ elif opt.name == 'MeshEncoderDecoder':
 elif  opt.name == 'img2texcode':
     from model.img2codeModel import Image2TexcodeModule as module
     opt.datasetname = 'fs_code'
+elif  opt.name == 'img2texmeshcode':
+    from model.img2codeModel import Image2TexMeshcodeModule as module
+    opt.datasetname = 'fs_code'
 
 dm = FacescapeDataModule(opt)
 
