@@ -477,7 +477,7 @@ class Image2TexMeshcodeModule(pl.LightningModule):
         tqdm_dict = { "loss" :loss }
 
         output = OrderedDict({
-            'mesh loss': loss_mesh,
+            'loss': loss,
             'texture loss': loss_tex,
             'progress_bar': tqdm_dict,
             'log': tqdm_dict
