@@ -477,7 +477,8 @@ class Image2TexMeshcodeModule(pl.LightningModule):
         tqdm_dict = { "loss" :loss }
 
         output = OrderedDict({
-            'loss': loss,
+            'mesh loss': loss_mesh,
+            'texture loss': loss_tex,
             'progress_bar': tqdm_dict,
             'log': tqdm_dict
         })
@@ -489,7 +490,7 @@ class Image2TexMeshcodeModule(pl.LightningModule):
           
     def configure_optimizers(self):
         lr = self.opt.lr   
-        opt_g = torch.optim.Adam((list(self.ImageEncoder.parameters()) + list(self.texturecode_dec.parameters())), lr=lr, betas=(self.opt.beta1, 0.999))
+        opt_g = torch.optim.Adam((list(self.ImageEncoder.parameters()) + list(self.texturecode_dec.parameters()) + + list(self.meshcode_dec.parameters()) ), lr=lr, betas=(self.opt.beta1, 0.999))
         def lr_foo(epoch):
             lr_scale = 0.95 ** int(epoch/10)
             if lr_scale < 0.08:
