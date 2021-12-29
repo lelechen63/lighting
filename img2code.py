@@ -253,7 +253,7 @@ else:
  
             fake_tex = fake_tex.numpy()
             
-            rec_tex = Decoder.synthesis(batch['texcode'].repeat(14,1).unsqueeze(0).to(device), noise_mode='const')
+            rec_tex = texDecoder.synthesis(batch['texcode'].repeat(14,1).unsqueeze(0).to(device), noise_mode='const')
             rec_tex = (rec_tex + 1) * (255/2)
             rec_tex = rec_tex.permute(0, 2, 3, 1).clamp(0, 255).to(torch.uint8)[0].cpu().numpy()
             ###############
