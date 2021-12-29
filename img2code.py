@@ -220,7 +220,7 @@ else:
         device = torch.device('cuda', 0)
         ImgEncoder = torch.load('./checkpoints/img2texmeshcode/ImageEncoder.pth')
         TexCodeDecoder = torch.load('./checkpoints/img2texmeshcode/texturecode_dec.pth')
-        MeshCodeDecoder = torch.load('./checkpoints/img2texmeshxcode/meshcode_dec.pth')
+        MeshCodeDecoder = torch.load('./checkpoints/img2texmeshcode/meshcode_dec.pth')
         with dnnlib.util.open_url('/home/uss00022/lelechen/github/stylegannerf/checkpoints/00012-target-face256/network-snapshot-002400.pkl') as fp:
             texDecoder = legacy.load_network_pkl(fp)['G_ema'].requires_grad_(False) # type: ignore
         meshDecoder = torch.load('./checkpoints/MeshEncoderDecoder/decoder.pth')
