@@ -216,3 +216,80 @@ else:
                 ])
             visualizer.display_current_results(visuals, num, 1000000)
         print (sum(loss)/len(loss))
+    elif opt.name == 'img2texmeshcode' :
+        device = torch.device('cuda', 0)
+        ImgEncoder = torch.load('./checkpoints/img2texmeshcode/ImageEncoder.pth')
+        TexCodeDecoder = torch.load('./checkpoints/img2texmeshcode/texturecode_dec.pth')
+        MeshCodeDecoder = torch.load('./checkpoints/img2texmeshxcode/meshcode_dec.pth')
+        with dnnlib.util.open_url('/home/uss00022/lelechen/github/stylegannerf/checkpoints/00012-target-face256/network-snapshot-002400.pkl') as fp:
+            texDecoder = legacy.load_network_pkl(fp)['G_ema'].requires_grad_(False) # type: ignore
+        meshDecoder = torch.load('./checkpoints/MeshEncoderDecoder/decoder.pth')
+        dm.setup()
+        testdata = dm.test_dataloader()
+        opt.name = opt.name + '_test'
+        visualizer = Visualizer(opt)
+        l2loss = torch.nn.MSELoss()
+        ImgEncoder = ImgEncoder.to(device)
+        TexCodeDecoder = TexCodeDecoder.to(device)
+        texDecoder = texDecoder.to(device)
+        meshDecoder = meshDecoder.to(device)
+        loss = []
+        for num,batch in enumerate(testdata):
+            if num == 100:
+                break
+            
+            img_fea = ImgEncoder( batch['image'].to(device))
+            img_fea = img_fea.view(img_fea.shape[0], -1)
+        
+            faketexcode = TexCodeDecoder(img_fea)
+            loss_texcode = l2loss(faketexcode.cpu(), batch['texcode'].detach() )
+            faketexcode = faketexcode.repeat(14,1)
+            
+            fake_tex = texDecoder.synthesis(faketexcode.unsqueeze(0), noise_mode='const')
+            fake_tex = (fake_tex + 1) * (255/2)
+            fake_tex = fake_tex.permute(0, 2, 3, 1).clamp(0, 255).to(torch.uint8)[0].cpu()
+            
+            loss_tex = l2loss(fake_tex, batch['tex'][0] )
+ 
+            fake_tex = fake_tex.numpy()
+            
+            rec_tex = Decoder.synthesis(batch['texcode'].repeat(14,1).unsqueeze(0).to(device), noise_mode='const')
+            rec_tex = (rec_tex + 1) * (255/2)
+            rec_tex = rec_tex.permute(0, 2, 3, 1).clamp(0, 255).to(torch.uint8)[0].cpu().numpy()
+            ###############
+            fakemeshcode = MeshCodeDecoder(img_fea)
+            loss_meshcode = l2loss(fakemeshcode.cpu(), batch['meshcode'].detach() )
+            rec_mesh = meshDecoder(fakemeshcode)
+            rec_Amesh = rec_mesh.data[0].cpu().view(-1) * totalstdmesh + totalmeanmesh
+
+            rec_mesh_gt = Decoder(batch['meshcode'].to(device))
+            rec_mesh_gt = rec_mesh_gt.data[0].cpu().view(-1) * totalstdmesh + totalmeanmesh
+
+            loss_mesh = l2loss(rec_Amesh, batch['mesh'] )
+            print ("loss_mesh: ", loss_mesh, "  loss_code", loss_meshcode, "loss_tex: ", loss_tex, "  loss_code", loss_code)
+            loss.append(loss_mesh + loss_tex)
+            
+            tmp = batch['A_path'][0].split('/')
+            gt_mesh = batch['mesh'].data[0].cpu() 
+            
+            gt_mesh = gt_mesh.float()
+            rec_Amesh = rec_Amesh.float()
+            rec_mesh_gt = rec_mesh_gt.float()
+            gt_Amesh = meshrender( opt.dataroot, int(tmp[0]), int(tmp[-1].split('_')[0]),gt_mesh )
+            rec_Amesh = meshrender(opt.dataroot,int(tmp[0]), int(tmp[-1].split('_')[0]), rec_Amesh )
+            rec_mesh_gt = meshrender(opt.dataroot,int(tmp[0]), int(tmp[-1].split('_')[0]), rec_mesh_gt )
+            gt_Amesh = np.ascontiguousarray(gt_Amesh, dtype=np.uint8)
+
+            gt_tex = batch['tex'].to(torch.uint8)[0].cpu().numpy()     
+            visuals = OrderedDict([
+                ('fake_tex', fake_tex),
+                ('rec_tex', rec_tex),
+                ('gt_tex', gt_tex),
+                ('rec_Amesh', rec_Amesh),
+                ('rec_mesh_gt', rec_mesh_gt),
+                ('gt_Amesh', gt_Amesh)
+                ])
+
+
+            visualizer.display_current_results(visuals, num, 1000000)
+        print (sum(loss)/len(loss))
