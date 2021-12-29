@@ -262,7 +262,7 @@ else:
             rec_mesh = meshDecoder(fakemeshcode)
             rec_Amesh = rec_mesh.data[0].cpu().view(-1) * totalstdmesh + totalmeanmesh
 
-            rec_mesh_gt = Decoder(batch['meshcode'].to(device))
+            rec_mesh_gt = meshDecoder(batch['meshcode'].to(device))
             rec_mesh_gt = rec_mesh_gt.data[0].cpu().view(-1) * totalstdmesh + totalmeanmesh
 
             loss_mesh = l2loss(rec_Amesh, batch['mesh'] )
