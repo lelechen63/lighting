@@ -266,7 +266,7 @@ else:
             rec_mesh_gt = rec_mesh_gt.data[0].cpu().view(-1) * totalstdmesh + totalmeanmesh
 
             loss_mesh = l2loss(rec_Amesh, batch['mesh'] )
-            print ("loss_mesh: ", loss_mesh, "  loss_code", loss_meshcode, "loss_tex: ", loss_tex, "  loss_code", loss_code)
+            print ("loss_mesh: ", loss_mesh, "  loss_meshcode", loss_meshcode, "loss_tex: ", loss_tex, "  loss_texcode", loss_texcode)
             loss.append(loss_mesh + loss_tex)
             
             tmp = batch['A_path'][0].split('/')
