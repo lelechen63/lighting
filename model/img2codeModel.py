@@ -389,68 +389,72 @@ class Image2TexMeshcodeModule(pl.LightningModule):
         ngf = 64
         n_blocks = 4
         padding_type='reflect'
-        # code_n = 512
         activation = nn.ReLU(True)
+        if opt.pretrain:
+            self.ImageEncoder = torch.load('./checkpoints/img2texmeshcode/ImageEncoder.pth')
+            self.texturecode_dec = torch.load('./checkpoints/img2texmeshcode/texturecode_dec.pth')
+            self.meshcode_dec = torch.load('./checkpoints/img2texmeshcode/meshcode_dec.pth')
 
-        model = [
-            nn.ReflectionPad2d(3), nn.Conv2d(3, ngf, kernel_size=7, padding=0),
-            norm_layer(ngf), 
-            nn.ReLU(True),  
+        else:
+            model = [
+                nn.ReflectionPad2d(3), nn.Conv2d(3, ngf, kernel_size=7, padding=0),
+                norm_layer(ngf), 
+                nn.ReLU(True),  
 
-            nn.Conv2d(ngf , ngf  * 2, kernel_size=3, stride=2, padding=1),
-            norm_layer(ngf  * 2),
-            nn.ReLU(True),  # 2
+                nn.Conv2d(ngf , ngf  * 2, kernel_size=3, stride=2, padding=1),
+                norm_layer(ngf  * 2),
+                nn.ReLU(True),  # 2
 
-            nn.Conv2d( ngf * 2, ngf  * 2, kernel_size=3, stride=2, padding=1),
-            norm_layer(ngf  * 2),
-            nn.ReLU(True),  #4
+                nn.Conv2d( ngf * 2, ngf  * 2, kernel_size=3, stride=2, padding=1),
+                norm_layer(ngf  * 2),
+                nn.ReLU(True),  #4
 
-            nn.Conv2d(ngf*2 , ngf  * 4, kernel_size=3, stride=2, padding=1),
-            norm_layer(ngf  * 4),
-            nn.ReLU(True), # 8
+                nn.Conv2d(ngf*2 , ngf  * 4, kernel_size=3, stride=2, padding=1),
+                norm_layer(ngf  * 4),
+                nn.ReLU(True), # 8
 
-            nn.Conv2d(ngf*4 , ngf  * 4, kernel_size=3, stride=2, padding=1),
-            norm_layer(ngf  * 4),
-            nn.ReLU(True), # 16
+                nn.Conv2d(ngf*4 , ngf  * 4, kernel_size=3, stride=2, padding=1),
+                norm_layer(ngf  * 4),
+                nn.ReLU(True), # 16
 
-            nn.Conv2d(ngf*4 , ngf  * 8, kernel_size=3, stride=2, padding=1),
-            norm_layer(ngf  * 8),
-            nn.ReLU(True),  #32
+                nn.Conv2d(ngf*4 , ngf  * 8, kernel_size=3, stride=2, padding=1),
+                norm_layer(ngf  * 8),
+                nn.ReLU(True),  #32
 
-            nn.Conv2d(ngf*8 , ngf  * 8, kernel_size=3, stride=2, padding=1),
-            norm_layer(ngf  * 8),
-            nn.ReLU(True),  #64
+                nn.Conv2d(ngf*8 , ngf  * 8, kernel_size=3, stride=2, padding=1),
+                norm_layer(ngf  * 8),
+                nn.ReLU(True),  #64
 
-            nn.Conv2d(ngf*8 , ngf  * 16, kernel_size=3, stride=2, padding=1),
-            norm_layer(ngf  * 16),
-            nn.ReLU(True),  #128
-        ]
-        for i in range(n_blocks):
-            model += [ResnetBlock(ngf * 16, padding_type=padding_type, activation=activation, norm_layer=norm_layer)]
-        
-        self.ImageEncoder = nn.Sequential(*model)
+                nn.Conv2d(ngf*8 , ngf  * 16, kernel_size=3, stride=2, padding=1),
+                norm_layer(ngf  * 16),
+                nn.ReLU(True),  #128
+            ]
+            for i in range(n_blocks):
+                model += [ResnetBlock(ngf * 16, padding_type=padding_type, activation=activation, norm_layer=norm_layer)]
+            
+            self.ImageEncoder = nn.Sequential(*model)
 
-        self.enc_input_size = int(ngf * 16 * self.tex_shape/128 * self.tex_shape/128 )
+            self.enc_input_size = int(ngf * 16 * self.tex_shape/128 * self.tex_shape/128 )
 
-        self.texturecode_dec = nn.Sequential(
-            nn.Linear( self.enc_input_size, ngf*4),
-            nn.ReLU(True),
-            nn.Linear( ngf*4, ngf*4),
-            nn.ReLU(True),
-            nn.Linear( ngf*4, ngf*4),
-            nn.ReLU(True),
-            nn.Linear( ngf*4,512),
-            )
+            self.texturecode_dec = nn.Sequential(
+                nn.Linear( self.enc_input_size, ngf*4),
+                nn.ReLU(True),
+                nn.Linear( ngf*4, ngf*4),
+                nn.ReLU(True),
+                nn.Linear( ngf*4, ngf*4),
+                nn.ReLU(True),
+                nn.Linear( ngf*4,512),
+                )
 
-        self.meshcode_dec = nn.Sequential(
-            nn.Linear( self.enc_input_size, ngf*4),
-            nn.ReLU(True),
-            nn.Linear( ngf*4, ngf*4),
-            nn.ReLU(True),
-            nn.Linear( ngf*4, ngf*4),
-            nn.ReLU(True),
-            nn.Linear( ngf*4,256),
-            )
+            self.meshcode_dec = nn.Sequential(
+                nn.Linear( self.enc_input_size, ngf*4),
+                nn.ReLU(True),
+                nn.Linear( ngf*4, ngf*4),
+                nn.ReLU(True),
+                nn.Linear( ngf*4, ngf*4),
+                nn.ReLU(True),
+                nn.Linear( ngf*4,256),
+                )
 
         
         self.visualizer = Visualizer(opt)
