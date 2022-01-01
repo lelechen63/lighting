@@ -473,7 +473,7 @@ class Image2TexMeshcodeModule(pl.LightningModule):
         # tex loss
         loss_tex = self.l2loss(texcode, batch['texcode'].detach() )
         loss_mesh = self.l2loss(meshcode, batch['meshcode'].detach() )
-        loss = loss_tex + loss_mesh
+        loss = loss_tex + loss_mesh * 1000
         tqdm_dict = { "loss" :loss }
 
         output = OrderedDict({
